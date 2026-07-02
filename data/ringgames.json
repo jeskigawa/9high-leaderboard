@@ -1,0 +1,265 @@
+{
+  "sessions": [
+    {
+      "date": "2026-06-02",
+      "playerId": "p1",
+      "playerName": "田中太郎",
+      "buyIn": 20000,
+      "cashOut": 45000,
+      "netChips": 25000,
+      "duration": 4.5
+    },
+    {
+      "date": "2026-06-02",
+      "playerId": "p2",
+      "playerName": "佐藤花子",
+      "buyIn": 20000,
+      "cashOut": 32000,
+      "netChips": 12000,
+      "duration": 3.0
+    },
+    {
+      "date": "2026-06-02",
+      "playerId": "p3",
+      "playerName": "鈴木一郎",
+      "buyIn": 20000,
+      "cashOut": 8000,
+      "netChips": -12000,
+      "duration": 2.5
+    },
+    {
+      "date": "2026-06-05",
+      "playerId": "p1",
+      "playerName": "田中太郎",
+      "buyIn": 20000,
+      "cashOut": 15000,
+      "netChips": -5000,
+      "duration": 3.0
+    },
+    {
+      "date": "2026-06-05",
+      "playerId": "p4",
+      "playerName": "山田健二",
+      "buyIn": 20000,
+      "cashOut": 55000,
+      "netChips": 35000,
+      "duration": 5.0
+    },
+    {
+      "date": "2026-06-05",
+      "playerId": "p6",
+      "playerName": "伊藤直人",
+      "buyIn": 20000,
+      "cashOut": 28000,
+      "netChips": 8000,
+      "duration": 4.0
+    },
+    {
+      "date": "2026-06-09",
+      "playerId": "p1",
+      "playerName": "田中太郎",
+      "buyIn": 20000,
+      "cashOut": 38000,
+      "netChips": 18000,
+      "duration": 4.0
+    },
+    {
+      "date": "2026-06-09",
+      "playerId": "p5",
+      "playerName": "高橋美咲",
+      "buyIn": 20000,
+      "cashOut": 42000,
+      "netChips": 22000,
+      "duration": 5.5
+    },
+    {
+      "date": "2026-06-09",
+      "playerId": "p3",
+      "playerName": "鈴木一郎",
+      "buyIn": 20000,
+      "cashOut": 30000,
+      "netChips": 10000,
+      "duration": 3.5
+    },
+    {
+      "date": "2026-06-12",
+      "playerId": "p2",
+      "playerName": "佐藤花子",
+      "buyIn": 20000,
+      "cashOut": 48000,
+      "netChips": 28000,
+      "duration": 6.0
+    },
+    {
+      "date": "2026-06-12",
+      "playerId": "p7",
+      "playerName": "渡辺裕子",
+      "buyIn": 20000,
+      "cashOut": 35000,
+      "netChips": 15000,
+      "duration": 4.0
+    },
+    {
+      "date": "2026-06-12",
+      "playerId": "p8",
+      "playerName": "中村大輔",
+      "buyIn": 20000,
+      "cashOut": 10000,
+      "netChips": -10000,
+      "duration": 2.0
+    },
+    {
+      "date": "2026-06-16",
+      "playerId": "p1",
+      "playerName": "田中太郎",
+      "buyIn": 20000,
+      "cashOut": 52000,
+      "netChips": 32000,
+      "duration": 5.0
+    },
+    {
+      "date": "2026-06-16",
+      "playerId": "p6",
+      "playerName": "伊藤直人",
+      "buyIn": 20000,
+      "cashOut": 44000,
+      "netChips": 24000,
+      "duration": 4.5
+    },
+    {
+      "date": "2026-06-16",
+      "playerId": "p9",
+      "playerName": "小林真理",
+      "buyIn": 20000,
+      "cashOut": 25000,
+      "netChips": 5000,
+      "duration": 3.0
+    },
+    {
+      "date": "2026-06-19",
+      "playerId": "p5",
+      "playerName": "高橋美咲",
+      "buyIn": 20000,
+      "cashOut": 38000,
+      "netChips": 18000,
+      "duration": 4.0
+    },
+    {
+      "date": "2026-06-19",
+      "playerId": "p10",
+      "playerName": "松本優",
+      "buyIn": 20000,
+      "cashOut": 60000,
+      "netChips": 40000,
+      "duration": 6.0
+    },
+    {
+      "date": "2026-06-19",
+      "playerId": "p3",
+      "playerName": "鈴木一郎",
+      "buyIn": 20000,
+      "cashOut": 22000,
+      "netChips": 2000,
+      "duration": 2.0
+    },
+    {
+      "date": "2026-06-23",
+      "playerId": "p4",
+      "playerName": "山田健二",
+      "buyIn": 20000,
+      "cashOut": 30000,
+      "netChips": 10000,
+      "duration": 3.5
+    },
+    {
+      "date": "2026-06-23",
+      "playerId": "p2",
+      "playerName": "佐藤花子",
+      "buyIn": 20000,
+      "cashOut": 5000,
+      "netChips": -15000,
+      "duration": 1.5
+    },
+    {
+      "date": "2026-06-23",
+      "playerId": "p1",
+      "playerName": "田中太郎",
+      "buyIn": 20000,
+      "cashOut": 28000,
+      "netChips": 8000,
+      "duration": 3.0
+    },
+    {
+      "date": "2026-05-05",
+      "playerId": "p1",
+      "playerName": "田中太郎",
+      "buyIn": 20000,
+      "cashOut": 35000,
+      "netChips": 15000,
+      "duration": 4.0
+    },
+    {
+      "date": "2026-05-05",
+      "playerId": "p3",
+      "playerName": "鈴木一郎",
+      "buyIn": 20000,
+      "cashOut": 50000,
+      "netChips": 30000,
+      "duration": 5.0
+    },
+    {
+      "date": "2026-05-12",
+      "playerId": "p2",
+      "playerName": "佐藤花子",
+      "buyIn": 20000,
+      "cashOut": 40000,
+      "netChips": 20000,
+      "duration": 4.5
+    },
+    {
+      "date": "2026-05-12",
+      "playerId": "p5",
+      "playerName": "高橋美咲",
+      "buyIn": 20000,
+      "cashOut": 33000,
+      "netChips": 13000,
+      "duration": 3.5
+    },
+    {
+      "date": "2026-05-19",
+      "playerId": "p4",
+      "playerName": "山田健二",
+      "buyIn": 20000,
+      "cashOut": 45000,
+      "netChips": 25000,
+      "duration": 5.0
+    },
+    {
+      "date": "2026-05-19",
+      "playerId": "p6",
+      "playerName": "伊藤直人",
+      "buyIn": 20000,
+      "cashOut": 18000,
+      "netChips": -2000,
+      "duration": 2.0
+    },
+    {
+      "date": "2026-05-26",
+      "playerId": "p7",
+      "playerName": "渡辺裕子",
+      "buyIn": 20000,
+      "cashOut": 52000,
+      "netChips": 32000,
+      "duration": 6.0
+    },
+    {
+      "date": "2026-05-26",
+      "playerId": "p8",
+      "playerName": "中村大輔",
+      "buyIn": 20000,
+      "cashOut": 26000,
+      "netChips": 6000,
+      "duration": 3.0
+    }
+  ]
+}

@@ -1,0 +1,133 @@
+{
+  "tournaments": [
+    {
+      "id": "weekly-nlh",
+      "name": "Weekly NLH",
+      "type": "NLH"
+    },
+    {
+      "id": "monthly-deepstack",
+      "name": "Monthly Deep Stack",
+      "type": "NLH"
+    },
+    {
+      "id": "bounty-hunter",
+      "name": "Bounty Hunter",
+      "type": "NLH"
+    }
+  ],
+  "results": [
+    {
+      "tournamentId": "weekly-nlh",
+      "date": "2026-06-01",
+      "entries": 24,
+      "results": [
+        { "playerId": "p1", "playerName": "田中太郎", "rank": 1, "points": 100, "prize": 50000 },
+        { "playerId": "p2", "playerName": "佐藤花子", "rank": 2, "points": 70, "prize": 30000 },
+        { "playerId": "p3", "playerName": "鈴木一郎", "rank": 3, "points": 50, "prize": 20000 },
+        { "playerId": "p4", "playerName": "山田健二", "rank": 4, "points": 40, "prize": 0 },
+        { "playerId": "p5", "playerName": "高橋美咲", "rank": 5, "points": 30, "prize": 0 }
+      ]
+    },
+    {
+      "tournamentId": "weekly-nlh",
+      "date": "2026-06-08",
+      "entries": 28,
+      "results": [
+        { "playerId": "p2", "playerName": "佐藤花子", "rank": 1, "points": 100, "prize": 55000 },
+        { "playerId": "p6", "playerName": "伊藤直人", "rank": 2, "points": 70, "prize": 33000 },
+        { "playerId": "p1", "playerName": "田中太郎", "rank": 3, "points": 50, "prize": 22000 },
+        { "playerId": "p7", "playerName": "渡辺裕子", "rank": 4, "points": 40, "prize": 0 },
+        { "playerId": "p8", "playerName": "中村大輔", "rank": 5, "points": 30, "prize": 0 }
+      ]
+    },
+    {
+      "tournamentId": "weekly-nlh",
+      "date": "2026-06-15",
+      "entries": 22,
+      "results": [
+        { "playerId": "p3", "playerName": "鈴木一郎", "rank": 1, "points": 100, "prize": 44000 },
+        { "playerId": "p1", "playerName": "田中太郎", "rank": 2, "points": 70, "prize": 26000 },
+        { "playerId": "p9", "playerName": "小林真理", "rank": 3, "points": 50, "prize": 18000 },
+        { "playerId": "p5", "playerName": "高橋美咲", "rank": 4, "points": 40, "prize": 0 },
+        { "playerId": "p2", "playerName": "佐藤花子", "rank": 5, "points": 30, "prize": 0 }
+      ]
+    },
+    {
+      "tournamentId": "weekly-nlh",
+      "date": "2026-06-22",
+      "entries": 26,
+      "results": [
+        { "playerId": "p5", "playerName": "高橋美咲", "rank": 1, "points": 100, "prize": 52000 },
+        { "playerId": "p4", "playerName": "山田健二", "rank": 2, "points": 70, "prize": 31000 },
+        { "playerId": "p6", "playerName": "伊藤直人", "rank": 3, "points": 50, "prize": 21000 },
+        { "playerId": "p1", "playerName": "田中太郎", "rank": 4, "points": 40, "prize": 0 },
+        { "playerId": "p10", "playerName": "松本優", "rank": 5, "points": 30, "prize": 0 }
+      ]
+    },
+    {
+      "tournamentId": "monthly-deepstack",
+      "date": "2026-06-14",
+      "entries": 40,
+      "results": [
+        { "playerId": "p6", "playerName": "伊藤直人", "rank": 1, "points": 150, "prize": 120000 },
+        { "playerId": "p1", "playerName": "田中太郎", "rank": 2, "points": 105, "prize": 72000 },
+        { "playerId": "p3", "playerName": "鈴木一郎", "rank": 3, "points": 75, "prize": 48000 },
+        { "playerId": "p2", "playerName": "佐藤花子", "rank": 4, "points": 60, "prize": 24000 },
+        { "playerId": "p9", "playerName": "小林真理", "rank": 5, "points": 45, "prize": 0 }
+      ]
+    },
+    {
+      "tournamentId": "bounty-hunter",
+      "date": "2026-06-21",
+      "entries": 32,
+      "results": [
+        { "playerId": "p1", "playerName": "田中太郎", "rank": 1, "points": 120, "prize": 80000 },
+        { "playerId": "p5", "playerName": "高橋美咲", "rank": 2, "points": 84, "prize": 48000 },
+        { "playerId": "p7", "playerName": "渡辺裕子", "rank": 3, "points": 60, "prize": 32000 },
+        { "playerId": "p10", "playerName": "松本優", "rank": 4, "points": 48, "prize": 16000 },
+        { "playerId": "p4", "playerName": "山田健二", "rank": 5, "points": 36, "prize": 0 }
+      ]
+    },
+    {
+      "tournamentId": "weekly-nlh",
+      "date": "2026-05-04",
+      "entries": 20,
+      "results": [
+        { "playerId": "p8", "playerName": "中村大輔", "rank": 1, "points": 100, "prize": 40000 },
+        { "playerId": "p1", "playerName": "田中太郎", "rank": 2, "points": 70, "prize": 24000 },
+        { "playerId": "p9", "playerName": "小林真理", "rank": 3, "points": 50, "prize": 16000 }
+      ]
+    },
+    {
+      "tournamentId": "weekly-nlh",
+      "date": "2026-05-11",
+      "entries": 25,
+      "results": [
+        { "playerId": "p3", "playerName": "鈴木一郎", "rank": 1, "points": 100, "prize": 50000 },
+        { "playerId": "p6", "playerName": "伊藤直人", "rank": 2, "points": 70, "prize": 30000 },
+        { "playerId": "p2", "playerName": "佐藤花子", "rank": 3, "points": 50, "prize": 20000 }
+      ]
+    },
+    {
+      "tournamentId": "weekly-nlh",
+      "date": "2026-05-18",
+      "entries": 30,
+      "results": [
+        { "playerId": "p1", "playerName": "田中太郎", "rank": 1, "points": 100, "prize": 60000 },
+        { "playerId": "p5", "playerName": "高橋美咲", "rank": 2, "points": 70, "prize": 36000 },
+        { "playerId": "p4", "playerName": "山田健二", "rank": 3, "points": 50, "prize": 24000 }
+      ]
+    },
+    {
+      "tournamentId": "weekly-nlh",
+      "date": "2026-05-25",
+      "entries": 22,
+      "results": [
+        { "playerId": "p7", "playerName": "渡辺裕子", "rank": 1, "points": 100, "prize": 44000 },
+        { "playerId": "p10", "playerName": "松本優", "rank": 2, "points": 70, "prize": 26000 },
+        { "playerId": "p1", "playerName": "田中太郎", "rank": 3, "points": 50, "prize": 18000 }
+      ]
+    }
+  ]
+}
