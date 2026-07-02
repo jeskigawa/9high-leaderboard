@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>9HIGH 仙台 リーダーボード</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.9/babel.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg-primary: #f5f5f5;
+      --bg-secondary: #ffffff;
+      --bg-card: #ffffff;
+      --bg-hover: #f0f0f0;
+      --text-primary: #1a1a2e;
+      --text-secondary: #555566;
+      --text-muted: #999aaa;
+      --accent: #d4a017;
+      --accent-light: #f5e6b8;
+      --accent-hover: #b8860b;
+      --border: #e0e0e8;
+      --gold: #d4a017;
+      --gold-light: #fff3d0;
+      --gold-border: #d4a017;
+      --silver: #8a8a9a;
+      --silver-light: #f0f0f5;
+      --silver-border: #8a8a9a;
+      --bronze: #b87333;
+      --bronze-light: #faebd7;
+      --bronze-border: #b87333;
+      --positive: #16a34a;
+      --negative: #dc2626;
+      --brand: #C3181F;
+      --shadow: 0 2px 12px rgba(0,0,0,0.08);
+      --shadow-lg: 0 4px 24px rgba(0,0,0,0.12);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Noto Sans JP', sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+    }
+    .container { max-width: 640px; margin: 0 auto; padding: 0 16px; }
+
+    /* ==================== HEADER ==================== */
+    .header {
+      background: var(--brand); padding: 14px 20px;
+      display: flex; align-items: center; gap: 14px;
+      border-radius: 0 0 14px 14px; margin-bottom: 4px;
+      position: relative;
+    }
+    .header-logo-svg {
+      height: 48px; flex-shrink: 0;
+    }
+    .header-title {
+      font-size: 15px; font-weight: 700; color: rgba(255,255,255,0.95);
+      letter-spacing: 0.5px;
+    }
+
+    /* ==================== MONTH SELECTOR ==================== */
+    .month-selector {
+      display: flex; align-items: center; justify-content: center;
+      gap: 12px; padding: 16px 0;
+    }
+    .month-btn {
+      background: var(--bg-secondary); border: 1px solid var(--border);
+      color: var(--text-primary); width: 36px; height: 36px;
+      border-radius: 50%; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px; transition: all 0.2s; box-shadow: var(--shadow);
+    }
+    .month-btn:hover { background: var(--bg-hover); border-color: var(--accent); }
+    .month-display { font-size: 18px; font-weight: 600; min-width: 160px; text-align: center; }
+
+    /* ==================== MAIN TABS ==================== */
+    .main-tabs { display: flex; border-bottom: 2px solid var(--border); }
+    .main-tab {
+      flex: 1; padding: 12px 8px; text-align: center;
+      font-size: 14px; font-weight: 600; cursor: pointer;
+      color: var(--text-muted); border-bottom: 3px solid transparent;
+      transition: all 0.2s; background: none;
+      border-top: none; border-left: none; border-right: none;
+    }
+    .main-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+    .main-tab:hover:not(.active) { color: var(--text-secondary); }
+
+    /* ==================== PERIOD TABS ==================== */
+    .sub-tabs { display: flex; gap: 6px; padding: 12px 0; flex-wrap: wrap; }
+    .sub-tab {
+      padding: 5px 12px; border-radius: 20px; font-size: 12px;
+      font-weight: 500; cursor: pointer;
+      border: 1px solid var(--border); background: var(--bg-secondary);
+      color: var(--text-secondary); transition: all 0.2s;
+    }
+    .sub-tab.active { background: var(--text-primary); color: #fff; border-color: var(--text-primary); }
+    .sub-tab:hover:not(.active) { background: var(--bg-hover); }
+
+    /* ==================== SECTION ==================== */
+    .leaderboard-section { margin-bottom: 24px; }
+    .section-title {
+      font-size: 15px; font-weight: 600; color: var(--accent);
+      margin-bottom: 12px; display: flex; align-items: center; gap: 8px;
+    }
+    .section-title::before {
+      content: ''; display: inline-block; width: 4px; height: 16px;
+      background: var(--accent); border-radius: 2px;
+    }
+
+    /* ==================== PODIUM ==================== */
+    .podium-container {
+      display: flex; justify-content: center; align-items: flex-end;
+      gap: 8px; padding: 20px 0 24px; margin-bottom: 8px;
+    }
+    .podium-card {
+      display: flex; flex-direction: column; align-items: center;
+      background: var(--bg-secondary); border-radius: 16px;
+      padding: 16px 12px 14px; cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+      position: relative; width: 120px;
+      box-shadow: var(--shadow);
+    }
+    .podium-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+    .podium-card.podium-1 { border: 2px solid var(--gold-border); padding-top: 28px; min-height: 190px; order: 2; }
+    .podium-card.podium-2 { border: 2px solid var(--silver-border); min-height: 165px; order: 1; }
+    .podium-card.podium-3 { border: 2px solid var(--bronze-border); min-height: 155px; order: 3; }
+
+    .podium-crown {
+      position: absolute; top: -18px; left: 50%; transform: translateX(-50%);
+      font-size: 24px; filter: drop-shadow(0 2px 4px rgba(212,160,23,0.4));
+    }
+    .podium-medal {
+      position: absolute; top: 8px; right: 8px;
+      width: 28px; height: 28px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 800; color: #fff;
+      clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+    }
+    .podium-medal.medal-1 { background: var(--gold); }
+    .podium-medal.medal-2 { background: var(--silver); }
+    .podium-medal.medal-3 { background: var(--bronze); }
+
+    .podium-photo {
+      width: 64px; height: 64px; border-radius: 50%; overflow: hidden;
+      margin-bottom: 8px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      background: var(--bg-hover);
+    }
+    .podium-1 .podium-photo { width: 80px; height: 80px; border: 3px solid var(--gold-border); box-shadow: 0 0 0 4px var(--gold-light); }
+    .podium-2 .podium-photo { border: 3px solid var(--silver-border); box-shadow: 0 0 0 3px var(--silver-light); }
+    .podium-3 .podium-photo { border: 3px solid var(--bronze-border); box-shadow: 0 0 0 3px var(--bronze-light); }
+    .podium-photo img { width: 100%; height: 100%; object-fit: cover; }
+    .podium-photo-placeholder { font-size: 28px; color: var(--text-muted); }
+
+    .podium-name {
+      font-size: 13px; font-weight: 700; text-align: center;
+      margin-bottom: 4px; line-height: 1.3;
+      max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .podium-1 .podium-name { color: var(--gold); font-size: 15px; }
+    .podium-2 .podium-name { color: var(--silver); }
+    .podium-3 .podium-name { color: var(--bronze); }
+    .podium-stats { font-size: 12px; color: var(--text-muted); text-align: center; }
+
+    /* ==================== TABLE ==================== */
+    .leaderboard-table {
+      width: 100%; border-collapse: collapse;
+      background: var(--bg-secondary); border-radius: 12px;
+      overflow: hidden; box-shadow: var(--shadow);
+    }
+    .leaderboard-table thead th {
+      font-size: 12px; font-weight: 600; color: var(--text-muted);
+      text-transform: uppercase; letter-spacing: 0.5px;
+      padding: 10px 12px; text-align: left;
+      border-bottom: 2px solid var(--border); background: var(--bg-primary);
+    }
+    .leaderboard-table thead th:last-child,
+    .leaderboard-table thead th:nth-child(3),
+    .leaderboard-table thead th:nth-child(4) { text-align: right; }
+    .leaderboard-table tbody tr {
+      border-bottom: 1px solid var(--border);
+      cursor: pointer; transition: background 0.15s;
+    }
+    .leaderboard-table tbody tr:last-child { border-bottom: none; }
+    .leaderboard-table tbody tr:hover { background: var(--bg-hover); }
+    .leaderboard-table td { padding: 12px; font-size: 14px; }
+    .leaderboard-table td:last-child,
+    .leaderboard-table td:nth-child(3),
+    .leaderboard-table td:nth-child(4) { text-align: right; }
+
+    .rank-badge {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 28px; height: 28px; border-radius: 50%;
+      font-size: 13px; font-weight: 700;
+    }
+    .rank-1 { background: linear-gradient(135deg, #f5e6b8, #d4a017); color: #fff; }
+    .rank-2 { background: linear-gradient(135deg, #e0e0e8, #8a8a9a); color: #fff; }
+    .rank-3 { background: linear-gradient(135deg, #faebd7, #b87333); color: #fff; }
+    .rank-other { background: var(--bg-hover); color: var(--text-secondary); }
+
+    .player-cell { display: flex; align-items: center; gap: 10px; }
+    .player-avatar {
+      width: 36px; height: 36px; border-radius: 50%; overflow: hidden;
+      background: var(--bg-hover); flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      border: 2px solid var(--border);
+    }
+    .player-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .player-avatar-placeholder { font-size: 16px; color: var(--text-muted); }
+    .player-name { font-weight: 500; color: var(--text-primary); }
+    .player-name:hover { color: var(--accent); }
+
+    .points-value { font-weight: 600; color: var(--accent); }
+    .wins-value { color: var(--text-secondary); }
+    .chips-positive { color: var(--positive); font-weight: 600; }
+    .chips-negative { color: var(--negative); font-weight: 600; }
+
+    /* ==================== MODAL ==================== */
+    .modal-overlay {
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.4); display: flex;
+      align-items: center; justify-content: center;
+      z-index: 100; animation: fadeIn 0.2s;
+      padding: 5vh 16px;
+    }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    .modal-content {
+      background: var(--bg-secondary); width: 100%; max-width: 640px;
+      max-height: 90vh; border-radius: 16px;
+      padding: 24px; overflow-y: auto; animation: slideUp 0.25s;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.25);
+    }
+    .modal-header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 20px;
+    }
+    .modal-close {
+      background: var(--bg-hover); border: none; color: var(--text-primary);
+      width: 32px; height: 32px; border-radius: 50%; cursor: pointer;
+      font-size: 18px; display: flex; align-items: center; justify-content: center;
+    }
+    .modal-close:hover { background: var(--border); }
+    .modal-player-header {
+      display: flex; align-items: center; gap: 16px; margin-bottom: 20px;
+    }
+    .modal-player-photo {
+      width: 64px; height: 64px; border-radius: 50%; overflow: hidden;
+      background: var(--bg-hover); display: flex;
+      align-items: center; justify-content: center;
+      border: 3px solid var(--accent); flex-shrink: 0;
+    }
+    .modal-player-photo img { width: 100%; height: 100%; object-fit: cover; }
+    .modal-player-photo-placeholder { font-size: 28px; color: var(--text-muted); }
+    .modal-player-name { font-size: 20px; font-weight: 700; }
+    .modal-player-nickname { font-size: 13px; color: var(--text-muted); }
+
+    .modal-stat-grid {
+      display: grid; grid-template-columns: repeat(2, 1fr);
+      gap: 12px; margin-bottom: 20px;
+    }
+    .modal-stat-card {
+      background: var(--bg-primary); border-radius: 12px;
+      padding: 16px; text-align: center; border: 1px solid var(--border);
+    }
+    .modal-stat-label {
+      font-size: 11px; color: var(--text-muted);
+      text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;
+    }
+    .modal-stat-value { font-size: 20px; font-weight: 700; }
+
+    .detail-table { width: 100%; border-collapse: collapse; margin-top: 16px; }
+    .detail-table th {
+      font-size: 11px; color: var(--text-muted); text-align: left;
+      padding: 8px; border-bottom: 2px solid var(--border);
+    }
+    .detail-table td {
+      padding: 8px; font-size: 13px;
+      border-bottom: 1px solid var(--border);
+    }
+    .detail-table td:not(:first-child),
+    .detail-table th:not(:first-child) { text-align: right; }
+
+    /* ==================== MISC ==================== */
+    .info-note {
+      font-size: 12px; color: var(--text-muted);
+      padding: 8px 12px; background: var(--gold-light);
+      border-left: 3px solid var(--accent);
+      border-radius: 0 8px 8px 0; margin: 12px 0; line-height: 1.5;
+    }
+    .tournament-select {
+      width: 100%; padding: 10px 14px;
+      background: var(--bg-secondary); border: 1px solid var(--border);
+      border-radius: 8px; color: var(--text-primary);
+      font-size: 14px; font-family: inherit; margin-bottom: 16px;
+      cursor: pointer; appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23999' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 14px center;
+    }
+    .tournament-select:focus { outline: none; border-color: var(--accent); }
+    .empty-state { text-align: center; padding: 40px 20px; color: var(--text-muted); }
+    .empty-state-icon { font-size: 40px; margin-bottom: 12px; }
+    .empty-state-text { font-size: 14px; }
+    .loading { text-align: center; padding: 60px 20px; color: var(--text-muted); font-size: 15px; }
+    .footer {
+      text-align: center; padding: 24px 0;
+      color: var(--text-muted); font-size: 12px;
+      border-top: 1px solid var(--border); margin-top: 32px;
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect, useMemo, useCallback } = React;
+
+    // ==================== UTILITIES ====================
+    function formatNumber(n) { return n.toLocaleString('ja-JP'); }
+    function formatChips(n) { return (n > 0 ? '+' : '') + formatNumber(n); }
+    function filterByMonth(date, year, month) {
+      const d = new Date(date);
+      return d.getFullYear() === year && d.getMonth() + 1 === month;
+    }
+    function filterByYear(date, year) { return new Date(date).getFullYear() === year; }
+    function filterByMonths(date, year, months) {
+      const d = new Date(date);
+      return d.getFullYear() === year && months.includes(d.getMonth() + 1);
+    }
+
+    const PERIOD_TABS = [
+      { key: 'monthly', label: '月間' },
+      { key: '1Q', label: '1Q', months: [1,2,3] },
+      { key: '2Q', label: '2Q', months: [4,5,6] },
+      { key: '3Q', label: '3Q', months: [7,8,9] },
+      { key: '4Q', label: '4Q', months: [10,11,12] },
+      { key: '1H', label: '1H', months: [1,2,3,4,5,6] },
+      { key: '2H', label: '2H', months: [7,8,9,10,11,12] },
+      { key: 'yearly', label: '年間' },
+    ];
+
+    function getPeriodLabel(key, year, month) {
+      if (key === 'monthly') return `${month}月`;
+      if (key === 'yearly') return `${year}年`;
+      return `${year}年 ${key}`;
+    }
+
+    function getPhotoSrc(info) {
+      if (!info) return null;
+      if (info.photoUrl) return info.photoUrl;
+      if (info.photo) return `/uploads/photos/${info.photo}`;
+      return null;
+    }
+
+    // ==================== COMPONENTS ====================
+    function RankBadge({ rank }) {
+      const cls = rank <= 3 ? `rank-${rank}` : 'rank-other';
+      return <span className={`rank-badge ${cls}`}>{rank}</span>;
+    }
+
+    function PlayerAvatar({ playerId, playersMap, size }) {
+      const info = playersMap[playerId] || null;
+      const photoSrc = getPhotoSrc(info);
+      const s = size || 36;
+      const style = { width: s, height: s, minWidth: s };
+      return (
+        <div className="player-avatar" style={style}>
+          {photoSrc
+            ? <img src={photoSrc} alt="" onError={e => { e.target.style.display='none'; }}/>
+            : <div className="player-avatar-placeholder">👤</div>}
+        </div>
+      );
+    }
+
+    // ==================== PODIUM ====================
+    function Podium({ top3, playersMap, onPlayerClick, valueFormatter }) {
+      if (top3.length === 0) return null;
+
+      const renderCard = (player, idx) => {
+        if (!player) {
+          return <div key={idx} className="podium-card" style={{visibility:'hidden', order: idx===0?2:idx===1?1:3}} />;
+        }
+        const rank = player.rank;
+        const info = playersMap[player.playerId] || {};
+        const photoSrc = getPhotoSrc(info);
+        return (
+          <div key={player.playerId || player.playerName} className={`podium-card podium-${rank}`} onClick={() => onPlayerClick(player)}>
+            {rank === 1 && <div className="podium-crown">👑</div>}
+            <div className={`podium-medal medal-${rank}`}>{rank}</div>
+            <div className="podium-photo">
+              {photoSrc
+                ? <img src={photoSrc} alt={player.playerName} onError={e => { e.target.style.display='none'; }}/>
+                : <div className="podium-photo-placeholder">👤</div>}
+            </div>
+            <div className="podium-name">{info.nickname || player.playerName}</div>
+            <div className="podium-stats">{valueFormatter(player)}</div>
+          </div>
+        );
+      };
+
+      const cards = [top3[0], top3[1], top3[2]].map((p, i) => renderCard(p, i));
+      return <div className="podium-container">{cards}</div>;
+    }
+
+    // ==================== PLAYER DETAIL MODAL ====================
+    function PlayerDetailModal({ player, type, detailData, playersMap, onClose }) {
+      if (!player) return null;
+      const info = playersMap[player.playerId] || {};
+      const photoSrc = getPhotoSrc(info);
+
+      const tournamentResults = type === 'tournament' ? (detailData || []) : [];
+      const sessions = type === 'ring' ? (detailData || []) : [];
+
+      const rankedResults = tournamentResults.filter(r => r.rank != null);
+      const bestRank = rankedResults.length > 0 ? Math.min(...rankedResults.map(r => r.rank)) : null;
+      const placedCount = tournamentResults.filter(r => (r.points || 0) > 0).length;
+      const totalNetChips = sessions.reduce((s, r) => s + (r.netChips || 0), 0);
+
+      return (
+        <div className="modal-overlay" onClick={onClose}>
+          <div className="modal-content" onClick={e => e.stopPropagation()}>
+            <div className="modal-header">
+              <div style={{flex:1}}/>
+              <button className="modal-close" onClick={onClose}>✕</button>
+            </div>
+            <div className="modal-player-header">
+              <div className="modal-player-photo">
+                {photoSrc
+                  ? <img src={photoSrc} alt={player.playerName} onError={e => { e.target.style.display='none'; }}/>
+                  : <div className="modal-player-photo-placeholder">👤</div>}
+              </div>
+              <div>
+                <div className="modal-player-name">{info.nickname || player.playerName}</div>
+                {info.nickname && <div className="modal-player-nickname">{player.playerName}</div>}
+              </div>
+            </div>
+
+            {type === 'tournament' && (
+              <>
+                <div className="modal-stat-grid">
+                  <div className="modal-stat-card">
+                    <div className="modal-stat-label">合計ポイント</div>
+                    <div className="modal-stat-value" style={{color:'var(--accent)'}}>
+                      {formatNumber(tournamentResults.reduce((s,r) => s+(r.points||0), 0))}
+                    </div>
+                  </div>
+                  <div className="modal-stat-card">
+                    <div className="modal-stat-label">入賞回数</div>
+                    <div className="modal-stat-value">{placedCount}回</div>
+                  </div>
+                  <div className="modal-stat-card">
+                    <div className="modal-stat-label">参加回数</div>
+                    <div className="modal-stat-value">{tournamentResults.length}回</div>
+                  </div>
+                  <div className="modal-stat-card">
+                    <div className="modal-stat-label">最高順位</div>
+                    <div className="modal-stat-value">{bestRank != null ? bestRank + '位' : '-'}</div>
+                  </div>
+                </div>
+                <div className="section-title">トーナメント履歴</div>
+                <table className="detail-table">
+                  <thead><tr><th>日付</th><th>トーナメント</th><th>順位</th><th>ポイント</th></tr></thead>
+                  <tbody>
+                    {tournamentResults.slice().sort((a,b)=>(b.date||'').localeCompare(a.date||'')).map((r,i) => (
+                      <tr key={i}>
+                        <td>{r.date}</td>
+                        <td style={{maxWidth:100,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',fontSize:12,color:'var(--text-muted)'}}>
+                          {r.tournamentId || '-'}
+                        </td>
+                        <td>{r.rank != null ? r.rank + '位' : '参加'}</td>
+                        <td style={{color:'var(--accent)'}}>{formatNumber(r.points||0)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </>
+            )}
+
+            {type === 'ring' && (
+              <>
+                <div className="modal-stat-grid">
+                  <div className="modal-stat-card">
+                    <div className="modal-stat-label">純増チップ合計</div>
+                    <div className="modal-stat-value" style={{color: totalNetChips>=0?'var(--positive)':'var(--negative)'}}>
+                      {formatChips(totalNetChips)}
+                    </div>
+                  </div>
+                  <div className="modal-stat-card">
+                    <div className="modal-stat-label">セッション数</div>
+                    <div className="modal-stat-value">{sessions.length}回</div>
+                  </div>
+                  <div className="modal-stat-card">
+                    <div className="modal-stat-label">勝率</div>
+                    <div className="modal-stat-value">
+                      {sessions.length > 0 ? Math.round(sessions.filter(s=>s.netChips>0).length/sessions.length*100) : 0}%
+                    </div>
+                  </div>
+                  <div className="modal-stat-card">
+                    <div className="modal-stat-label">プラス回数</div>
+                    <div className="modal-stat-value">{sessions.filter(s=>s.netChips>0).length}回</div>
+                  </div>
+                </div>
+                <div className="section-title">セッション履歴</div>
+                <table className="detail-table">
+                  <thead><tr><th>日付</th><th>イベント</th><th>純増</th></tr></thead>
+                  <tbody>
+                    {sessions.slice().sort((a,b)=>(b.date||'').localeCompare(a.date||'')).map((s,i) => (
+                      <tr key={i}>
+                        <td>{s.date}</td>
+                        <td style={{maxWidth:120,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap',fontSize:12,color:'var(--text-muted)'}}>
+                          {s.eventName || '-'}
+                        </td>
+                        <td className={s.netChips>=0?'chips-positive':'chips-negative'}>{formatChips(s.netChips||0)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </>
+            )}
+          </div>
+        </div>
+      );
+    }
+
+    // ==================== TOURNAMENT TAB ====================
+    function TournamentTab({ year, month, tournamentsData, playersMap }) {
+      const [subTab, setSubTab] = useState('monthly');
+      const [selectedTournament, setSelectedTournament] = useState('all');
+      const [selectedPlayer, setSelectedPlayer] = useState(null);
+
+      const ranking = useMemo(() => {
+        const tab = PERIOD_TABS.find(t => t.key === subTab);
+        let filtered;
+        if (subTab === 'monthly') {
+          filtered = (tournamentsData.results || []).filter(r => filterByMonth(r.date, year, month));
+        } else if (subTab === 'yearly') {
+          filtered = (tournamentsData.results || []).filter(r => filterByYear(r.date, year));
+        } else {
+          filtered = (tournamentsData.results || []).filter(r => filterByMonths(r.date, year, tab.months));
+        }
+        if (subTab !== 'monthly' && selectedTournament !== 'all') {
+          filtered = filtered.filter(r => r.tournamentId === selectedTournament);
+        }
+        const playerMap = {};
+        filtered.forEach(event => {
+          (event.results || []).forEach(result => {
+            const key = result.playerId || ('__' + result.playerName);
+            if (!playerMap[key]) {
+              playerMap[key] = { ...result, totalPoints: 0, wins: 0, details: [] };
+            }
+            playerMap[key].totalPoints += (result.points || 0);
+            if ((result.points || 0) > 0) playerMap[key].wins++;
+            playerMap[key].details.push({ ...result, date: event.date, tournamentId: event.tournamentId || '' });
+          });
+        });
+        return Object.values(playerMap)
+          .filter(p => p.totalPoints > 0 || p.wins > 0)
+          .sort((a, b) => b.totalPoints - a.totalPoints)
+          .map((p, i) => ({ ...p, rank: i + 1 }));
+      }, [tournamentsData, year, month, subTab, selectedTournament]);
+
+      const top3 = ranking.slice(0, 3);
+      const rest = ranking.slice(3);
+      const uniqueTournaments = [...new Set((tournamentsData.results || []).map(r => r.tournamentId).filter(Boolean))].sort();
+
+      return (
+        <div>
+          <div className="sub-tabs">
+            {PERIOD_TABS.map(t => (
+              <button key={t.key} className={`sub-tab ${subTab===t.key?'active':''}`} onClick={() => setSubTab(t.key)}>{t.label}</button>
+            ))}
+          </div>
+          {subTab !== 'monthly' && (
+            <select className="tournament-select" value={selectedTournament} onChange={e => setSelectedTournament(e.target.value)}>
+              <option value="all">全トーナメント</option>
+              {uniqueTournaments.map(name => <option key={name} value={name}>{name}</option>)}
+            </select>
+          )}
+          <div className="leaderboard-section">
+            <div className="section-title">
+              {getPeriodLabel(subTab, year, month)} トーナメントランキング
+            </div>
+            {ranking.length === 0 ? (
+              <div className="empty-state">
+                <div className="empty-state-icon">🏆</div>
+                <div className="empty-state-text">データがありません</div>
+              </div>
+            ) : (
+              <>
+                <Podium
+                  top3={top3}
+                  playersMap={playersMap}
+                  onPlayerClick={setSelectedPlayer}
+                  valueFormatter={p => `${formatNumber(p.totalPoints)} pt / ${p.wins}回`}
+                />
+                {rest.length > 0 && (
+                  <table className="leaderboard-table">
+                    <thead>
+                      <tr>
+                        <th style={{width:50}}>順位</th>
+                        <th>プレイヤー</th>
+                        <th>ポイント</th>
+                        <th>入賞回数</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {rest.map(player => (
+                        <tr key={player.playerId || player.playerName} onClick={() => setSelectedPlayer(player)}>
+                          <td><RankBadge rank={player.rank}/></td>
+                          <td>
+                            <div className="player-cell">
+                              <PlayerAvatar playerId={player.playerId} playersMap={playersMap}/>
+                              <span className="player-name">{(playersMap[player.playerId] || {}).nickname || player.playerName}</span>
+                            </div>
+                          </td>
+                          <td className="points-value">{formatNumber(player.totalPoints)}</td>
+                          <td className="wins-value">{player.wins}回</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
+              </>
+            )}
+          </div>
+          {selectedPlayer && (
+            <PlayerDetailModal
+              player={selectedPlayer} type="tournament"
+              detailData={selectedPlayer.details}
+              playersMap={playersMap}
+              onClose={() => setSelectedPlayer(null)}
+            />
+          )}
+        </div>
+      );
+    }
+
+    // ==================== RING GAME TAB ====================
+    function RingGameTab({ year, month, ringData, playersMap }) {
+      const [subTab, setSubTab] = useState('monthly');
+      const [selectedPlayer, setSelectedPlayer] = useState(null);
+
+      const computeRanking = useCallback((sessions) => {
+        const playerMap = {};
+        sessions.forEach(s => {
+          const key = s.playerId || ('__unmatched_' + s.playerName);
+          if (!playerMap[key]) {
+            playerMap[key] = {
+              playerId: s.playerId || null,
+              playerName: s.playerName,
+              totalChips: 0, positiveChips: 0,
+              sessionCount: 0, winCount: 0, sessions: []
+            };
+          }
+          const p = playerMap[key];
+          p.totalChips += (s.netChips || 0);
+          if (s.netChips > 0) { p.positiveChips += s.netChips; p.winCount++; }
+          p.sessionCount++;
+          p.sessions.push(s);
+        });
+        return Object.values(playerMap)
+          .filter(p => p.totalChips !== 0 || p.positiveChips > 0)
+          .sort((a, b) => b.positiveChips - a.positiveChips)
+          .map((p, i) => ({ ...p, rank: i + 1 }));
+      }, []);
+
+      // Flatten grouped session format → per-player records for ranking
+      const flatSessions = useMemo(() =>
+        (ringData.sessions || []).flatMap(sess =>
+          (sess.players || []).map(p => ({
+            ...p,
+            date: sess.date,
+            eventName: sess.name
+          }))
+        ),
+        [ringData]
+      );
+
+      const ranking = useMemo(() => {
+        const tab = PERIOD_TABS.find(t => t.key === subTab);
+        let filtered;
+        if (subTab === 'monthly') {
+          filtered = flatSessions.filter(s => filterByMonth(s.date, year, month));
+        } else if (subTab === 'yearly') {
+          filtered = flatSessions.filter(s => filterByYear(s.date, year));
+        } else {
+          filtered = flatSessions.filter(s => filterByMonths(s.date, year, tab.months));
+        }
+        return computeRanking(filtered);
+      }, [flatSessions, year, month, subTab]);
+
+      const top3 = ranking.slice(0, 3);
+      const rest = ranking.slice(3);
+
+      return (
+        <div>
+          <div className="sub-tabs">
+            {PERIOD_TABS.map(t => (
+              <button key={t.key} className={`sub-tab ${subTab===t.key?'active':''}`} onClick={() => setSubTab(t.key)}>{t.label}</button>
+            ))}
+          </div>
+          <div className="info-note">ランキングはプラス収支のセッションのみカウントされます</div>
+          <div className="leaderboard-section">
+            <div className="section-title">
+              {getPeriodLabel(subTab, year, month)} リングゲームランキング
+            </div>
+            {ranking.length === 0 ? (
+              <div className="empty-state">
+                <div className="empty-state-icon">💰</div>
+                <div className="empty-state-text">データがありません</div>
+              </div>
+            ) : (
+              <>
+                <Podium
+                  top3={top3}
+                  playersMap={playersMap}
+                  onPlayerClick={setSelectedPlayer}
+                  valueFormatter={p => `${formatChips(p.positiveChips)}`}
+                />
+                {rest.length > 0 && (
+                  <table className="leaderboard-table">
+                    <thead>
+                      <tr>
+                        <th style={{width:50}}>順位</th>
+                        <th>プレイヤー</th>
+                        <th>純増チップ</th>
+                        <th>回数</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {rest.map(player => (
+                        <tr key={player.playerId || player.playerName} onClick={() => setSelectedPlayer(player)}>
+                          <td><RankBadge rank={player.rank}/></td>
+                          <td>
+                            <div className="player-cell">
+                              <PlayerAvatar playerId={player.playerId} playersMap={playersMap}/>
+                              <span className="player-name">{(playersMap[player.playerId] || {}).nickname || player.playerName}</span>
+                            </div>
+                          </td>
+                          <td className={player.positiveChips >= 0 ? 'chips-positive' : 'chips-negative'}>
+                            {formatChips(player.positiveChips)}
+                          </td>
+                          <td className="wins-value">{player.sessionCount}回</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
+              </>
+            )}
+          </div>
+          {selectedPlayer && (
+            <PlayerDetailModal
+              player={selectedPlayer} type="ring"
+              detailData={selectedPlayer.sessions}
+              playersMap={playersMap}
+              onClose={() => setSelectedPlayer(null)}
+            />
+          )}
+        </div>
+      );
+    }
+
+    // ==================== MAIN APP ====================
+    function App() {
+      const now = new Date();
+      const [year, setYear] = useState(now.getFullYear());
+      const [month, setMonth] = useState(now.getMonth() + 1);
+      const [mainTab, setMainTab] = useState('tournament');
+      const [loading, setLoading] = useState(true);
+      const [tournamentsData, setTournamentsData] = useState({ tournaments: [], results: [] });
+      const [ringData, setRingData] = useState({ sessions: [] });
+      const [playersMap, setPlayersMap] = useState({});
+      const [storeName, setStoreName] = useState('9HIGH 仙台');
+
+      useEffect(() => {
+        Promise.all([
+          fetch('/api/config').then(r => r.json()).catch(() => ({})),
+          fetch('/api/tournaments').then(r => r.json()).catch(() => ({ tournaments: [], results: [] })),
+          fetch('/api/ringgames').then(r => r.json()).catch(() => ({ sessions: [] })),
+          fetch('/api/players').then(r => r.json()).catch(() => ({ players: [] }))
+        ]).then(([cfg, tournaments, ring, players]) => {
+          if (cfg.store_name) setStoreName(cfg.store_name);
+          setTournamentsData(tournaments || { tournaments: [], results: [] });
+          setRingData(ring || { sessions: [] });
+          const map = {};
+          ((players && players.players) || []).forEach(p => { map[p.id] = p; });
+          setPlayersMap(map);
+          setLoading(false);
+        });
+      }, []);
+
+      const prevMonth = () => { if (month===1){setMonth(12);setYear(y=>y-1);}else setMonth(m=>m-1); };
+      const nextMonth = () => { if (month===12){setMonth(1);setYear(y=>y+1);}else setMonth(m=>m+1); };
+
+      return (
+        <div className="container">
+          <div className="header">
+            <svg className="header-logo-svg" viewBox="0 0 368.5 170.08" xmlns="http://www.w3.org/2000/svg">
+              <g>
+                <path fill="white" d="M199.244,21.083c-0.284,0-0.379-0.379-0.521-0.758c-1.612-5.121-5.359-7.587-9.814-7.587c-5.265,0-9.629,4.079-9.629,10.955c0,10.243,12.095,17.878,19.019,28.594c0.282,0.427,0.614,0.665,0.946,0.665s0.665-0.238,0.949-0.665c6.925-10.715,19.016-18.351,19.016-28.594c0-6.875-4.363-10.955-9.625-10.955c-4.459,0-8.206,2.467-9.818,7.587C199.623,20.704,199.531,21.083,199.244,21.083"/>
+                <path fill="white" d="M208.053,69.08h-18.035c-0.556,0-1.006,0.451-1.006,1.005v48.874c0,0.555,0.45,1.005,1.006,1.005h18.035c0.555,0,1.005-0.45,1.005-1.005V70.085C209.058,69.531,208.607,69.08,208.053,69.08"/>
+                <path fill="white" d="M68.896,17.493c-5.928-3.155-12.818-4.754-20.476-4.754c-7.556,0-14.42,1.602-20.405,4.761c-5.943,3.139-10.706,7.437-14.155,12.775c-3.434,5.313-5.103,11.173-5.103,17.912c0,6.344,1.531,11.918,4.68,17.039c3.149,5.129,7.453,9.287,12.793,12.359c4.71,2.709,9.975,4.235,15.652,4.533l8.26,0.434c0.472,0.025,0.729,0.563,0.451,0.946L25.328,118.39c-0.476,0.655-0.005,1.577,0.806,1.577H46.98c0.329,0,0.637-0.164,0.823-0.437l31.766-46.806c5.652-8.286,8.518-16.541,8.518-24.537c0-6.737-1.669-12.595-5.1-17.91C79.527,24.93,74.787,20.629,68.896,17.493 M50.028,68.79c-12.121,0.966-22.202-9.116-21.237-21.235c0.76-9.538,8.487-17.265,18.026-18.026c12.119-0.965,22.2,9.116,21.235,21.238C67.292,60.304,59.564,68.03,50.028,68.79"/>
+                <path fill="white" d="M280.075,129.194h-16.722c-0.499,0-0.926,0.409-0.99,0.906c-0.739,5.668-5.599,10.057-11.464,10.057s-10.725-4.389-11.464-10.057c-0.064-0.497-0.492-0.906-0.99-0.906h-16.722c-0.575,0-1.046,0.481-1.014,1.053c0.859,15.907,14.073,28.583,30.189,28.583s29.33-12.676,30.189-28.583C281.118,129.676,280.646,129.194,280.075,129.194"/>
+                <path fill="white" d="M173.717,35.545h-18.537c-0.554,0-1.004,0.45-1.004,1.004v31.449c0,0.554-0.45,1.004-1.005,1.004h-31.091c-0.554,0-1.004-0.45-1.004-1.004V36.549c0-0.555-0.45-1.004-1.005-1.004h-18.535c-0.555,0-1.005,0.45-1.005,1.004v37.357v45.053c0,0.558,0.45,1.005,1.005,1.005h25.16c6.119,0,7.592-4.336,7.592-4.336l0.063-0.194c0.201-0.584-0.023-1.024-0.173-1.234c-0.261-0.365-0.686-0.589-1.113-0.589c-0.245,0-0.48,0.068-0.681,0.193c-1.563,1.066-3.387,1.985-5.419,1.985c-5.825,0-10.39-4.818-10.39-10.97c0-5.781,3.912-9.586,8.862-14.402c3.309-3.217,7.056-6.862,10.759-11.995c0.531-0.714,1.092-0.864,1.468-0.864c0.388,0,0.965,0.159,1.503,0.92c3.667,5.116,7.4,8.757,10.693,11.969c4.929,4.805,8.822,8.599,8.822,14.372c0,6.253-4.468,10.97-10.388,10.97c-2.032,0-3.856-0.919-5.417-1.985c-0.201-0.125-0.438-0.193-0.684-0.193c-0.427,0-0.852,0.224-1.113,0.589c-0.15,0.21-0.372,0.65-0.173,1.234l0.063,0.194c0,0,1.473,4.336,7.591,4.336h2.729h22.427c0.556,0,1.004-0.447,1.004-1.005V71.479v-34.93C174.722,35.995,174.273,35.545,173.717,35.545"/>
+                <path fill="white" d="M260.922,61.153v-7.198c0-0.554-0.45-1.004-1.004-1.004h-18.035c-0.557,0-1.007,0.45-1.007,1.004v7.195c0,0.417-0.263,0.784-0.653,0.932c-11.87,4.482-20.182,16.215-19.52,29.801c0.741,15.221,13.053,27.712,28.261,28.661c17.574,1.092,32.168-12.838,32.168-30.176c0-12.936-8.13-23.971-19.557-28.286C261.184,61.935,260.922,61.569,260.922,61.153 M265.764,91.409c-3.913,3.498-10.369,11.161-13.989,17.78c-0.252,0.458-0.585,0.668-0.875,0.668c-0.291,0-0.626-0.21-0.875-0.668c-3.622-6.619-10.076-14.282-13.992-17.78c-0.415-0.373-0.582-0.706-0.582-1.041c0-0.332,0.167-0.624,0.582-1.039c3.706-3.708,10.37-11.161,13.992-17.782c0.249-0.458,0.584-0.666,0.875-0.666c0.29,0,0.623,0.208,0.875,0.666c3.62,6.621,10.284,14.074,13.989,17.782c0.416,0.415,0.585,0.707,0.585,1.039C266.349,90.703,266.18,91.036,265.764,91.409"/>
+                <path fill="white" d="M330.568,59.417c-10.388,0-15.433,3.891-17.326,5.545c-0.295,0.259-0.757,0.048-0.757-0.344V36.435c0-0.554-0.448-1.004-1.005-1.004h-18.03c-0.555,0-1.005,0.45-1.005,1.004v82.524c0,0.555,0.45,1.005,1.005,1.005h23.955c1.699,0,3.337-0.721,4.419-2.024c0.524-0.633,0.995-1.333,1.423-2.162c1.117-2.479-1.404-3.648-3.061-2.813l-1.232,0.622l0.019-0.023c-1.23,0.64-2.625,1.027-4.221,1.027c-5.647,0-10.046-4.2-10.046-10.147c0-5.698,4.551-10.196,9.347-10.196c1.245,0,2.723,0.276,3.764,0.741c0,0,0.018,0.005,0.055,0.022c0.059,0.029,0.116,0.055,0.169,0.082c0.337,0.149,0.958,0.354,1.277,0.016c0.364-0.384-0.109-0.87-0.109-0.87c-1.906-1.966-3.004-4.205-3.004-6.592c0-5.699,4.598-10.396,10.347-10.396c5.752,0,10.349,4.697,10.349,10.396c0,2.387-1.098,4.626-3.004,6.592c0,0-0.474,0.486-0.109,0.87c0.319,0.339,0.94,0.134,1.277-0.016c0.054-0.027,0.11-0.053,0.169-0.082c0.037-0.018,0.055-0.022,0.055-0.022c1.039-0.465,2.52-0.741,3.762-0.741c4.798,0,9.349,4.498,9.349,10.196c0,5.947-4.401,10.147-10.048,10.147c-1.593,0-2.99-0.388-4.219-1.027l0.019,0.023l-1.232-0.622c-1.659-0.836-4.178,0.333-3.061,2.813c0.428,0.829,0.896,1.529,1.423,2.162c1.082,1.304,2.72,2.024,4.419,2.024h23.956c0.556,0,1.006-0.45,1.006-1.005V90.192C360.66,74.542,351.286,59.417,330.568,59.417"/>
+              </g>
+            </svg>
+            <div className="header-title">Sendai Leaders Board</div>
+          </div>
+
+          {loading ? (
+            <div className="loading">読み込み中...</div>
+          ) : (
+            <>
+              <div className="month-selector">
+                <button className="month-btn" onClick={prevMonth}>◀</button>
+                <div className="month-display">{year}年{month}月</div>
+                <button className="month-btn" onClick={nextMonth}>▶</button>
+              </div>
+              <div className="main-tabs">
+                <button className={`main-tab ${mainTab==='tournament'?'active':''}`} onClick={() => setMainTab('tournament')}>Tournament</button>
+                <button className={`main-tab ${mainTab==='ring'?'active':''}`} onClick={() => setMainTab('ring')}>Ring Game</button>
+              </div>
+              {mainTab === 'tournament' && (
+                <TournamentTab year={year} month={month} tournamentsData={tournamentsData} playersMap={playersMap}/>
+              )}
+              {mainTab === 'ring' && (
+                <RingGameTab year={year} month={month} ringData={ringData} playersMap={playersMap}/>
+              )}
+              <div className="footer">© {year} {storeName} - All rights reserved</div>
+            </>
+          )}
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>

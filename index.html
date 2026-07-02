@@ -1,0 +1,3823 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>9HIGH 仙台 - 管理者パネル</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.9/babel.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg-primary: #0f172a;
+      --bg-secondary: #1e293b;
+      --bg-card: #1e293b;
+      --bg-hover: #334155;
+      --bg-input: #0f172a;
+      --text-primary: #f1f5f9;
+      --text-secondary: #e2e8f0;
+      --text-muted: #cbd5e1;
+      --accent: #f59e0b;
+      --accent-hover: #d97706;
+      --border: #334155;
+      --positive: #22c55e;
+      --negative: #ef4444;
+      --danger: #ef4444;
+      --danger-hover: #dc2626;
+      --info: #3b82f6;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Noto Sans JP', sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+    }
+    .container { max-width: 800px; margin: 0 auto; padding: 0 16px; }
+
+    /* Login */
+    .login-wrapper {
+      display: flex; align-items: center; justify-content: center;
+      min-height: 100vh;
+    }
+    .login-box {
+      background: var(--bg-secondary);
+      border-radius: 16px; padding: 40px;
+      width: 100%; max-width: 400px;
+      text-align: center;
+    }
+    .login-title { font-size: 24px; font-weight: 700; color: var(--accent); margin-bottom: 8px; }
+    .login-subtitle { font-size: 14px; color: var(--text-secondary); margin-bottom: 32px; }
+
+    /* Form elements */
+    .form-group { margin-bottom: 16px; text-align: left; }
+    .form-label {
+      display: block; font-size: 13px; font-weight: 600;
+      color: var(--text-secondary); margin-bottom: 6px;
+    }
+    .form-input {
+      width: 100%; padding: 10px 14px;
+      background: var(--bg-input); border: 1px solid var(--border);
+      border-radius: 8px; color: var(--text-primary);
+      font-size: 14px; font-family: inherit;
+      transition: border-color 0.2s;
+    }
+    .form-input:focus { outline: none; border-color: var(--accent); }
+    .form-select {
+      width: 100%; padding: 10px 14px;
+      background: var(--bg-input); border: 1px solid var(--border);
+      border-radius: 8px; color: var(--text-primary);
+      font-size: 14px; font-family: inherit;
+      appearance: none; cursor: pointer;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2394a3b8' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat; background-position: right 14px center;
+    }
+    .form-select:focus { outline: none; border-color: var(--accent); }
+
+    /* Buttons */
+    .btn {
+      padding: 10px 20px; border-radius: 8px; font-size: 14px;
+      font-weight: 600; cursor: pointer; border: none;
+      font-family: inherit; transition: all 0.2s;
+      display: inline-flex; align-items: center; gap: 6px;
+    }
+    .btn-primary { background: var(--accent); color: var(--bg-primary); }
+    .btn-primary:hover { background: var(--accent-hover); }
+    .btn-secondary { background: var(--bg-hover); color: var(--text-primary); }
+    .btn-secondary:hover { background: var(--border); }
+    .btn-danger { background: var(--danger); color: white; }
+    .btn-danger:hover { background: var(--danger-hover); }
+    .btn-sm { padding: 6px 12px; font-size: 12px; }
+    .btn-block { width: 100%; justify-content: center; }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    /* Header */
+    .admin-header {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 20px 0; border-bottom: 1px solid var(--border);
+    }
+    .admin-header-title { font-size: 18px; font-weight: 700; color: var(--accent); display: flex; align-items: center; gap: 8px; }
+    .admin-header-actions { display: flex; gap: 8px; align-items: center; }
+
+    /* Portal */
+    .portal-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      padding: 16px 0;
+    }
+    @media (max-width: 600px) {
+      .portal-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    }
+    .portal-tile {
+      background: var(--bg-secondary);
+      border-radius: 14px;
+      padding: 20px 16px;
+      text-align: center;
+      cursor: pointer;
+      border: 2px solid var(--border);
+      transition: all 0.2s;
+    }
+    .portal-tile:hover {
+      border-color: var(--accent);
+      transform: translateY(-3px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+    }
+    .portal-tile-icon { font-size: 34px; margin-bottom: 10px; }
+    .portal-tile-title { font-size: 14px; font-weight: 700; margin-bottom: 6px; }
+    .portal-tile-desc { font-size: 11px; color: var(--text-muted); line-height: 1.5; }
+
+    /* Back button in header */
+    .back-btn {
+      background: none; border: none; color: var(--text-secondary);
+      cursor: pointer; font-size: 22px; padding: 0 4px; line-height: 1;
+      transition: color 0.2s;
+    }
+    .back-btn:hover { color: var(--accent); }
+
+    /* Nav tabs */
+    .admin-nav {
+      display: flex; gap: 4px; padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+      overflow-x: auto;
+    }
+    .admin-nav-item {
+      padding: 8px 16px; border-radius: 8px; font-size: 13px;
+      font-weight: 600; cursor: pointer; white-space: nowrap;
+      background: none; border: 1px solid transparent;
+      color: var(--text-muted); transition: all 0.2s;
+    }
+    .admin-nav-item.active {
+      background: var(--accent); color: var(--bg-primary);
+      border-color: var(--accent);
+    }
+    .admin-nav-item:hover:not(.active) {
+      background: var(--bg-hover); color: var(--text-primary);
+    }
+
+    /* Cards */
+    .card {
+      background: var(--bg-secondary); border-radius: 12px;
+      padding: 20px; margin-bottom: 16px;
+    }
+    .card-title {
+      font-size: 16px; font-weight: 600; margin-bottom: 16px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .card-title::before {
+      content: ''; display: inline-block; width: 4px; height: 16px;
+      background: var(--accent); border-radius: 2px;
+    }
+
+    /* Player grid */
+    .player-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 16px;
+    }
+    .player-card {
+      background: var(--bg-primary); border-radius: 12px;
+      padding: 16px; text-align: center; cursor: pointer;
+      border: 1px solid var(--border); transition: all 0.2s;
+      position: relative;
+    }
+    .player-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+    .player-photo-wrapper {
+      width: 80px; height: 80px; border-radius: 50%;
+      margin: 0 auto 12px; overflow: hidden;
+      background: var(--bg-hover); display: flex;
+      align-items: center; justify-content: center;
+      border: 2px solid var(--border);
+    }
+    .player-photo-wrapper img {
+      width: 100%; height: 100%; object-fit: cover;
+    }
+    .player-photo-placeholder {
+      font-size: 32px; color: var(--text-muted);
+    }
+    .player-card-name { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
+    .player-card-nickname { font-size: 12px; color: var(--text-muted); }
+
+    /* Photo upload */
+    .photo-upload-area {
+      width: 120px; height: 120px; border-radius: 50%;
+      margin: 0 auto 16px; overflow: hidden; cursor: pointer;
+      background: var(--bg-hover); display: flex;
+      align-items: center; justify-content: center;
+      border: 3px dashed var(--border); position: relative;
+      transition: border-color 0.2s;
+    }
+    .photo-upload-area:hover { border-color: var(--accent); }
+    .photo-upload-area img { width: 100%; height: 100%; object-fit: cover; }
+    .photo-upload-label {
+      font-size: 11px; color: var(--text-muted);
+      text-align: center; line-height: 1.3;
+    }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.7); display: flex;
+      align-items: center; justify-content: center; z-index: 100;
+      animation: fadeIn 0.2s; padding: 20px;
+    }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    .modal-box {
+      background: var(--bg-secondary); border-radius: 16px;
+      padding: 28px; width: 100%; max-width: 500px;
+      max-height: 90vh; overflow-y: auto;
+    }
+    .modal-box::-webkit-scrollbar,
+    .modal-box > div::-webkit-scrollbar {
+      width: 4px;
+    }
+    .modal-box::-webkit-scrollbar-track,
+    .modal-box > div::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .modal-box::-webkit-scrollbar-thumb,
+    .modal-box > div::-webkit-scrollbar-thumb {
+      background: rgba(255,255,255,0.15);
+      border-radius: 4px;
+    }
+    .modal-box::-webkit-scrollbar-thumb:hover,
+    .modal-box > div::-webkit-scrollbar-thumb:hover {
+      background: rgba(255,255,255,0.3);
+    }
+    .modal-header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 24px;
+    }
+    .modal-title { font-size: 18px; font-weight: 700; }
+    .modal-close {
+      background: var(--bg-hover); border: none; color: var(--text-primary);
+      width: 32px; height: 32px; border-radius: 50%; cursor: pointer;
+      font-size: 18px; display: flex; align-items: center; justify-content: center;
+    }
+    .modal-actions {
+      display: flex; gap: 8px; justify-content: flex-end; margin-top: 24px;
+    }
+
+    /* Table */
+    .admin-table { width: 100%; border-collapse: collapse; }
+    .admin-table th {
+      font-size: 12px; color: var(--text-muted); text-align: left;
+      padding: 8px 12px; border-bottom: 1px solid var(--border);
+      user-select: none;
+    }
+    .admin-table th.sortable { cursor: pointer; }
+    .admin-table th.sortable:hover { color: var(--text-secondary); }
+    .admin-table td {
+      padding: 10px 12px; font-size: 13px;
+      border-bottom: 1px solid rgba(51,65,85,0.3);
+    }
+    .admin-table tr:hover { background: var(--bg-hover); }
+
+    /* Status badge */
+    .status-badge {
+      display: inline-block; padding: 3px 10px; border-radius: 12px;
+      font-size: 11px; font-weight: 600; cursor: pointer; border: none;
+      font-family: inherit; transition: all 0.15s;
+    }
+    .status-badge.given {
+      background: rgba(34,197,94,0.15); color: var(--positive);
+    }
+    .status-badge.given:hover { background: rgba(34,197,94,0.3); }
+    .status-badge.pending {
+      background: rgba(239,68,68,0.15); color: var(--danger);
+    }
+    .status-badge.pending:hover { background: rgba(239,68,68,0.3); }
+
+    /* Toast */
+    .toast {
+      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+      background: var(--positive); color: white; padding: 12px 24px;
+      border-radius: 8px; font-size: 14px; font-weight: 600;
+      z-index: 200; animation: slideUpFade 0.3s;
+    }
+    .toast.error { background: var(--danger); }
+    @keyframes slideUpFade {
+      from { opacity: 0; transform: translateX(-50%) translateY(20px); }
+      to { opacity: 1; transform: translateX(-50%) translateY(0); }
+    }
+
+    /* Results form inline */
+    .result-row {
+      display: grid; grid-template-columns: 1fr 130px 80px 40px;
+      gap: 8px; align-items: center; margin-bottom: 8px;
+    }
+    .rank-toggle {
+      display: flex; gap: 4px; align-items: center;
+    }
+    .rank-toggle-btn {
+      font-size: 11px; padding: 2px 7px; border-radius: 4px; border: 1px solid var(--border);
+      cursor: pointer; font-family: inherit; white-space: nowrap; flex-shrink: 0;
+    }
+    .rank-toggle-btn.active-sanka {
+      background: rgba(34,197,94,0.15); color: var(--positive); border-color: var(--positive);
+    }
+    .rank-toggle-btn.inactive {
+      background: transparent; color: var(--text-muted);
+    }
+    .result-row-header {
+      font-size: 11px; color: var(--text-muted); font-weight: 600;
+    }
+    .add-row-btn {
+      background: none; border: 1px dashed var(--border);
+      color: var(--text-muted); border-radius: 8px;
+      padding: 8px; cursor: pointer; font-size: 13px;
+      width: 100%; text-align: center; margin-top: 8px;
+      transition: all 0.2s;
+    }
+    .add-row-btn:hover { border-color: var(--accent); color: var(--accent); }
+    .remove-btn {
+      background: none; border: none; color: var(--danger);
+      cursor: pointer; font-size: 16px;
+    }
+
+    /* Autocomplete */
+    .autocomplete-wrapper { position: relative; }
+    .autocomplete-input {
+      width: 100%; padding: 8px 10px; font-size: 13px;
+      background: var(--bg-input); border: 1px solid var(--border);
+      border-radius: 8px; color: var(--text-primary);
+      font-family: inherit;
+    }
+    .autocomplete-input:focus { outline: none; border-color: var(--accent); }
+    .autocomplete-input.has-value { border-color: var(--positive); }
+    .autocomplete-dropdown {
+      position: absolute; top: 100%; left: 0; right: 0;
+      background: var(--bg-secondary); border: 1px solid var(--border);
+      border-radius: 8px; margin-top: 4px; max-height: 180px;
+      overflow-y: auto; z-index: 200; box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+    }
+    .autocomplete-item {
+      padding: 8px 12px; cursor: pointer; font-size: 13px;
+      border-bottom: 1px solid rgba(51,65,85,0.3);
+    }
+    .autocomplete-item:last-child { border-bottom: none; }
+    .autocomplete-item:hover, .autocomplete-item.highlighted { background: var(--bg-hover); }
+    .autocomplete-empty {
+      padding: 8px 12px; font-size: 12px; color: var(--text-muted);
+    }
+
+    .back-link {
+      display: inline-flex; align-items: center; gap: 4px;
+      color: var(--text-secondary); font-size: 13px; text-decoration: none;
+      padding: 8px 0;
+    }
+    .back-link:hover { color: var(--accent); }
+
+    .error-text { color: var(--danger); font-size: 13px; margin-top: 4px; }
+    @keyframes pulse { 0%,100% { opacity: 0.4; } 50% { opacity: 1; } }
+
+    /* Inline form panel */
+    .inline-form {
+      background: var(--bg-primary); border-radius: 8px;
+      padding: 14px; margin-bottom: 14px;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="text/babel">
+    const { useState, useEffect, useCallback, useRef } = React;
+
+    // ==================== API HELPERS ====================
+    async function api(url, opts = {}) {
+      let res;
+      try {
+        res = await fetch(url, {
+          headers: { 'Content-Type': 'application/json', ...opts.headers },
+          ...opts
+        });
+      } catch (e) {
+        throw new Error('サーバーに接続できません。\npython app.py を実行してから\nhttp://localhost:5000/ にアクセスしてください。');
+      }
+      let data;
+      try {
+        data = await res.json();
+      } catch (e) {
+        if (!res.ok) throw new Error(`サーバーエラー (${res.status})。app.py を再起動してください。`);
+        throw new Error('サーバーの応答を解析できませんでした。');
+      }
+      if (!res.ok) throw new Error(data.error || 'エラーが発生しました');
+      return data;
+    }
+
+    async function apiUpload(url, formData) {
+      let res;
+      try {
+        res = await fetch(url, { method: 'POST', body: formData });
+      } catch (e) {
+        throw new Error('サーバーに接続できません。python app.py を実行してください。');
+      }
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'アップロードに失敗しました');
+      return data;
+    }
+
+    // ==================== PLAYER AUTOCOMPLETE ====================
+    function PlayerAutocomplete({ players, value, onChange, placeholder }) {
+      const [text, setText] = useState('');
+      const [open, setOpen] = useState(false);
+      const [hlIdx, setHlIdx] = useState(0);
+      const wrapperRef = useRef(null);
+
+      const displayName = (p) => p.memberCode ? `${p.name}（${p.memberCode}）` : p.name;
+
+      useEffect(() => {
+        if (value) {
+          const p = players.find(p => p.id === value);
+          setText(p ? displayName(p) : '');
+        } else {
+          setText('');
+        }
+      }, [value, players]);
+
+      useEffect(() => {
+        const handleClick = (e) => {
+          if (wrapperRef.current && !wrapperRef.current.contains(e.target)) setOpen(false);
+        };
+        document.addEventListener('mousedown', handleClick);
+        return () => document.removeEventListener('mousedown', handleClick);
+      }, []);
+
+      const filtered = text
+        ? players.filter(p => p.name.toLowerCase().includes(text.toLowerCase()) || (p.memberCode && p.memberCode.includes(text)))
+        : players;
+
+      const handleInput = (e) => {
+        setText(e.target.value);
+        setOpen(true);
+        setHlIdx(0);
+        if (!e.target.value) onChange('');
+      };
+
+      const handleSelect = (p) => {
+        onChange(p.id);
+        setText(displayName(p));
+        setOpen(false);
+      };
+
+      const handleKeyDown = (e) => {
+        if (!open || filtered.length === 0) return;
+        if (e.key === 'ArrowDown') { e.preventDefault(); setHlIdx(i => Math.min(i + 1, filtered.length - 1)); }
+        else if (e.key === 'ArrowUp') { e.preventDefault(); setHlIdx(i => Math.max(i - 1, 0)); }
+        else if (e.key === 'Enter') { e.preventDefault(); handleSelect(filtered[hlIdx]); }
+        else if (e.key === 'Escape') { setOpen(false); }
+      };
+
+      return (
+        <div className="autocomplete-wrapper" ref={wrapperRef}>
+          <input
+            className={`autocomplete-input${value ? ' has-value' : ''}`}
+            value={text}
+            onChange={handleInput}
+            onFocus={() => setOpen(true)}
+            onKeyDown={handleKeyDown}
+            placeholder={placeholder || '名前を入力...'}
+          />
+          {open && (
+            <div className="autocomplete-dropdown">
+              {filtered.length === 0
+                ? <div className="autocomplete-empty">該当なし</div>
+                : filtered.map((p, i) => (
+                    <div key={p.id}
+                      className={`autocomplete-item${i === hlIdx ? ' highlighted' : ''}`}
+                      onMouseDown={() => handleSelect(p)}>
+                      {p.name}
+                      {p.memberCode && <span style={{marginLeft:6, fontSize:11, color:'var(--text-muted)'}}>({p.memberCode})</span>}
+                    </div>
+                  ))
+              }
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    // ==================== TOAST ====================
+    function Toast({ message, type, onClose }) {
+      useEffect(() => {
+        const t = setTimeout(onClose, 3000);
+        return () => clearTimeout(t);
+      }, []);
+      return <div className={`toast ${type === 'error' ? 'error' : ''}`}>{message}</div>;
+    }
+
+    // ==================== LOGIN SCREEN ====================
+    function LoginScreen({ onLogin, onForgot }) {
+      const [email, setEmail] = useState('');
+      const [password, setPassword] = useState('');
+      const [error, setError] = useState('');
+      const [loading, setLoading] = useState(false);
+
+      const handleSubmit = async (e) => {
+        e.preventDefault();
+        setLoading(true);
+        setError('');
+        try {
+          const res = await api('/api/login', { method: 'POST', body: JSON.stringify({ email, password }) });
+          onLogin(res);
+        } catch (err) {
+          setError(err.message);
+        }
+        setLoading(false);
+      };
+
+      return (
+        <div className="login-wrapper">
+          <div className="login-box">
+            <div className="login-title">9HIGH 仙台</div>
+            <div className="login-subtitle">管理者ログイン</div>
+            <form onSubmit={handleSubmit}>
+              <div className="form-group">
+                <input
+                  type="email"
+                  className="form-input"
+                  placeholder="メールアドレス"
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                  autoFocus
+                  style={{marginBottom: 8}}
+                />
+              </div>
+              <div className="form-group">
+                <input
+                  type="password"
+                  className="form-input"
+                  placeholder="パスワード"
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
+                />
+              </div>
+              {error && <div className="error-text" style={{marginBottom: 12}}>{error}</div>}
+              <button type="submit" className="btn btn-primary btn-block" disabled={loading}>
+                {loading ? 'ログイン中...' : 'ログイン'}
+              </button>
+            </form>
+            <div style={{textAlign:'center', marginTop:14}}>
+              <button onClick={onForgot} style={{background:'none', border:'none', color:'var(--text-muted)', fontSize:13, cursor:'pointer', textDecoration:'underline'}}>
+                パスワードを忘れた方はこちら
+              </button>
+            </div>
+            <a href="/" className="back-link" style={{marginTop: 12, display: 'inline-block'}}>
+              ← リーダーボードに戻る
+            </a>
+          </div>
+        </div>
+      );
+    }
+
+    // ==================== FORGOT PASSWORD SCREEN ====================
+    function ForgotPasswordScreen({ onBack }) {
+      const [email, setEmail] = useState('');
+      const [loading, setLoading] = useState(false);
+      const [sent, setSent] = useState(false);
+      const [error, setError] = useState('');
+
+      const handleSubmit = async (e) => {
+        e.preventDefault();
+        setLoading(true); setError('');
+        try {
+          await api('/api/forgot-password', { method: 'POST', body: JSON.stringify({ email }) });
+          setSent(true);
+        } catch (err) {
+          setError(err.message);
+        }
+        setLoading(false);
+      };
+
+      return (
+        <div className="login-wrapper">
+          <div className="login-box">
+            <div className="login-title">9HIGH 仙台</div>
+            <div className="login-subtitle">パスワードリセット</div>
+            {sent ? (
+              <div style={{textAlign:'center'}}>
+                <div style={{fontSize:40, marginBottom:12}}>📧</div>
+                <div style={{fontSize:14, color:'var(--text-secondary)', marginBottom:20, lineHeight:1.6}}>
+                  入力されたメールアドレスに<br/>リセット用のリンクを送信しました。<br/>
+                  <span style={{fontSize:12, color:'var(--text-muted)'}}>（有効期限: 1時間）</span>
+                </div>
+                <button className="btn btn-secondary btn-block" onClick={onBack}>ログインに戻る</button>
+              </div>
+            ) : (
+              <form onSubmit={handleSubmit}>
+                <div style={{fontSize:13, color:'var(--text-muted)', marginBottom:16, lineHeight:1.6}}>
+                  登録済みのメールアドレスを入力してください。パスワードリセット用のリンクを送信します。
+                </div>
+                <div className="form-group">
+                  <input type="email" className="form-input" placeholder="メールアドレス"
+                    value={email} onChange={e => setEmail(e.target.value)} autoFocus style={{marginBottom:8}} />
+                </div>
+                {error && <div className="error-text" style={{marginBottom:12}}>{error}</div>}
+                <button type="submit" className="btn btn-primary btn-block" disabled={loading || !email}>
+                  {loading ? '送信中...' : 'リセットメールを送信'}
+                </button>
+                <div style={{textAlign:'center', marginTop:14}}>
+                  <button type="button" onClick={onBack} style={{background:'none', border:'none', color:'var(--text-muted)', fontSize:13, cursor:'pointer', textDecoration:'underline'}}>
+                    ← ログインに戻る
+                  </button>
+                </div>
+              </form>
+            )}
+          </div>
+        </div>
+      );
+    }
+
+    // ==================== RESET PASSWORD SCREEN ====================
+    function ResetPasswordScreen({ token, onDone }) {
+      const [password, setPassword] = useState('');
+      const [password2, setPassword2] = useState('');
+      const [loading, setLoading] = useState(false);
+      const [done, setDone] = useState(false);
+      const [error, setError] = useState('');
+
+      const handleSubmit = async (e) => {
+        e.preventDefault();
+        if (password !== password2) { setError('パスワードが一致しません'); return; }
+        if (password.length < 6) { setError('パスワードは6文字以上にしてください'); return; }
+        setLoading(true); setError('');
+        try {
+          await api('/api/reset-password', { method: 'POST', body: JSON.stringify({ token, password }) });
+          setDone(true);
+        } catch (err) {
+          setError(err.message);
+        }
+        setLoading(false);
+      };
+
+      return (
+        <div className="login-wrapper">
+          <div className="login-box">
+            <div className="login-title">9HIGH 仙台</div>
+            <div className="login-subtitle">新しいパスワードを設定</div>
+            {done ? (
+              <div style={{textAlign:'center'}}>
+                <div style={{fontSize:40, marginBottom:12}}>✅</div>
+                <div style={{fontSize:14, color:'var(--text-secondary)', marginBottom:20}}>パスワードを変更しました</div>
+                <button className="btn btn-primary btn-block" onClick={onDone}>ログインする</button>
+              </div>
+            ) : (
+              <form onSubmit={handleSubmit}>
+                <div className="form-group">
+                  <input type="password" className="form-input" placeholder="新しいパスワード（6文字以上）"
+                    value={password} onChange={e => setPassword(e.target.value)} autoFocus style={{marginBottom:8}} />
+                </div>
+                <div className="form-group">
+                  <input type="password" className="form-input" placeholder="新しいパスワード（確認）"
+                    value={password2} onChange={e => setPassword2(e.target.value)} />
+                </div>
+                {error && <div className="error-text" style={{marginBottom:12}}>{error}</div>}
+                <button type="submit" className="btn btn-primary btn-block" disabled={loading || !password || !password2}>
+                  {loading ? '変更中...' : 'パスワードを変更する'}
+                </button>
+              </form>
+            )}
+          </div>
+        </div>
+      );
+    }
+
+    // ==================== USER MANAGEMENT MODAL ====================
+    function UserManagementModal({ onClose, showToast, currentEmail }) {
+      const [users, setUsers] = useState([]);
+      const [newEmail, setNewEmail] = useState('');
+      const [newPassword, setNewPassword] = useState('');
+      const [newRole, setNewRole] = useState('user');
+      const [tab, setTab] = useState('users'); // 'users' | 'password' | 'smtp' | 'backup'
+      const [curPw, setCurPw] = useState('');
+      const [newPw, setNewPw] = useState('');
+      const [newPw2, setNewPw2] = useState('');
+      const [smtp, setSmtp] = useState({ host:'', port:587, user:'', password:'', from_addr:'', base_url:'http://localhost:5000' });
+      const [smtpConfigured, setSmtpConfigured] = useState(false);
+      const [backups, setBackups] = useState([]);
+      const [backupMsg, setBackupMsg] = useState('');
+      const [confirmRestore, setConfirmRestore] = useState(null);
+
+      const load = async () => {
+        try { const d = await api('/api/users'); setUsers(d.users); } catch(e) {}
+      };
+      const loadSmtp = async () => {
+        try { const d = await api('/api/smtp-settings'); setSmtp(s => ({...s, ...d, password:''})); setSmtpConfigured(d.configured); } catch(e) {}
+      };
+      const loadBackups = async () => {
+        try { const d = await api('/api/backup/list'); setBackups(d.backups || []); } catch(e) {}
+      };
+      useEffect(() => { load(); loadSmtp(); loadBackups(); }, []);
+
+      const addUser = async () => {
+        if (!newEmail || !newPassword) { showToast('メールとパスワードを入力してください', 'error'); return; }
+        try {
+          await api('/api/users', { method: 'POST', body: JSON.stringify({ email: newEmail, password: newPassword, role: newRole }) });
+          showToast('ユーザーを追加しました');
+          setNewEmail(''); setNewPassword(''); setNewRole('user');
+          load();
+        } catch(e) { showToast(e.message, 'error'); }
+      };
+
+      const deleteUser = async (email) => {
+        if (!confirm(`${email} を削除しますか？`)) return;
+        try {
+          await api(`/api/users/${encodeURIComponent(email)}`, { method: 'DELETE' });
+          showToast('削除しました'); load();
+        } catch(e) { showToast(e.message, 'error'); }
+      };
+
+      const changePassword = async () => {
+        if (newPw !== newPw2) { showToast('新しいパスワードが一致しません', 'error'); return; }
+        try {
+          await api('/api/users/change-password', { method: 'POST', body: JSON.stringify({ currentPassword: curPw, newPassword: newPw }) });
+          showToast('パスワードを変更しました');
+          setCurPw(''); setNewPw(''); setNewPw2('');
+        } catch(e) { showToast(e.message, 'error'); }
+      };
+
+      return (
+        <div className="modal-overlay" onClick={onClose}>
+          <div className="modal-box" onClick={e => e.stopPropagation()} style={{maxWidth: 500}}>
+            <div className="modal-header">
+              <div className="modal-title">アカウント管理</div>
+              <button className="modal-close" onClick={onClose}>✕</button>
+            </div>
+
+            <div style={{display:'flex', gap:8, marginBottom:16}}>
+              <button className={`btn btn-sm ${tab==='users' ? 'btn-primary' : 'btn-secondary'}`} onClick={() => setTab('users')}>ユーザー管理</button>
+              <button className={`btn btn-sm ${tab==='password' ? 'btn-primary' : 'btn-secondary'}`} onClick={() => setTab('password')}>パスワード変更</button>
+              <button className={`btn btn-sm ${tab==='smtp' ? 'btn-primary' : 'btn-secondary'}`} onClick={() => setTab('smtp')}>
+                メール設定{smtpConfigured ? ' ✓' : ' ⚠'}
+              </button>
+              <button className={`btn btn-sm ${tab==='backup' ? 'btn-primary' : 'btn-secondary'}`} onClick={() => { setTab('backup'); loadBackups(); }}>
+                バックアップ
+              </button>
+            </div>
+
+            {tab === 'users' && (
+              <div>
+                <table className="admin-table" style={{marginBottom:16}}>
+                  <thead><tr><th>メールアドレス</th><th>権限</th><th></th></tr></thead>
+                  <tbody>
+                    {users.map(u => (
+                      <tr key={u.email}>
+                        <td style={{fontSize:13}}>{u.email}{u.email === currentEmail && <span style={{marginLeft:6, fontSize:11, color:'var(--accent)'}}>（あなた）</span>}</td>
+                        <td><span style={{fontSize:11, padding:'2px 8px', borderRadius:10, background: u.role==='admin' ? 'rgba(245,158,11,0.15)' : 'rgba(148,163,184,0.15)', color: u.role==='admin' ? 'var(--accent)' : 'var(--text-muted)'}}>{u.role==='admin' ? '管理者' : 'ユーザー'}</span></td>
+                        <td>{u.email !== currentEmail && <button className="btn btn-danger btn-sm" onClick={() => deleteUser(u.email)}>削除</button>}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                <div style={{borderTop:'1px solid var(--border)', paddingTop:14}}>
+                  <div style={{fontSize:13, fontWeight:600, marginBottom:10}}>新規ユーザー追加</div>
+                  <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:8, marginBottom:8}}>
+                    <input className="form-input" type="email" placeholder="メールアドレス" value={newEmail} onChange={e => setNewEmail(e.target.value)} style={{fontSize:12}} />
+                    <input className="form-input" type="password" placeholder="パスワード（6文字以上）" value={newPassword} onChange={e => setNewPassword(e.target.value)} style={{fontSize:12}} />
+                  </div>
+                  <div style={{display:'flex', gap:8, alignItems:'center'}}>
+                    <select className="form-select" value={newRole} onChange={e => setNewRole(e.target.value)} style={{fontSize:12, flex:1}}>
+                      <option value="user">ユーザー（一般）</option>
+                      <option value="admin">管理者</option>
+                    </select>
+                    <button className="btn btn-primary btn-sm" onClick={addUser}>追加</button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {tab === 'password' && (
+              <div style={{display:'flex', flexDirection:'column', gap:10}}>
+                <input className="form-input" type="password" placeholder="現在のパスワード" value={curPw} onChange={e => setCurPw(e.target.value)} />
+                <input className="form-input" type="password" placeholder="新しいパスワード（6文字以上）" value={newPw} onChange={e => setNewPw(e.target.value)} />
+                <input className="form-input" type="password" placeholder="新しいパスワード（確認）" value={newPw2} onChange={e => setNewPw2(e.target.value)} />
+                <button className="btn btn-primary" onClick={changePassword}>変更する</button>
+              </div>
+            )}
+
+            {tab === 'backup' && (
+              <div>
+                <div style={{display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:12}}>
+                  <div style={{fontSize:12, color:'var(--text-muted)'}}>毎日 3:00 AM に自動バックアップ（最大30世代）</div>
+                  <button className="btn btn-primary btn-sm" onClick={async () => {
+                    setBackupMsg('');
+                    try {
+                      const d = await api('/api/backup', { method: 'POST' });
+                      setBackupMsg(`✓ バックアップ完了: ${d.timestamp}`);
+                      loadBackups();
+                    } catch(e) { setBackupMsg(`✗ ${e.message}`); }
+                  }}>今すぐバックアップ</button>
+                </div>
+                {backupMsg && <div style={{fontSize:12, marginBottom:10, color: backupMsg.startsWith('✓') ? 'var(--positive)' : 'var(--danger)'}}>{backupMsg}</div>}
+                <div style={{maxHeight:260, overflowY:'auto'}}>
+                  {backups.length === 0 ? (
+                    <div style={{fontSize:12, color:'var(--text-muted)'}}>バックアップはまだありません</div>
+                  ) : backups.map(b => (
+                    <div key={b.name} style={{borderRadius:6, marginBottom:4, background:'rgba(255,255,255,0.03)', border:'1px solid var(--border)', overflow:'hidden'}}>
+                      <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', padding:'7px 10px'}}>
+                        <div style={{flex:1, minWidth:0}}>
+                          <div style={{fontSize:12, fontWeight:600}}>{b.name}</div>
+                          <div style={{fontSize:11, color:'var(--text-muted)', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap'}}>{b.files.join(', ')}</div>
+                        </div>
+                        <div style={{display:'flex', gap:6, alignItems:'center', flexShrink:0, marginLeft:8}}>
+                          <span style={{fontSize:11, padding:'2px 8px', borderRadius:10,
+                            background: b.name.includes('auto') ? 'rgba(34,197,94,0.1)' : b.name.includes('restore') ? 'rgba(99,102,241,0.15)' : 'rgba(245,158,11,0.1)',
+                            color: b.name.includes('auto') ? 'var(--positive)' : b.name.includes('restore') ? '#818cf8' : 'var(--accent)'}}>
+                            {b.name.includes('auto') ? '自動' : b.name.includes('restore') ? '復元前' : '手動'}
+                          </span>
+                          <button className="btn btn-secondary btn-sm" style={{fontSize:11, padding:'3px 10px'}}
+                            onClick={() => setConfirmRestore(b.name)}>復元</button>
+                        </div>
+                      </div>
+                      {confirmRestore === b.name && (
+                        <div style={{background:'rgba(239,68,68,0.1)', borderTop:'1px solid var(--danger)', padding:'8px 10px'}}>
+                          <div style={{fontSize:12, color:'var(--danger)', marginBottom:6}}>
+                            ⚠ 現在のデータを <strong>{b.name}</strong> の状態に戻します。（復元前の自動バックアップが作成されます）
+                          </div>
+                          <div style={{display:'flex', gap:6}}>
+                            <button className="btn btn-sm" style={{background:'var(--danger)', color:'#fff', padding:'4px 14px'}}
+                              onClick={async () => {
+                                setBackupMsg('');
+                                try {
+                                  const d = await api(`/api/backup/restore/${b.name}`, { method: 'POST' });
+                                  setBackupMsg(`✓ 復元完了: ${d.restored.join(', ')} — ページを再読み込みしてください`);
+                                  setConfirmRestore(null);
+                                  loadBackups();
+                                } catch(e) { setBackupMsg(`✗ ${e.message}`); }
+                              }}>はい、復元する</button>
+                            <button className="btn btn-secondary btn-sm" style={{padding:'4px 14px'}}
+                              onClick={() => setConfirmRestore(null)}>キャンセル</button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {tab === 'smtp' && (
+              <div style={{display:'flex', flexDirection:'column', gap:10}}>
+                <div style={{fontSize:12, color:'var(--text-muted)', marginBottom:4, lineHeight:1.6}}>
+                  パスワード忘れメールの送信に使うSMTPサーバーを設定してください。<br/>
+                  Gmailの場合は「アプリパスワード」を使用してください。
+                </div>
+                {[
+                  { label: 'SMTPホスト', key: 'host', placeholder: 'smtp.gmail.com' },
+                  { label: 'SMTPポート', key: 'port', placeholder: '587' },
+                  { label: '送信元メールアドレス', key: 'user', placeholder: 'your@gmail.com' },
+                  { label: 'パスワード（アプリパスワード）', key: 'password', placeholder: '変更する場合のみ入力', type: 'password' },
+                  { label: '差出人アドレス（省略可）', key: 'from_addr', placeholder: 'your@gmail.com' },
+                  { label: 'アプリのURL', key: 'base_url', placeholder: 'http://localhost:5000' },
+                ].map(f => (
+                  <div key={f.key}>
+                    <label className="form-label" style={{fontSize:11}}>{f.label}</label>
+                    <input className="form-input" type={f.type || 'text'} placeholder={f.placeholder} style={{fontSize:13}}
+                      value={smtp[f.key] || ''} onChange={e => setSmtp(s => ({...s, [f.key]: e.target.value}))} />
+                  </div>
+                ))}
+                <button className="btn btn-primary" onClick={async () => {
+                  try {
+                    await api('/api/smtp-settings', { method: 'POST', body: JSON.stringify(smtp) });
+                    showToast('メール設定を保存しました');
+                    loadSmtp();
+                  } catch(e) { showToast(e.message, 'error'); }
+                }}>保存する</button>
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    }
+
+    // ==================== PORTAL HOME ====================
+    function PortalHome({ onNavigate }) {
+      const sections = [
+        {
+          id: 'players',
+          icon: '👥',
+          title: 'プレイヤー情報取得',
+          desc: 'Sunvyからメンバーをインポート・管理'
+        },
+        {
+          id: 'leaderboard',
+          icon: '🏆',
+          title: 'リーダーズボード',
+          desc: 'トーナメント・リングゲーム結果を入力'
+        },
+        {
+          id: 'analysis',
+          icon: '📊',
+          title: '顧客データ分析',
+          desc: '9Hポイント・9Hドル・直近来店日を確認'
+        },
+        {
+          id: 'prizes',
+          icon: '🎁',
+          title: '権利付与管理',
+          desc: 'プライズの付与・未付与を管理'
+        },
+        {
+          id: 'pokerfans',
+          icon: '📈',
+          title: '競合店客数レポート',
+          desc: 'Poker Fansのイベント参加人数をExcel出力',
+          external: '/pokerfans'
+        },
+      ];
+
+      return (
+        <div>
+          <div style={{textAlign: 'center', padding: '24px 0 8px'}}>
+            <div style={{fontSize: 14, color: 'var(--text-secondary)'}}>機能を選択してください</div>
+          </div>
+          <div className="portal-grid">
+            {sections.map(s => (
+              <div key={s.id} className="portal-tile" onClick={() => s.external ? (window.location.href = s.external) : onNavigate(s.id)}>
+                <div className="portal-tile-icon">{s.icon}</div>
+                <div className="portal-tile-title">{s.title}</div>
+                <div className="portal-tile-desc">{s.desc}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    // ==================== PLAYER MODAL ====================
+    function PlayerModal({ player, sunvyCache, onSave, onClose, onDelete }) {
+      const [name, setName] = useState(player ? player.name : '');
+      const [nickname, setNickname] = useState(player ? (player.nickname || '') : '');
+      const [note, setNote] = useState(player ? (player.note || '') : '');
+      const existingPhotoSrc = player ? getPlayerPhotoSrc(player) : null;
+      const [photoPreview, setPhotoPreview] = useState(existingPhotoSrc);
+      const [photoFile, setPhotoFile] = useState(null);
+      const [saving, setSaving] = useState(false);
+      const [deleteStep, setDeleteStep] = useState(0);
+      const [deleting, setDeleting] = useState(false);
+      const [prizes, setPrizes] = useState({ types: [], awards: [] });
+      const fileRef = useRef();
+
+      useEffect(() => {
+        if (player) {
+          api('/api/prizes').then(d => setPrizes(d)).catch(() => {});
+        }
+      }, []);
+
+      // Sunvy stats for this player
+      const sm = (player?.memberCode && sunvyCache)
+        ? sunvyCache.find(m => m.memberCode === player.memberCode)
+        : null;
+
+      // Awards for this player
+      const playerAwards = player
+        ? (prizes.awards || []).filter(a => a.playerId === player.id)
+        : [];
+      const typeMap = Object.fromEntries((prizes.types || []).map(t => [t.id, t.name]));
+
+      const handlePhotoChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          setPhotoFile(file);
+          setPhotoPreview(URL.createObjectURL(file));
+        }
+      };
+
+      const handleSave = async () => {
+        if (!name.trim()) return;
+        setSaving(true);
+        try {
+          let savedPlayer;
+          if (player) {
+            savedPlayer = await api(`/api/players/${player.id}`, {
+              method: 'PUT',
+              body: JSON.stringify({ name, nickname, note })
+            });
+          } else {
+            savedPlayer = await api('/api/players', {
+              method: 'POST',
+              body: JSON.stringify({ name, nickname, note })
+            });
+          }
+          if (photoFile) {
+            const fd = new FormData();
+            fd.append('photo', photoFile);
+            await apiUpload(`/api/players/${savedPlayer.id}/photo`, fd);
+          }
+          onSave();
+        } catch (err) {
+          alert(err.message);
+        }
+        setSaving(false);
+      };
+
+      const isEdit = !!player;
+      const fg = { marginBottom: isEdit ? 6 : 16 };
+      const inp = isEdit ? { padding: '5px 10px', fontSize: 13 } : {};
+
+      return (
+        <div className="modal-overlay" onClick={onClose}>
+          <div className="modal-box" onClick={e => e.stopPropagation()} style={{height:'90vh', display:'flex', flexDirection:'column'}}>
+            <div className="modal-header" style={{marginBottom: isEdit ? 8 : 20, flexShrink:0, paddingBottom: isEdit ? 8 : 16}}>
+              <div className="modal-title">{isEdit ? 'プレイヤー編集' : '新規プレイヤー'}</div>
+              <button className="modal-close" onClick={onClose}>✕</button>
+            </div>
+
+            {/* スクロール可能コンテンツ */}
+            <div style={{flex:1, overflowY:'auto', minHeight:0}}>
+            {/* 写真 — 編集時はコンパクト化 */}
+            <div style={{display:'flex', alignItems:'center', gap:10, marginBottom: isEdit ? 8 : 0}}>
+              <div
+                className="photo-upload-area"
+                onClick={() => fileRef.current.click()}
+                style={isEdit ? {width:60, height:60, margin:0, flexShrink:0} : {}}
+              >
+                {photoPreview
+                  ? <img src={photoPreview} alt="Player" />
+                  : <div className="photo-upload-label">{isEdit ? '📷' : 'クリックして\n写真を変更'}</div>
+                }
+              </div>
+              <input type="file" ref={fileRef} accept="image/*" style={{display:'none'}} onChange={handlePhotoChange} />
+
+              {/* 編集時: 右側にSunvyステータスを3列で表示 */}
+              {isEdit && (
+                <div style={{flex:1, display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:1, borderRadius:8, overflow:'hidden', background:'var(--border)'}}>
+                  {[
+                    { label: '9Hポイント', value: sm?.points ? Number(sm.points).toLocaleString() : '—', color: 'var(--text-primary)' },
+                    { label: '9Hドル',    value: sm?.dollars ? Number(sm.dollars).toLocaleString() : '—', color: 'var(--positive)' },
+                    { label: '直近来店',  value: sm?.lastVisit || '—', color: 'var(--text-secondary)', small: true },
+                  ].map((s, i) => (
+                    <div key={i} style={{background:'var(--bg-input)', padding:'5px 4px', textAlign:'center'}}>
+                      <div style={{fontSize:9, color:'var(--text-muted)', marginBottom:2, letterSpacing:0}}>{s.label}</div>
+                      <div style={{fontSize: s.small ? 11 : 13, fontWeight:700, color:s.color, lineHeight:1.2}}>{s.value}</div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* 権利付与履歴バッジ（削除 → メモ下に移動） */}
+
+            {/* フォーム — 編集時は3カラム1行 */}
+            {isEdit ? (
+              <>
+                <div style={{display:'grid', gridTemplateColumns:'80px 1fr 1fr', gap:6, marginBottom:6}}>
+                  {/* メンバーコード（小さめ） */}
+                  <div>
+                    <label className="form-label" style={{fontSize:10}}>コード</label>
+                    <input className="form-input" style={{...inp, opacity:0.6, cursor:'not-allowed', fontSize:12, padding:'7px 8px', textAlign:'center', letterSpacing:1}}
+                      value={player.memberCode || '—'} disabled />
+                  </div>
+                  {/* プレイヤー名 */}
+                  <div>
+                    <label className="form-label" style={{fontSize:10}}>プレイヤー名 *</label>
+                    <input className="form-input" style={inp} value={name} onChange={e => setName(e.target.value)} placeholder="Sunvy名" />
+                  </div>
+                  {/* 表示名 */}
+                  <div>
+                    <label className="form-label" style={{fontSize:10}}>表示名</label>
+                    <input className="form-input" style={inp} value={nickname} onChange={e => setNickname(e.target.value)} placeholder="ニックネーム" />
+                  </div>
+                </div>
+                <div style={fg}>
+                  <label className="form-label">メモ</label>
+                  <input className="form-input" style={inp} value={note} onChange={e => setNote(e.target.value)} placeholder="自由記述" />
+                </div>
+
+                {/* 権利付与履歴 */}
+                {(() => {
+                  const pending = playerAwards.filter(a => a.status === '未付与');
+                  const given   = playerAwards.filter(a => a.status === '付与済み');
+                  const sorted  = [...pending, ...given];
+
+                  // per-type unpaid summary
+                  const pendingByType = {};
+                  pending.forEach(a => {
+                    const tName = typeMap[a.typeId] || '不明';
+                    pendingByType[tName] = (pendingByType[tName] || 0) + (parseInt(a.quantity) || 1);
+                  });
+                  const pendingTypes = Object.entries(pendingByType);
+
+                  return (
+                    <div style={{marginTop:4}}>
+                      {/* サマリー */}
+                      <div style={{marginBottom:8}}>
+                        <div style={{fontSize:11, color:'var(--text-muted)', fontWeight:600, marginBottom:5}}>権利未付与サマリー</div>
+                        {pendingTypes.length === 0 ? (
+                          <div style={{fontSize:12, color:'var(--text-muted)'}}>未付与なし</div>
+                        ) : (
+                          <div style={{display:'flex', flexWrap:'wrap', gap:6}}>
+                            {pendingTypes.map(([typeName, cnt]) => (
+                              <span key={typeName} style={{
+                                fontSize:12, fontWeight:600, padding:'3px 10px', borderRadius:20,
+                                background:'rgba(245,158,11,0.12)', border:'1px solid rgba(245,158,11,0.35)',
+                                color:'var(--accent)',
+                              }}>
+                                {typeName} {cnt}権利
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* 履歴テーブル */}
+                      <div style={{fontSize:11, color:'var(--text-muted)', fontWeight:600, marginBottom:5}}>権利付与履歴</div>
+                      {sorted.length === 0 ? (
+                        <div style={{fontSize:11, color:'var(--text-muted)'}}>権利付与なし</div>
+                      ) : (
+                        <div style={{borderRadius:8, overflow:'hidden', border:'1px solid var(--border)'}}>
+                          <table style={{width:'100%', borderCollapse:'collapse', fontSize:12}}>
+                            <thead>
+                              <tr style={{background:'rgba(255,255,255,0.03)', borderBottom:'1px solid var(--border)'}}>
+                                <th style={{padding:'5px 8px', textAlign:'left', fontWeight:600, color:'var(--text-muted)', fontSize:11}}>権利種別</th>
+                                <th style={{padding:'5px 8px', textAlign:'center', fontWeight:600, color:'var(--text-muted)', fontSize:11}}>個数</th>
+                                <th style={{padding:'5px 8px', textAlign:'center', fontWeight:600, color:'var(--text-muted)', fontSize:11}}>権利発生日</th>
+                                <th style={{padding:'5px 8px', textAlign:'center', fontWeight:600, color:'var(--text-muted)', fontSize:11}}>ステータス</th>
+                                <th style={{padding:'5px 8px', textAlign:'center', fontWeight:600, color:'var(--text-muted)', fontSize:11}}>付与日</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {sorted.map((a, i) => {
+                                const isPending = a.status === '未付与';
+                                const givenDate = a.givenAt ? a.givenAt.slice(0, 10) : null;
+                                return (
+                                  <tr key={a.id} style={{
+                                    borderBottom: i < sorted.length-1 ? '1px solid rgba(255,255,255,0.04)' : 'none',
+                                    background: isPending ? 'rgba(245,158,11,0.04)' : 'transparent',
+                                  }}>
+                                    <td style={{padding:'6px 8px', fontWeight:600, color:'var(--text-primary)'}}>{typeMap[a.typeId] || '不明'}</td>
+                                    <td style={{padding:'6px 8px', textAlign:'center', color:'var(--text-primary)'}}>{parseInt(a.quantity) || 1}</td>
+                                    <td style={{padding:'6px 8px', textAlign:'center', color:'var(--text-primary)'}}>{a.occurredAt || '—'}</td>
+                                    <td style={{padding:'6px 8px', textAlign:'center'}}>
+                                      <span style={{
+                                        fontSize:10, padding:'2px 8px', borderRadius:10, whiteSpace:'nowrap', fontWeight:600,
+                                        background: isPending ? 'rgba(245,158,11,0.15)' : 'rgba(34,197,94,0.12)',
+                                        color: isPending ? 'var(--accent)' : 'var(--positive)',
+                                        border: `1px solid ${isPending ? 'rgba(245,158,11,0.3)' : 'rgba(34,197,94,0.25)'}`,
+                                      }}>
+                                        {isPending ? '未付与' : '付与済'}
+                                      </span>
+                                    </td>
+                                    <td style={{padding:'6px 8px', textAlign:'center', color:'var(--text-primary)', fontSize:11}}>
+                                      {givenDate || '—'}
+                                    </td>
+                                  </tr>
+                                );
+                              })}
+                            </tbody>
+                          </table>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })()}
+              </>
+            ) : (
+              <>
+                <div style={fg}>
+                  <label className="form-label">プレイヤー名（Sunvy名） *</label>
+                  <input className="form-input" value={name} onChange={e => setName(e.target.value)} placeholder="例: 田中太郎" />
+                </div>
+                <div style={fg}>
+                  <label className="form-label">表示名（ニックネーム）</label>
+                  <input className="form-input" value={nickname} onChange={e => setNickname(e.target.value)} placeholder="リーダーボードでの表示名" />
+                  <div style={{fontSize:11, color:'var(--text-muted)', marginTop:4}}>リーダーボードに表示される名前です</div>
+                </div>
+                <div style={fg}>
+                  <label className="form-label">メモ</label>
+                  <input className="form-input" value={note} onChange={e => setNote(e.target.value)} placeholder="自由記述" />
+                </div>
+              </>
+            )}
+
+            {player && deleteStep === 1 && (
+              <div style={{
+                background: 'rgba(239,68,68,0.1)', border: '1px solid var(--danger)',
+                borderRadius: 8, padding: 14, marginBottom: 12
+              }}>
+                <div style={{fontSize: 13, fontWeight: 600, color: 'var(--danger)', marginBottom: 8}}>本当に削除しますか？</div>
+                <div style={{fontSize: 12, color: 'var(--text-secondary)', marginBottom: 12}}>
+                  削除すると過去のトーナメントの入賞履歴など全て破棄されます
+                </div>
+                <div style={{display: 'flex', gap: 8, justifyContent: 'flex-end'}}>
+                  <button className="btn btn-secondary btn-sm" onClick={() => setDeleteStep(0)}>いいえ</button>
+                  <button className="btn btn-sm" style={{background: 'var(--danger)', color: '#fff'}} onClick={() => setDeleteStep(2)}>はい</button>
+                </div>
+              </div>
+            )}
+            {player && deleteStep === 2 && (
+              <div style={{
+                background: 'rgba(239,68,68,0.15)', border: '2px solid var(--danger)',
+                borderRadius: 8, padding: 14, marginBottom: 12
+              }}>
+                <div style={{fontSize: 13, fontWeight: 700, color: 'var(--danger)', marginBottom: 8}}>最終確認</div>
+                <div style={{fontSize: 12, color: 'var(--text-secondary)', marginBottom: 12}}>
+                  「{player.name}」を完全に削除します。この操作は取り消せません。
+                </div>
+                <div style={{display: 'flex', gap: 8, justifyContent: 'flex-end'}}>
+                  <button className="btn btn-secondary btn-sm" onClick={() => setDeleteStep(0)}>やめる</button>
+                  <button className="btn btn-sm" style={{background: 'var(--danger)', color: '#fff'}}
+                    disabled={deleting}
+                    onClick={async () => {
+                      setDeleting(true);
+                      try {
+                        await api(`/api/players/${player.id}`, { method: 'DELETE' });
+                        onDelete();
+                      } catch (err) { alert(err.message); }
+                      setDeleting(false);
+                    }}>
+                    {deleting ? '削除中...' : '完全に削除する'}
+                  </button>
+                </div>
+              </div>
+            )}
+
+            </div>{/* end scrollable content */}
+            <div className="modal-actions" style={{justifyContent: player ? 'space-between' : 'flex-end', flexShrink:0, borderTop:'1px solid var(--border)', marginTop:8, paddingTop:12}}>
+              {player && (
+                <button className="btn btn-sm" style={{
+                  background: 'transparent', color: 'var(--danger)',
+                  border: '1px solid var(--danger)', borderRadius: 6
+                }}
+                  onClick={() => setDeleteStep(1)} disabled={deleteStep > 0 || saving}>
+                  削除
+                </button>
+              )}
+              <div style={{display: 'flex', gap: 8}}>
+                <button className="btn btn-secondary" onClick={onClose}>キャンセル</button>
+                <button className="btn btn-primary" onClick={handleSave} disabled={saving || !name.trim()}>
+                  {saving ? '保存中...' : '保存'}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    // ==================== PLAYER PHOTO HELPER ====================
+    function getPlayerPhotoSrc(player) {
+      if (player.photoUrl) return player.photoUrl;
+      if (player.photo) return `/uploads/photos/${player.photo}`;
+      return null;
+    }
+
+    // ==================== SUNVY IMPORT MODAL ====================
+    function parseSunvyName(raw) {
+      if (!raw) return { name: raw || '', memberCode: '' };
+      const m = raw.trim().match(/^(.+?)\(([^)]+)\)/);
+      if (m) return { name: m[1].trim(), memberCode: m[2].trim() };
+      return { name: raw.trim(), memberCode: '' };
+    }
+
+    function SunvyImportModal({ existingPlayers, onClose, onImport, showToast }) {
+      const [sessionCookie, setSessionCookie] = useState('');
+      const [busy, setBusy] = useState(false);
+      const [phase, setPhase] = useState('input');
+      const [fetchStatus, setFetchStatus] = useState('');
+      const [fetchProgress, setFetchProgress] = useState(null);
+      const [importProgress, setImportProgress] = useState({ current: 0, total: 0 });
+      const [results, setResults] = useState(null);
+      const [lastFetchTime, setLastFetchTime] = useState(0);
+      const FETCH_COOLDOWN_MS = 3600 * 1000;
+
+      const randomDelay = () => new Promise(r => setTimeout(r, 4500 + Math.floor(Math.random() * 500)));
+
+      const apiWithTimeout = (url, opts, timeoutMs) => {
+        return Promise.race([
+          api(url, opts),
+          new Promise((_, reject) => setTimeout(() => reject(new Error('タイムアウト')), timeoutMs))
+        ]);
+      };
+
+      const handleFetchAndImport = async () => {
+        if (!sessionCookie.trim()) { showToast('セッションCookieを入力してください', 'error'); return; }
+
+        const now = Date.now();
+        if (lastFetchTime > 0 && (now - lastFetchTime) < FETCH_COOLDOWN_MS) {
+          const remainMin = Math.ceil((FETCH_COOLDOWN_MS - (now - lastFetchTime)) / 60000);
+          showToast(`サーバー保護のため次回取得まで約${remainMin}分お待ちください`, 'error');
+          return;
+        }
+
+        setBusy(true);
+        setPhase('fetching');
+        setFetchStatus('接続中...');
+        setFetchProgress(null);
+        let fetchedMembers = [];
+
+        try {
+          const resp = await fetch('/api/sunvy/fetch-members', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ sessionCookie: sessionCookie.trim(), useCache: false })
+          });
+
+          const ct = resp.headers.get('content-type') || '';
+          if (resp.status >= 400 || ct.includes('application/json')) {
+            try {
+              const errData = await resp.json();
+              showToast(errData.message || errData.error || `エラー (${resp.status})`, 'error');
+            } catch (e) { showToast(`サーバーエラー (${resp.status})`, 'error'); }
+            setBusy(false); setPhase('input'); setFetchStatus(''); return;
+          }
+
+          const reader = resp.body.getReader();
+          const decoder = new TextDecoder();
+          let buffer = '';
+          let fetchError = false;
+
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            buffer += decoder.decode(value, { stream: true });
+            const lines = buffer.split('\n');
+            buffer = lines.pop();
+
+            for (const line of lines) {
+              if (!line.startsWith('data: ')) continue;
+              try {
+                const evt = JSON.parse(line.slice(6));
+                if (evt.type === 'status') {
+                  setFetchStatus(evt.message);
+                } else if (evt.type === 'progress') {
+                  setFetchStatus(`ページ${evt.current} 取得完了（計${evt.membersSoFar}人、このページ${evt.pageMembers}人）`);
+                  setFetchProgress({ current: evt.current });
+                } else if (evt.type === 'waiting') {
+                  setFetchStatus(evt.message);
+                } else if (evt.type === 'warning') {
+                  setFetchStatus(evt.message);
+                } else if (evt.type === 'error') {
+                  showToast(evt.message, 'error');
+                  fetchError = true;
+                } else if (evt.type === 'done') {
+                  fetchedMembers = evt.members || [];
+                  setLastFetchTime(Date.now());
+                }
+              } catch (parseErr) {}
+            }
+          }
+
+          if (fetchError) { setBusy(false); setPhase('input'); setFetchStatus(''); setFetchProgress(null); return; }
+          if (fetchedMembers.length === 0) {
+            showToast('メンバーが見つかりませんでした', 'error');
+            setBusy(false); setPhase('input'); setFetchStatus(''); setFetchProgress(null); return;
+          }
+        } catch (err) {
+          showToast(err.message || '取得に失敗しました', 'error');
+          setBusy(false); setPhase('input'); setFetchStatus(''); setFetchProgress(null); return;
+        }
+
+        // Auto-import new members
+        const newMembers = fetchedMembers.filter(m => {
+          const parsed = parseSunvyName(m.raw || m.name);
+          const code = (parsed.memberCode || m.memberCode || '').trim();
+          const name = (parsed.name || m.name || '').trim();
+          if (code) {
+            // コードで重複チェック（最も確実）
+            return !existingPlayers.some(p => p.memberCode && p.memberCode === code);
+          } else {
+            // コードなしの場合は名前で重複チェック
+            return !existingPlayers.some(p => (p.name || '').trim() === name || (p.nickname || '').trim() === name);
+          }
+        });
+        const skipped = fetchedMembers.length - newMembers.length;
+
+        if (newMembers.length === 0) {
+          setResults({ fetched: fetchedMembers.length, imported: 0, skipped, errors: 0 });
+          setPhase('done'); setBusy(false);
+          showToast(`${fetchedMembers.length}人取得済み、全員登録済みです`);
+          onImport(); return;
+        }
+
+        setPhase('importing');
+        setImportProgress({ current: 0, total: newMembers.length });
+        let imported = 0, errors = 0, noCode = 0;
+
+        for (let i = 0; i < newMembers.length; i++) {
+          const m = newMembers[i];
+          setImportProgress({ current: i + 1, total: newMembers.length });
+          try {
+            const parsed = parseSunvyName(m.raw || m.name);
+            const cleanName = parsed.name || m.name;
+            const cleanCode = (parsed.memberCode || m.memberCode || '').trim();
+            if (!cleanCode) noCode++;
+            await apiWithTimeout('/api/players', {
+              method: 'POST',
+              body: JSON.stringify({ name: cleanName, nickname: cleanName, memberCode: cleanCode, photoUrl: m.photoUrl || '', note: '' })
+            }, 3000);
+            imported++;
+          } catch (err) {
+            console.error('Import error:', err);
+            errors++;
+            if (err.message === 'タイムアウト') {
+              showToast(`サーバー応答なし。${imported}人インポート済み、残りは中断`, 'error');
+              setResults({ fetched: fetchedMembers.length, imported, skipped, noCode, errors: errors + (newMembers.length - i - 1) });
+              setPhase('done'); setBusy(false); onImport(); return;
+            }
+          }
+          if (i < newMembers.length - 1) await randomDelay();
+        }
+
+        setResults({ fetched: fetchedMembers.length, imported, skipped, noCode, errors });
+        setPhase('done'); setBusy(false);
+        showToast(`${imported}人のプレイヤーをインポートしました`);
+        onImport();
+      };
+
+      return (
+        <div className="modal-overlay" onClick={busy ? undefined : onClose}>
+          <div className="modal-box" onClick={e => e.stopPropagation()} style={{maxWidth: 500}}>
+            <div className="modal-header">
+              <div className="modal-title">Sunvy メンバー取得 &amp; インポート</div>
+              {!busy && <button className="modal-close" onClick={onClose}>✕</button>}
+            </div>
+
+            {phase === 'input' && (
+              <div>
+                <div style={{fontSize: 13, color: 'var(--text-secondary)', marginBottom: 16}}>
+                  ボタンを押すと全ページを自動取得し、未登録メンバーを自動インポートします。
+                  <div style={{fontSize: 11, color: 'var(--text-muted)', marginTop: 4}}>
+                    サーバー保護のため取得は1時間に1回まで。全ページ取得+インポートには15〜20分かかります。
+                  </div>
+                </div>
+                <div className="form-group">
+                  <label className="form-label">セッションCookie（JSESSIONID）</label>
+                  <input className="form-input" type="text" value={sessionCookie}
+                    onChange={e => setSessionCookie(e.target.value)}
+                    placeholder="F12 → Application → Cookies → JSESSIONID の値" />
+                  <div style={{fontSize: 11, color: 'var(--text-muted)', marginTop: 4}}>
+                    Sunvyにログイン → F12 → Application → Cookies → club.sunvy.jp → JSESSIONIDの値
+                  </div>
+                </div>
+                <div className="modal-actions">
+                  <button className="btn btn-secondary" onClick={onClose}>キャンセル</button>
+                  <button className="btn btn-primary" onClick={handleFetchAndImport}>全メンバーを取得 &amp; インポート</button>
+                </div>
+              </div>
+            )}
+
+            {phase === 'fetching' && (
+              <div>
+                <div style={{textAlign: 'center', marginBottom: 20}}>
+                  <div style={{fontSize: 32, marginBottom: 12}}>&#128269;</div>
+                  <div style={{fontSize: 15, fontWeight: 600, marginBottom: 8}}>メンバー取得中...</div>
+                  <div style={{fontSize: 13, color: 'var(--accent)'}}>{fetchStatus}</div>
+                </div>
+                {fetchProgress && (
+                  <div style={{marginBottom: 16, textAlign: 'center'}}>
+                    <div style={{fontSize: 12, color: 'var(--text-muted)', marginBottom: 6}}>
+                      ページ{fetchProgress.current} まで取得済み
+                    </div>
+                    <div style={{height: 4, background: 'var(--bg-primary)', borderRadius: 2, overflow: 'hidden'}}>
+                      <div style={{
+                        height: '100%', background: 'var(--accent)', borderRadius: 2,
+                        width: '100%', animation: 'pulse 1.5s ease-in-out infinite', opacity: 0.7
+                      }} />
+                    </div>
+                  </div>
+                )}
+                <div style={{fontSize: 11, color: 'var(--text-muted)', textAlign: 'center'}}>
+                  データがなくなるまで自動で次のページへ進みます。このウィンドウを閉じないでください。
+                </div>
+              </div>
+            )}
+
+            {phase === 'importing' && (
+              <div>
+                <div style={{textAlign: 'center', marginBottom: 20}}>
+                  <div style={{fontSize: 32, marginBottom: 12}}>&#128229;</div>
+                  <div style={{fontSize: 15, fontWeight: 600, marginBottom: 8}}>インポート中...</div>
+                  <div style={{fontSize: 13, color: 'var(--accent)'}}>{importProgress.current} / {importProgress.total} 人</div>
+                </div>
+                <div style={{marginBottom: 16}}>
+                  <div style={{display: 'flex', justifyContent: 'space-between', fontSize: 11, color: 'var(--text-muted)', marginBottom: 4}}>
+                    <span>{importProgress.current}/{importProgress.total}人</span>
+                    <span>{Math.round((importProgress.current / importProgress.total) * 100)}%</span>
+                  </div>
+                  <div style={{height: 6, background: 'var(--bg-primary)', borderRadius: 3, overflow: 'hidden'}}>
+                    <div style={{
+                      height: '100%', background: 'var(--positive)', borderRadius: 3,
+                      width: `${(importProgress.current / importProgress.total) * 100}%`,
+                      transition: 'width 0.3s'
+                    }} />
+                  </div>
+                </div>
+                <div style={{fontSize: 11, color: 'var(--text-muted)', textAlign: 'center'}}>このウィンドウを閉じないでください</div>
+              </div>
+            )}
+
+            {phase === 'done' && results && (
+              <div>
+                <div style={{textAlign: 'center', marginBottom: 20}}>
+                  <div style={{fontSize: 32, marginBottom: 12}}>&#9989;</div>
+                  <div style={{fontSize: 15, fontWeight: 600, marginBottom: 16}}>完了</div>
+                </div>
+                <div style={{background: 'var(--bg-primary)', borderRadius: 8, padding: 16, marginBottom: 16}}>
+                  <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12}}>
+                    <div style={{textAlign: 'center'}}>
+                      <div style={{fontSize: 24, fontWeight: 700}}>{results.fetched}</div>
+                      <div style={{fontSize: 11, color: 'var(--text-muted)'}}>Sunvy取得数</div>
+                    </div>
+                    <div style={{textAlign: 'center'}}>
+                      <div style={{fontSize: 24, fontWeight: 700, color: 'var(--positive)'}}>{results.imported}</div>
+                      <div style={{fontSize: 11, color: 'var(--text-muted)'}}>新規インポート</div>
+                    </div>
+                    <div style={{textAlign: 'center'}}>
+                      <div style={{fontSize: 24, fontWeight: 700, color: 'var(--accent)'}}>{results.skipped}</div>
+                      <div style={{fontSize: 11, color: 'var(--text-muted)'}}>登録済みスキップ</div>
+                    </div>
+                    <div style={{textAlign: 'center'}}>
+                      <div style={{fontSize: 24, fontWeight: 700, color: results.errors > 0 ? 'var(--danger)' : 'var(--text-muted)'}}>{results.errors}</div>
+                      <div style={{fontSize: 11, color: 'var(--text-muted)'}}>エラー</div>
+                    </div>
+                  </div>
+                  {results.noCode > 0 && (
+                    <div style={{marginTop: 12, padding: '8px 12px', background: 'rgba(245,158,11,0.1)', border: '1px solid rgba(245,158,11,0.3)', borderRadius: 6, fontSize: 12, color: 'var(--accent)'}}>
+                      ⚠ コード未取得のメンバーが {results.noCode} 人含まれます。これらは名前で重複判定されます。CSVアップロードを使うとより正確にインポートできます。
+                    </div>
+                  )}
+                </div>
+                <div className="modal-actions">
+                  <button className="btn btn-primary" onClick={onClose}>閉じる</button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    }
+
+    // ==================== PLAYERS TAB ====================
+    function PlayersTab({ players, onReload, showToast, isAdmin = false }) {
+      const [showModal, setShowModal] = useState(false);
+      const [editPlayer, setEditPlayer] = useState(null);
+      const [showSunvy, setShowSunvy] = useState(false);
+      const [updatingId, setUpdatingId] = useState(null);
+      const [sunvyCache, setSunvyCache] = useState(null);
+      const [playerSearch, setPlayerSearch] = useState('');
+      const [csvImporting, setCsvImporting] = useState(false);
+      const [invalidPlayers, setInvalidPlayers] = useState(null); // null=未検出, []=検出済み
+      const [showClearConfirm, setShowClearConfirm] = useState(false);
+
+      useEffect(() => {
+        api('/api/sunvy/cache').then(data => {
+          if (data.members && data.members.length > 0) setSunvyCache(data.members);
+        }).catch(() => {});
+      }, []);
+
+      const handleClearAll = async () => {
+        try {
+          const res = await api('/api/players/clear-all', { method: 'POST' });
+          showToast(`${res.deleted}人のプレイヤーデータを全削除しました`);
+          setShowClearConfirm(false);
+          onReload();
+        } catch (e) { showToast(e.message, 'error'); }
+      };
+
+      const handleDetectInvalid = async () => {
+        try {
+          const res = await api('/api/players/detect-invalid');
+          setInvalidPlayers(res.invalid);
+          if (res.invalid.length === 0) showToast('不正なプレイヤーデータは見つかりませんでした');
+        } catch (e) { showToast(e.message, 'error'); }
+      };
+
+      const handleDeleteInvalid = async () => {
+        if (!invalidPlayers || invalidPlayers.length === 0) return;
+        try {
+          const res = await api('/api/players/delete-invalid', {
+            method: 'POST',
+            body: JSON.stringify({ ids: invalidPlayers.map(p => p.id) })
+          });
+          showToast(`${res.deleted}人の不正データを削除しました`);
+          setInvalidPlayers(null);
+          onReload();
+        } catch (e) { showToast(e.message, 'error'); }
+      };
+
+      const handleCsvImport = async () => {
+        if (csvImporting) return;
+        setCsvImporting(true);
+        try {
+          const res = await api('/api/players/import-from-cache', { method: 'POST' });
+          showToast(`${res.imported}人をインポートしました（スキップ: ${res.skipped}人）`);
+          onReload();
+        } catch (e) { showToast(e.message, 'error'); }
+        setCsvImporting(false);
+      };
+
+      const handleUpdatePlayer = async (player, e) => {
+        e.stopPropagation();
+        if (!player.memberCode) { showToast('メンバーコードがないため更新できません', 'error'); return; }
+        if (!sunvyCache || sunvyCache.length === 0) {
+          showToast('Sunvyキャッシュがありません。先にSunvyからメンバーを取得してください。', 'error'); return;
+        }
+        const match = sunvyCache.find(m => {
+          const p = parseSunvyName(m.raw || m.name);
+          return (p.memberCode || m.memberCode) === player.memberCode;
+        });
+        if (!match) { showToast('Sunvyキャッシュに該当メンバーが見つかりません', 'error'); return; }
+        const parsed = parseSunvyName(match.raw || match.name);
+        const cleanName = parsed.name || match.name;
+        const nameChanged = cleanName && cleanName !== player.name;
+        const photoChanged = match.photoUrl && match.photoUrl !== player.photoUrl;
+        if (!nameChanged && !photoChanged) { showToast('変更はありません'); return; }
+
+        setUpdatingId(player.id);
+        try {
+          const updateData = { name: nameChanged ? cleanName : player.name, nickname: player.nickname || '', note: player.note || '' };
+          if (photoChanged) updateData.photoUrl = match.photoUrl;
+          await api(`/api/players/${player.id}`, { method: 'PUT', body: JSON.stringify(updateData) });
+          showToast(`${cleanName} を更新しました`);
+          onReload();
+        } catch (err) { showToast(err.message, 'error'); }
+        setUpdatingId(null);
+      };
+
+      const filteredPlayers = playerSearch
+        ? players.filter(p => {
+            const q = playerSearch.toLowerCase();
+            return (
+              (p.memberCode && p.memberCode.toLowerCase().includes(q)) ||
+              (p.name && p.name.toLowerCase().includes(q)) ||
+              (p.nickname && p.nickname.toLowerCase().includes(q)) ||
+              (p.memo && p.memo.toLowerCase().includes(q))
+            );
+          })
+        : players;
+
+      return (
+        <div>
+          <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', margin: '16px 0', flexWrap: 'wrap', gap: 8}}>
+            <div style={{fontSize: 14, color: 'var(--text-muted)'}}>
+              {playerSearch ? `${filteredPlayers.length} / ${players.length}人` : `${players.length}人のプレイヤー`}
+            </div>
+            <div style={{display: 'flex', gap: 8, flexWrap: 'wrap'}}>
+              <button className="btn btn-sm" style={{background: '#6366f1', color: '#fff'}} onClick={() => setShowSunvy(true)}>
+                Sunvyからインポート
+              </button>
+              <button className="btn btn-sm" style={{background: '#0e7490', color: '#fff', opacity: csvImporting ? 0.6 : 1}}
+                onClick={handleCsvImport} disabled={csvImporting}>
+                {csvImporting ? '処理中...' : '📂 CSVキャッシュからインポート'}
+              </button>
+              {isAdmin && (
+                <button className="btn btn-sm" style={{background: '#7f1d1d', color: '#fca5a5'}}
+                  onClick={handleDetectInvalid}>
+                  🔍 不正データ検出
+                </button>
+              )}
+              {isAdmin && (
+                <button className="btn btn-sm" style={{background: '#450a0a', color: '#f87171', border:'1px solid rgba(239,68,68,0.4)'}}
+                  onClick={() => setShowClearConfirm(true)}>
+                  🗑 全データクリア
+                </button>
+              )}
+              <button className="btn btn-primary btn-sm" onClick={() => { setEditPlayer(null); setShowModal(true); }}>
+                + 新規追加
+              </button>
+            </div>
+          </div>
+
+          {/* 全データクリア確認モーダル */}
+          {isAdmin && showClearConfirm && (
+            <div className="modal-overlay" onClick={() => setShowClearConfirm(false)}>
+              <div className="modal-box" onClick={e => e.stopPropagation()} style={{maxWidth:380, textAlign:'center'}}>
+                <div style={{fontSize:32, marginBottom:12}}>⚠️</div>
+                <div style={{fontSize:18, fontWeight:700, marginBottom:12, color:'#f87171'}}>全プレイヤーデータを削除</div>
+                <div style={{fontSize:13, color:'var(--text-secondary)', marginBottom:8}}>
+                  <strong style={{color:'var(--text-primary)'}}>{players.length}人</strong> 全員のプレイヤーデータが削除されます。
+                </div>
+                <div style={{fontSize:12, color:'#fca5a5', marginBottom:8, padding:'8px 12px', background:'rgba(239,68,68,0.1)', borderRadius:6}}>
+                  ⚠ Sunvyスクレイピングで取得した<strong>写真も全て失われます</strong>。<br/>
+                  再取得には「Sunvyからインポート」で再スクレイピングが必要です。
+                </div>
+                <div style={{fontSize:12, color:'var(--text-muted)', marginBottom:20}}>
+                  この操作は元に戻せません。試合記録・権利付与データは残ります。
+                </div>
+                <div style={{display:'flex', gap:10, justifyContent:'center'}}>
+                  <button className="btn btn-secondary" style={{minWidth:100}} onClick={() => setShowClearConfirm(false)}>キャンセル</button>
+                  <button className="btn btn-danger" style={{minWidth:100}} onClick={handleClearAll}>削除する</button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* 不正データ確認パネル */}
+          {isAdmin && invalidPlayers && invalidPlayers.length > 0 && (
+            <div style={{marginBottom:16, padding:14, background:'rgba(127,29,29,0.2)', border:'1px solid rgba(239,68,68,0.4)', borderRadius:8}}>
+              <div style={{fontWeight:600, color:'#fca5a5', marginBottom:8}}>
+                ⚠ 不正データが {invalidPlayers.length} 件検出されました（一覧）
+              </div>
+              <div style={{maxHeight:160, overflowY:'auto', marginBottom:10}}>
+                <table style={{width:'100%', fontSize:12, borderCollapse:'collapse'}}>
+                  <thead>
+                    <tr style={{color:'var(--text-muted)'}}>
+                      <th style={{textAlign:'left', padding:'3px 8px'}}>名前</th>
+                      <th style={{textAlign:'left', padding:'3px 8px'}}>コード</th>
+                      <th style={{textAlign:'left', padding:'3px 8px'}}>理由</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {invalidPlayers.map(p => (
+                      <tr key={p.id} style={{borderTop:'1px solid rgba(255,255,255,0.05)'}}>
+                        <td style={{padding:'3px 8px', color:'var(--text-primary)'}}>{p.name || '(空)'}</td>
+                        <td style={{padding:'3px 8px', color:'var(--text-muted)'}}>{p.memberCode || '-'}</td>
+                        <td style={{padding:'3px 8px', color:'#fca5a5'}}>{p.reason}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <div style={{display:'flex', gap:8}}>
+                <button className="btn btn-danger btn-sm" onClick={handleDeleteInvalid}>
+                  {invalidPlayers.length}件を一括削除
+                </button>
+                <button className="btn btn-secondary btn-sm" onClick={() => setInvalidPlayers(null)}>
+                  キャンセル
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* 検索バー */}
+          <div style={{marginBottom: 14}}>
+            <input
+              className="form-input"
+              style={{width: '100%', padding: '8px 12px', fontSize: 13}}
+              placeholder="🔍 コード・プレイヤー名・表示名・メモで検索..."
+              value={playerSearch}
+              onChange={e => setPlayerSearch(e.target.value)}
+            />
+          </div>
+
+          <div className="player-grid">
+            {filteredPlayers.map(p => {
+              const photoSrc = getPlayerPhotoSrc(p);
+              return (
+                <div className="player-card" key={p.id} onClick={() => { setEditPlayer(p); setShowModal(true); }}>
+                  <div className="player-photo-wrapper">
+                    {photoSrc ? <img src={photoSrc} alt={p.name} /> : <div className="player-photo-placeholder">👤</div>}
+                  </div>
+                  <div className="player-card-name">{p.name}</div>
+                  {p.memberCode && <div className="player-card-nickname" style={{fontSize: 10}}>{p.memberCode}</div>}
+                  {p.memberCode && (
+                    <button className="btn btn-sm" style={{
+                      position: 'absolute', top: 8, right: 8, padding: '3px 8px',
+                      fontSize: 10, background: 'var(--info)', color: '#fff'
+                    }} disabled={updatingId === p.id} onClick={(e) => handleUpdatePlayer(p, e)}>
+                      {updatingId === p.id ? '...' : '更新'}
+                    </button>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+
+          {showModal && (
+            <PlayerModal
+              player={editPlayer}
+              sunvyCache={sunvyCache}
+              onClose={() => setShowModal(false)}
+              onSave={() => { setShowModal(false); showToast('保存しました'); onReload(); }}
+              onDelete={() => { setShowModal(false); showToast('プレイヤーを削除しました'); onReload(); }}
+            />
+          )}
+          {showSunvy && (
+            <SunvyImportModal
+              existingPlayers={players}
+              onClose={() => setShowSunvy(false)}
+              onImport={onReload}
+              showToast={showToast}
+            />
+          )}
+        </div>
+      );
+    }
+
+    // ==================== TOURNAMENT RESULTS TAB ====================
+    function TournamentResultsTab({ players, showToast }) {
+      const [tournaments, setTournaments] = useState({ tournaments: [], results: [] });
+      const [showForm, setShowForm] = useState(false);
+      const [editIndex, setEditIndex] = useState(null);
+      const emptyForm = { tournamentId: '', date: '', entries: 0, results: [{ playerId: '', rank: 1, points: 0 }] };
+      const [formData, setFormData] = useState(emptyForm);
+
+      const loadData = async () => {
+        const data = await api('/api/tournaments');
+        setTournaments(data);
+      };
+      useEffect(() => { loadData(); }, []);
+
+      const openAddForm = () => {
+        setEditIndex(null);
+        setFormData({ ...emptyForm, results: [{ playerId: '', rank: 1, points: 0 }] });
+        setShowForm(true);
+      };
+
+      const openEditForm = (idx) => {
+        const event = tournaments.results[idx];
+        setEditIndex(idx);
+        setFormData({
+          tournamentId: event.tournamentId || '',
+          date: event.date || '',
+          entries: event.entries || 0,
+          results: (event.results || []).map(r => ({
+            playerId: r.playerId || '',
+            rank: (r.rank === null || r.rank === '参加') ? null : (r.rank || 1),
+            points: r.points || 0
+          }))
+        });
+        setShowForm(true);
+      };
+
+      const closeForm = () => { setShowForm(false); setEditIndex(null); };
+
+      const handleSubmit = async () => {
+        if (!formData.tournamentId || !formData.date) { showToast('トーナメントと日付を入力してください', 'error'); return; }
+        const results = formData.results.filter(r => r.playerId).map(r => {
+          const player = players.find(p => p.id === r.playerId);
+          // rank: null → 参加 (non-placer), number → 入賞 (placed)
+          return { playerId: r.playerId, rank: r.rank, points: r.points || 0,
+                   playerName: player ? player.name : '', placed: r.rank !== null };
+        });
+        try {
+          if (editIndex !== null) {
+            await api(`/api/tournaments/results/${editIndex}`, { method: 'PUT', body: JSON.stringify({ ...formData, results }) });
+            showToast('トーナメント結果を更新しました');
+          } else {
+            await api('/api/tournaments/results', { method: 'POST', body: JSON.stringify({ ...formData, results }) });
+            showToast('トーナメント結果を追加しました');
+          }
+          closeForm();
+          setFormData({ ...emptyForm, results: [{ playerId: '', rank: 1, points: 0 }] });
+          loadData();
+        } catch (err) { showToast(err.message, 'error'); }
+      };
+
+      const handleDeleteResult = async (idx) => {
+        if (!confirm('この結果を削除しますか？')) return;
+        try {
+          await api(`/api/tournaments/results/${idx}`, { method: 'DELETE' });
+          showToast('削除しました');
+          loadData();
+        } catch (err) { showToast(err.message, 'error'); }
+      };
+
+      return (
+        <div>
+          <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', margin: '16px 0'}}>
+            <div className="card-title" style={{margin: 0}}>トーナメント結果</div>
+            <button className="btn btn-primary btn-sm" onClick={openAddForm}>+ 結果を追加</button>
+          </div>
+          <div className="card">
+            <table className="admin-table">
+              <thead>
+                <tr><th>日付</th><th>トーナメント</th><th>参加者数</th><th>結果数</th><th></th></tr>
+              </thead>
+              <tbody>
+                {(tournaments.results || [])
+                  .map((event, idx) => ({ event, idx }))
+                  .sort((a, b) => (b.event.date || '').localeCompare(a.event.date || ''))
+                  .map(({ event, idx }) => (
+                  <tr key={idx}>
+                    <td>{event.date}</td>
+                    <td>{(event.tournamentId || '').replace(/\s*\(Processed\)\s*/gi, '').trim()}</td>
+                    <td>{event.entries}人</td>
+                    <td>{event.results.length}人</td>
+                    <td style={{whiteSpace: 'nowrap'}}>
+                      <button className="btn btn-sm" style={{background: 'var(--info)', color: '#fff', marginRight: 6}} onClick={() => openEditForm(idx)}>修正</button>
+                      <button className="btn btn-danger btn-sm" onClick={() => handleDeleteResult(idx)}>削除</button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            {(tournaments.results || []).length === 0 && (
+              <div style={{textAlign: 'center', padding: 20, color: 'var(--text-muted)'}}>まだ結果がありません</div>
+            )}
+          </div>
+
+          {showForm && (
+            <div className="modal-overlay" onClick={closeForm}>
+              <div className="modal-box" onClick={e => e.stopPropagation()} style={{maxWidth: 600}}>
+                <div className="modal-header">
+                  <div className="modal-title">{editIndex !== null ? 'トーナメント結果を修正' : 'トーナメント結果を追加'}</div>
+                  <button className="modal-close" onClick={closeForm}>✕</button>
+                </div>
+                <div className="form-group">
+                  <label className="form-label">トーナメント名</label>
+                  <input className="form-input" value={formData.tournamentId}
+                    onChange={e => setFormData(prev => ({...prev, tournamentId: e.target.value}))}
+                    placeholder="例: Weekly NLH" />
+                </div>
+                <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12}}>
+                  <div className="form-group">
+                    <label className="form-label">日付</label>
+                    <input type="date" className="form-input" value={formData.date}
+                      onChange={e => setFormData(prev => ({...prev, date: e.target.value}))} />
+                  </div>
+                  <div className="form-group">
+                    <label className="form-label">参加者数</label>
+                    <input type="number" className="form-input" value={formData.entries}
+                      onChange={e => setFormData(prev => ({...prev, entries: Number(e.target.value)}))} />
+                  </div>
+                </div>
+                <div style={{marginTop: 16}}>
+                  <label className="form-label">参加者</label>
+                  <div className="result-row result-row-header">
+                    <span>プレイヤー</span><span>順位</span><span>ポイント</span><span></span>
+                  </div>
+                  {formData.results.map((r, idx) => (
+                    <div className="result-row" key={idx}>
+                      <PlayerAutocomplete players={players} value={r.playerId}
+                        onChange={v => setFormData(prev => ({...prev, results: prev.results.map((row, i) => i === idx ? {...row, playerId: v} : row)}))} />
+                      <div className="rank-toggle">
+                        {r.rank === null ? (
+                          <button className="rank-toggle-btn active-sanka"
+                            onClick={() => setFormData(prev => ({...prev, results: prev.results.map((row, i) => i === idx ? {...row, rank: idx + 1} : row)}))}>
+                            参加
+                          </button>
+                        ) : (
+                          <>
+                            <input type="number" className="form-input" value={r.rank} min="1"
+                              style={{width: 60, padding: '5px 6px'}}
+                              onChange={e => setFormData(prev => ({...prev, results: prev.results.map((row, i) => i === idx ? {...row, rank: Number(e.target.value)} : row)}))} />
+                            <button className="rank-toggle-btn inactive"
+                              onClick={() => setFormData(prev => ({...prev, results: prev.results.map((row, i) => i === idx ? {...row, rank: null} : row)}))}>
+                              参加
+                            </button>
+                          </>
+                        )}
+                      </div>
+                      <input type="number" className="form-input" value={r.points}
+                        onChange={e => setFormData(prev => ({...prev, results: prev.results.map((row, i) => i === idx ? {...row, points: Number(e.target.value)} : row)}))} />
+                      <button className="remove-btn" onClick={() => setFormData(prev => ({...prev, results: prev.results.filter((_, i) => i !== idx)}))}>✕</button>
+                    </div>
+                  ))}
+                  <button className="add-row-btn" onClick={() => setFormData(prev => ({...prev, results: [...prev.results, {playerId: '', rank: null, points: 0}]}))}>
+                    + 参加者を追加
+                  </button>
+                </div>
+                <div className="modal-actions">
+                  <button className="btn btn-secondary" onClick={closeForm}>キャンセル</button>
+                  <button className="btn btn-primary" onClick={handleSubmit}>{editIndex !== null ? '更新' : '保存'}</button>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    // ==================== RING GAME TAB ====================
+    function RingGameResultsTab({ players, showToast }) {
+      const [ringData, setRingData] = useState({ sessions: [] });
+      const [showAddModal, setShowAddModal] = useState(false);
+      const [editSession, setEditSession] = useState(null); // session object being edited
+
+      // Add form state
+      const emptyAdd = () => ({ name: '', date: '', players: [{ playerId: '', playerName: '', netChips: 0 }] });
+      const [addForm, setAddForm] = useState(emptyAdd());
+
+      const loadData = async () => {
+        const data = await api('/api/ringgames');
+        setRingData(data || { sessions: [] });
+      };
+      useEffect(() => { loadData(); }, []);
+
+      const sessions = React.useMemo(() =>
+        [...(ringData.sessions || [])].sort((a, b) => (b.date || '').localeCompare(a.date || '')),
+        [ringData]
+      );
+
+      // ---- Add session helpers ----
+      const openAdd = () => { setAddForm(emptyAdd()); setShowAddModal(true); };
+
+      // Generic player list mutators — work with any array-setter (fn or direct)
+      const pAdd = (setList) => setList(ps => [...ps, { playerId: '', playerName: '', netChips: 0 }]);
+      const pRemove = (setList, idx) => setList(ps => ps.filter((_, i) => i !== idx));
+      const pUpdate = (setList, idx, field, value) => setList(ps => {
+        const copy = [...ps];
+        copy[idx] = { ...copy[idx], [field]: value };
+        return copy;
+      });
+
+      const handleAddSubmit = async () => {
+        if (!addForm.date) { showToast('日付を入力してください', 'error'); return; }
+        const validPlayers = addForm.players.filter(p => p.playerId);
+        if (validPlayers.length === 0) { showToast('プレイヤーを1人以上追加してください', 'error'); return; }
+        try {
+          await api('/api/ringgames/sessions', {
+            method: 'POST',
+            body: JSON.stringify({ name: addForm.name, date: addForm.date, players: validPlayers })
+          });
+          showToast('セッションを追加しました ✅');
+          setShowAddModal(false);
+          loadData();
+        } catch(err) { showToast(err.message, 'error'); }
+      };
+
+      // ---- Edit session helpers ----
+      const openEdit = (sess) => setEditSession(JSON.parse(JSON.stringify(sess))); // deep copy
+
+      const handleEditSubmit = async () => {
+        if (!editSession.date) { showToast('日付を入力してください', 'error'); return; }
+        try {
+          await api(`/api/ringgames/sessions/${editSession.id}`, {
+            method: 'PUT',
+            body: JSON.stringify({
+              name: editSession.name,
+              date: editSession.date,
+              players: editSession.players.filter(p => p.playerId)
+            })
+          });
+          showToast('保存しました ✅');
+          setEditSession(null);
+          loadData();
+        } catch(e) { showToast(e.message, 'error'); }
+      };
+
+      const deleteSession = async (sess) => {
+        if (!confirm(`「${sess.name}」を削除しますか？`)) return;
+        try {
+          await api(`/api/ringgames/sessions/${sess.id}`, { method: 'DELETE' });
+          showToast('削除しました');
+          loadData();
+        } catch(e) { showToast(e.message, 'error'); }
+      };
+
+      // ---- Shared player rows renderer ----
+      // setList: (prevArray) => newArray  — setter for the players array specifically
+      const renderPlayerRows = (playerList, setList) => (
+        <div>
+          <div style={{display: 'grid', gridTemplateColumns: '1fr 120px 32px', gap: '6px 8px', alignItems: 'center', marginBottom: 4}}>
+            <div style={{fontSize: 11, color: 'var(--text-secondary)', fontWeight: 600}}>プレイヤー</div>
+            <div style={{fontSize: 11, color: 'var(--text-secondary)', fontWeight: 600}}>増減チップ</div>
+            <div></div>
+          </div>
+          {playerList.map((p, idx) => (
+            <div key={idx} style={{display: 'grid', gridTemplateColumns: '1fr 120px 32px', gap: '6px 8px', alignItems: 'center', marginBottom: 6}}>
+              <PlayerAutocomplete players={players} value={p.playerId}
+                onChange={v => pUpdate(setList, idx, 'playerId', v)} />
+              <input type="number" className="form-input"
+                style={{padding: '5px 8px', textAlign: 'right'}}
+                value={p.netChips}
+                onChange={e => pUpdate(setList, idx, 'netChips', Number(e.target.value))} />
+              <button onClick={() => pRemove(setList, idx)}
+                style={{background: 'none', border: 'none', color: 'var(--danger)', cursor: 'pointer', fontSize: 16, padding: '0 4px', lineHeight: 1}}>✕</button>
+            </div>
+          ))}
+          <button className="btn btn-sm" style={{marginTop: 4, color: 'var(--primary)', background: 'transparent', border: '1px dashed var(--primary)'}}
+            onClick={() => pAdd(setList)}>
+            + プレイヤー追加
+          </button>
+        </div>
+      );
+
+      return (
+        <div>
+          <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', margin: '16px 0'}}>
+            <div className="card-title" style={{margin: 0}}>リングゲームセッション</div>
+            <button className="btn btn-primary btn-sm" onClick={openAdd}>+ セッション追加</button>
+          </div>
+
+          <div className="card">
+            {sessions.length === 0 && (
+              <div style={{textAlign: 'center', padding: 20, color: 'var(--text-muted)'}}>まだセッションがありません</div>
+            )}
+            {sessions.map(sess => (
+              <div key={sess.id} style={{borderBottom: '1px solid var(--border)', padding: '10px 0'}}>
+                <div style={{display: 'flex', alignItems: 'center', gap: 8}}>
+                  <div style={{flex: 1}}>
+                    <div style={{fontWeight: 600, fontSize: 14}}>{sess.name}</div>
+                    <div style={{fontSize: 12, color: 'var(--text-muted)', marginTop: 2}}>
+                      {sess.date}　{(sess.players || []).length}人参加
+                      {sess.pokerfansUrl && <span style={{marginLeft: 8, fontSize: 11, color: 'var(--text-muted)'}}>（取込）</span>}
+                    </div>
+                  </div>
+                  <button className="btn btn-sm" style={{background: 'var(--info)', color: '#fff', whiteSpace: 'nowrap'}}
+                    onClick={() => openEdit(sess)}>修正</button>
+                  <button className="btn btn-danger btn-sm" onClick={() => deleteSession(sess)}>削除</button>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* ---- Edit session modal ---- */}
+          {editSession && (
+            <div className="modal-overlay" onClick={() => setEditSession(null)}>
+              <div className="modal-box" onClick={e => e.stopPropagation()} style={{maxWidth: 520}}>
+                <div className="modal-header">
+                  <div className="modal-title">セッション修正</div>
+                  <button className="modal-close" onClick={() => setEditSession(null)}>✕</button>
+                </div>
+                <div className="form-group">
+                  <label className="form-label">セッション名</label>
+                  <input type="text" className="form-input" value={editSession.name}
+                    onChange={e => setEditSession(prev => ({...prev, name: e.target.value}))}
+                    placeholder="例: 6/28 キャッシュゲーム" />
+                </div>
+                <div className="form-group">
+                  <label className="form-label">日付</label>
+                  <input type="date" className="form-input" value={editSession.date}
+                    onChange={e => setEditSession(prev => ({...prev, date: e.target.value}))} />
+                </div>
+                <div className="form-group">
+                  <label className="form-label">プレイヤー増減</label>
+                  {renderPlayerRows(editSession.players || [],
+                    (setFn) => setEditSession(prev => ({...prev, players: setFn(prev.players)}))
+                  )}
+                </div>
+                <div className="modal-actions" style={{marginTop: 20}}>
+                  <button className="btn btn-secondary" onClick={() => setEditSession(null)}>キャンセル</button>
+                  <button className="btn btn-primary" onClick={handleEditSubmit}>保存</button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ---- Add session modal ---- */}
+          {showAddModal && (
+            <div className="modal-overlay" onClick={() => setShowAddModal(false)}>
+              <div className="modal-box" onClick={e => e.stopPropagation()} style={{maxWidth: 520}}>
+                <div className="modal-header">
+                  <div className="modal-title">セッション追加</div>
+                  <button className="modal-close" onClick={() => setShowAddModal(false)}>✕</button>
+                </div>
+                <div className="form-group">
+                  <label className="form-label">セッション名</label>
+                  <input type="text" className="form-input" value={addForm.name}
+                    onChange={e => setAddForm(p => ({...p, name: e.target.value}))}
+                    placeholder="例: 6/28 キャッシュゲーム" />
+                </div>
+                <div className="form-group">
+                  <label className="form-label">日付</label>
+                  <input type="date" className="form-input" value={addForm.date}
+                    onChange={e => setAddForm(p => ({...p, date: e.target.value}))} />
+                </div>
+                <div className="form-group">
+                  <label className="form-label">プレイヤー増減</label>
+                  {renderPlayerRows(addForm.players,
+                    (setFn) => setAddForm(prev => ({...prev, players: setFn(prev.players)}))
+                  )}
+                </div>
+                <div className="modal-actions" style={{marginTop: 20}}>
+                  <button className="btn btn-secondary" onClick={() => setShowAddModal(false)}>キャンセル</button>
+                  <button className="btn btn-primary" onClick={handleAddSubmit}>保存</button>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    // ==================== SETTINGS TAB ====================
+    function SettingsTab({ showToast }) {
+      const [storeName, setStoreName] = useState('');
+      const [storeSubtitle, setStoreSubtitle] = useState('');
+      const [newPassword, setNewPassword] = useState('');
+      const [confirmPassword, setConfirmPassword] = useState('');
+
+      useEffect(() => {
+        api('/api/config').then(c => { setStoreName(c.store_name); setStoreSubtitle(c.store_subtitle); });
+      }, []);
+
+      const saveConfig = async () => {
+        try {
+          await api('/api/config', { method: 'PUT', body: JSON.stringify({ store_name: storeName, store_subtitle: storeSubtitle }) });
+          showToast('設定を保存しました');
+        } catch (err) { showToast(err.message, 'error'); }
+      };
+
+      const changePassword = async () => {
+        if (newPassword !== confirmPassword) { showToast('パスワードが一致しません', 'error'); return; }
+        try {
+          await api('/api/auth/change-password', { method: 'POST', body: JSON.stringify({ newPassword }) });
+          showToast('パスワードを変更しました');
+          setNewPassword(''); setConfirmPassword('');
+        } catch (err) { showToast(err.message, 'error'); }
+      };
+
+      return (
+        <div style={{marginTop: 16}}>
+          <div className="card">
+            <div className="card-title">店舗設定</div>
+            <div className="form-group">
+              <label className="form-label">店舗名</label>
+              <input className="form-input" value={storeName} onChange={e => setStoreName(e.target.value)} />
+            </div>
+            <div className="form-group">
+              <label className="form-label">サブタイトル</label>
+              <input className="form-input" value={storeSubtitle} onChange={e => setStoreSubtitle(e.target.value)} />
+            </div>
+            <button className="btn btn-primary" onClick={saveConfig}>保存</button>
+          </div>
+          <div className="card">
+            <div className="card-title">パスワード変更</div>
+            <div className="form-group">
+              <label className="form-label">新しいパスワード</label>
+              <input type="password" className="form-input" value={newPassword} onChange={e => setNewPassword(e.target.value)} />
+            </div>
+            <div className="form-group">
+              <label className="form-label">パスワード確認</label>
+              <input type="password" className="form-input" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} />
+            </div>
+            <button className="btn btn-primary" onClick={changePassword} disabled={!newPassword || newPassword !== confirmPassword}>
+              パスワードを変更
+            </button>
+          </div>
+        </div>
+      );
+    }
+
+    // ==================== DATA IMPORT TAB ====================
+    function DataImportTab({ players, showToast }) {
+      const [email, setEmail] = React.useState('');
+      const [password, setPassword] = React.useState('');
+      const [hasPassword, setHasPassword] = React.useState(false);
+      const [showCredPopup, setShowCredPopup] = React.useState(false);
+      const [credEmail, setCredEmail] = React.useState('');
+      const [credPassword, setCredPassword] = React.useState('');
+      const [credSaving, setCredSaving] = React.useState(false);
+      const [importMode, setImportMode] = React.useState('single');
+      const [singleDate, setSingleDate] = React.useState(
+        () => new Date().toISOString().split('T')[0]
+      );
+      const [rangeStart, setRangeStart] = React.useState('');
+      const [rangeEnd, setRangeEnd] = React.useState('');
+      const [busy, setBusy] = React.useState(false);
+      const [statusMsgs, setStatusMsgs] = React.useState([]);
+      const [importedEvents, setImportedEvents] = React.useState([]);
+      const [expandedEvents, setExpandedEvents] = React.useState({});
+      const [localEdits, setLocalEdits] = React.useState({}); // {importId: {ranking: {rank, points, netChips}}}
+      const [showCategoryPopup, setShowCategoryPopup] = React.useState(false);
+      const [pendingCategories, setPendingCategories] = React.useState({});
+      const [pendingEvents, setPendingEvents] = React.useState([]);
+      const [directUrl, setDirectUrl] = React.useState('');
+      const [directBusy, setDirectBusy] = React.useState(false);
+      const [importPage, setImportPage] = React.useState(0);
+      const IMPORT_PER_PAGE = 20;
+      const [filterHasPlayers, setFilterHasPlayers] = React.useState(false);
+      const [filterHideAdded, setFilterHideAdded] = React.useState(false);
+      const [backfillBusy, setBackfillBusy] = React.useState(false);
+      const [bgImportRunning, setBgImportRunning] = React.useState(false);
+      const [bgImportLog, setBgImportLog] = React.useState([]);
+      const [cancellingLock, setCancellingLock] = React.useState(false);
+      const logEndRef = React.useRef(null);
+      const bgPollRef = React.useRef(null);
+
+      // Poll import status when not actively importing (catch background runs)
+      React.useEffect(() => {
+        const poll = async () => {
+          try {
+            const data = await api('/api/sunvy/import-status');
+            if (data) {
+              setBgImportRunning(data.running);
+              if (data.running || (data.recentLog && data.recentLog.length > 0)) {
+                setBgImportLog(data.recentLog || []);
+              }
+            }
+          } catch(e) {}
+        };
+        poll();
+        bgPollRef.current = setInterval(poll, 4000);
+        return () => clearInterval(bgPollRef.current);
+      }, []);
+
+      const cancelImportLock = async () => {
+        setCancellingLock(true);
+        try {
+          const data = await api('/api/sunvy/import-cancel', { method: 'POST' });
+          if (data && data.success) {
+            setBgImportRunning(false);
+            showToast('ロックを解除しました');
+          } else {
+            showToast((data && data.error) || '解除できませんでした', 'error');
+          }
+        } catch(e) { showToast('エラー', 'error'); }
+        setCancellingLock(false);
+      };
+
+      // Watch for background import finishing → reload events → popup uncategorized
+      const prevBgRunning = React.useRef(false);
+      React.useEffect(() => {
+        if (prevBgRunning.current && !bgImportRunning) {
+          // Import just finished while we were away — reload and check for uncategorized
+          api('/api/sunvy/imported-events').then(data => {
+            if (data && data.events) {
+              const evs = data.events;
+              setImportedEvents(evs);
+              const uncategorized = evs.filter(ev => !ev.eventType);
+              if (uncategorized.length > 0) openCategoryPopup(uncategorized);
+            }
+          }).catch(() => {});
+        }
+        prevBgRunning.current = bgImportRunning;
+      }, [bgImportRunning]);
+
+      React.useEffect(() => {
+        api('/api/sunvy/imported-events').then(data => {
+          if (data && data.events) setImportedEvents([...data.events].reverse());
+        }).catch(() => {});
+        api('/api/sunvy/credentials').then(data => {
+          if (data) {
+            setEmail(data.email || '');
+            setCredEmail(data.email || '');
+            setHasPassword(!!data.hasPassword);
+          }
+        }).catch(() => {});
+      }, []);
+
+      React.useEffect(() => {
+        if (logEndRef.current) logEndRef.current.scrollIntoView({ behavior: 'smooth' });
+      }, [statusMsgs]);
+
+      const addLog = (type, msg) => {
+        setStatusMsgs(prev => [...prev.slice(-29), { type, msg }]);
+      };
+
+      const saveCreds = async () => {
+        setCredSaving(true);
+        try {
+          await api('/api/sunvy/credentials', { method: 'POST', body: JSON.stringify({ email: credEmail, password: credPassword }) });
+          setEmail(credEmail);
+          setHasPassword(!!credPassword);
+          setCredPassword('');
+          setShowCredPopup(false);
+          showToast('認証情報を保存しました');
+        } catch(e) { showToast('保存に失敗しました', 'error'); }
+        setCredSaving(false);
+      };
+
+      const startImport = async () => {
+        // credentials stored server-side
+        if (importMode === 'range' && (!rangeStart || !rangeEnd)) { showToast('開始日と終了日を入力してください', 'error'); return; }
+        setBusy(true);
+        setStatusMsgs([]);
+        const body = {
+          email: email.trim(), password: password.trim(),
+          mode: importMode,
+          date: importMode === 'single' ? singleDate : undefined,
+          startDate: importMode === 'range' ? rangeStart : undefined,
+          endDate: importMode === 'range' ? rangeEnd : undefined,
+        };
+        try {
+          const resp = await fetch('/api/sunvy/import-events', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+          });
+          const ct = resp.headers.get('content-type') || '';
+          if (resp.status >= 400 || ct.includes('application/json')) {
+            const err = await resp.json().catch(() => ({}));
+            showToast(err.error || 'エラーが発生しました', 'error');
+            setBusy(false); return;
+          }
+          const reader = resp.body.getReader();
+          const decoder = new TextDecoder();
+          let buffer = '';
+          const freshEvents = [];
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            buffer += decoder.decode(value, { stream: true });
+            const lines = buffer.split('\n');
+            buffer = lines.pop();
+            for (const line of lines) {
+              if (!line.startsWith('data: ')) continue;
+              try {
+                const evt = JSON.parse(line.slice(6));
+                if (evt.type === 'status') addLog('status', evt.message);
+                else if (evt.type === 'waiting') addLog('waiting', evt.message);
+                else if (evt.type === 'warning') addLog('warning', '⚠️ ' + evt.message);
+                else if (evt.type === 'progress') addLog('progress', evt.message);
+                else if (evt.type === 'event') {
+                  freshEvents.push(evt.event);
+                  const tag = evt.action === '更新' ? '🔄' : '✅';
+                  addLog('ok', tag + ' [' + (evt.action || '新規') + '] ' + (evt.event.pokerfansName || evt.event.pokerfansUrl) + ' (' + evt.matched + '/' + evt.total + '人マッチ)');
+                } else if (evt.type === 'error') {
+                  showToast(evt.message, 'error');
+                  addLog('error', '❌ ' + evt.message);
+                } else if (evt.type === 'done') {
+                  addLog('ok', evt.message || (evt.count + '件取込完了'));
+                  showToast(evt.message || (evt.count + '件取込完了'));
+                  const newOnly = freshEvents.filter(ev => !ev.updatedAt);
+                  if (newOnly.length > 0) {
+                    openCategoryPopup(newOnly);
+                  }
+                  setImportPage(0);
+                }
+              } catch(pe) {}
+            }
+          }
+          if (freshEvents.length > 0) {
+            setImportedEvents(prev => {
+              const map = new Map(prev.map(e => [e.importId, e]));
+              freshEvents.forEach(e => map.set(e.importId, e));
+              return [...map.values()];
+            });
+          }
+        } catch(e) {
+          showToast(e.message || '取込エラー', 'error');
+          addLog('error', '❌ ' + (e.message || '取込エラー'));
+        } finally {
+          setBusy(false);
+        }
+      };
+
+      const openCategoryPopup = (freshEvents) => {
+        const defaults = {};
+        freshEvents.forEach(ev => {
+          const name = ev.pokerfansName || '';
+          defaults[ev.importId] = /リングゲーム2-5-5|スペシャルリング/.test(name) ? 'ring' : 'tournament';
+        });
+        setPendingEvents(freshEvents);
+        setPendingCategories(defaults);
+        setShowCategoryPopup(true);
+      };
+
+      const importDirectUrl = async () => {
+        if (!directUrl.trim()) { showToast('URLを入力してください', 'error'); return; }
+        setDirectBusy(true);
+        setStatusMsgs([]);
+        try {
+          const resp = await fetch('/api/sunvy/import-event-direct', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ url: directUrl.trim() })
+          });
+          const ct = resp.headers.get('content-type') || '';
+          if (resp.status >= 400 || ct.includes('application/json')) {
+            const err = await resp.json().catch(() => ({}));
+            showToast(err.error || 'エラーが発生しました', 'error');
+            setDirectBusy(false); return;
+          }
+          const reader = resp.body.getReader();
+          const decoder = new TextDecoder();
+          let buffer = '';
+          const freshEvents = [];
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            buffer += decoder.decode(value, { stream: true });
+            const lines = buffer.split('\n');
+            buffer = lines.pop();
+            for (const line of lines) {
+              if (!line.startsWith('data: ')) continue;
+              try {
+                const evt = JSON.parse(line.slice(6));
+                if (evt.type === 'status') addLog('status', evt.message);
+                else if (evt.type === 'warning') addLog('warning', '⚠️ ' + evt.message);
+                else if (evt.type === 'progress') addLog('progress', evt.message);
+                else if (evt.type === 'event') {
+                  freshEvents.push(evt.event);
+                  const tag = evt.action === '更新' ? '🔄' : '✅';
+                  addLog('ok', tag + ' [' + (evt.action || '新規') + '] ' + (evt.event.pokerfansName || evt.event.pokerfansUrl) + ' (' + evt.matched + '/' + evt.total + '人マッチ)');
+                } else if (evt.type === 'error') {
+                  showToast(evt.message, 'error');
+                  addLog('error', '❌ ' + evt.message);
+                } else if (evt.type === 'done') {
+                  addLog('ok', evt.message);
+                  showToast(evt.message);
+                  if (freshEvents.length > 0) {
+                    // Update existing events in state (upsert by importId)
+                    setImportedEvents(prev => {
+                      const map = new Map(prev.map(e => [e.importId, e]));
+                      freshEvents.forEach(e => map.set(e.importId, e));
+                      return [...map.values()];
+                    });
+                    const newOnly = freshEvents.filter(ev => !ev.updatedAt);
+                    if (newOnly.length > 0) openCategoryPopup(newOnly);
+                    setImportPage(0);
+                    setDirectUrl('');
+                  }
+                }
+              } catch(pe) {}
+            }
+          }
+        } catch(e) {
+          showToast(e.message || '取込エラー', 'error');
+          addLog('error', '❌ ' + (e.message || '取込エラー'));
+        } finally {
+          setDirectBusy(false);
+        }
+      };
+
+      const toggleExpand = (id) => setExpandedEvents(prev => ({ ...prev, [id]: !prev[id] }));
+
+      const backfillDates = async () => {
+        setBackfillBusy(true);
+        try {
+          const resp = await fetch('/api/sunvy/imported-events/backfill-dates', { method: 'POST' });
+          const data = await resp.json();
+          if (data && data.fixed !== undefined) {
+            showToast(`日付を補完しました（${data.fixed}件更新）`);
+            // Reload imported events to reflect updated dates
+            const evData = await api('/api/sunvy/imported-events');
+            if (evData && evData.events) {
+              setImportedEvents([...evData.events].reverse());
+            }
+          } else {
+            showToast('バックフィル失敗: ' + (data.error || '不明なエラー'), 'error');
+          }
+        } catch(e) {
+          showToast('バックフィルエラー: ' + e.message, 'error');
+        } finally {
+          setBackfillBusy(false);
+        }
+      };
+
+      const updateMatch = async (importId, ranking, playerId) => {
+        try {
+          const resp = await fetch('/api/sunvy/imported-events/' + importId + '/match', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ ranking, playerId: playerId || null })
+          });
+          const data = await resp.json();
+          if (!resp.ok) throw new Error(data.error || '更新失敗');
+          setImportedEvents(prev => prev.map(ev => {
+            if (ev.importId !== importId) return ev;
+            return { ...ev, results: ev.results.map(r => r.ranking === ranking ? data.result : r) };
+          }));
+        } catch(e) { showToast(e.message, 'error'); }
+      };
+
+      const deleteImportedEvent = async (importId, name) => {
+        if (!confirm(`「${name}」を削除しますか？`)) return;
+        try {
+          await api(`/api/sunvy/imported-events/${importId}`, { method: 'DELETE' });
+          setImportedEvents(prev => prev.filter(e => e.importId !== importId));
+          showToast('削除しました');
+        } catch(e) { showToast(e.message, 'error'); }
+      };
+
+      const addToLeaderboard = async (importId) => {
+        const ev = importedEvents.find(e => e.importId === importId);
+        const isRing = ev && ev.eventType === 'ring';
+        const endpoint = isRing
+          ? '/api/sunvy/imported-events/' + importId + '/add-to-ringgame'
+          : '/api/sunvy/imported-events/' + importId + '/add-to-leaderboard';
+        // Build playerOverrides from localEdits for this event
+        const edits = localEdits[importId] || {};
+        const playerOverrides = Object.entries(edits).map(([ranking, vals]) => ({
+          ranking: Number(ranking), ...vals
+        }));
+        try {
+          const resp = await fetch(endpoint, {
+            method: 'POST', headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ playerOverrides })
+          });
+          const data = await resp.json();
+          if (!resp.ok) throw new Error(data.error || '追加失敗');
+          const label = isRing ? 'リングゲームセッションに追加しました ✅' : 'トーナメント結果に追加しました ✅';
+          showToast(label);
+          setImportedEvents(prev => prev.map(e => e.importId === importId ? { ...e, addedToLeaderboard: true } : e));
+        } catch(e) { showToast(e.message, 'error'); }
+      };
+
+      const logColor = { ok: 'var(--positive)', warning: '#f59e0b', error: 'var(--danger)',
+        status: 'var(--text-secondary)', waiting: 'var(--text-muted)', progress: 'var(--info)' };
+
+      const confirmCategories = async () => {
+        const categories = pendingEvents.map(ev => ({
+          importId: ev.importId,
+          category: pendingCategories[ev.importId] || 'tournament'
+        }));
+        try {
+          const resp = await fetch('/api/sunvy/imported-events/categorize', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ categories })
+          });
+          const data = await resp.json();
+          if (!resp.ok) throw new Error(data.error || '分類保存失敗');
+          const skipIds = new Set(categories.filter(c => c.category === 'skip').map(c => c.importId));
+          setImportedEvents(prev => prev
+            .filter(ev => !skipIds.has(ev.importId))
+            .map(ev => {
+              const cat = categories.find(c => c.importId === ev.importId);
+              return cat ? { ...ev, eventType: cat.category } : ev;
+            })
+          );
+          const skipCount = skipIds.size;
+          const kept = categories.length - skipCount;
+          showToast(`${kept}件を分類しました${skipCount > 0 ? `（${skipCount}件を非取込として削除）` : ''}`);
+        } catch(e) { showToast(e.message, 'error'); }
+        setShowCategoryPopup(false);
+      };
+
+      const catLabels = { ring: 'リングゲーム', tournament: 'トーナメント', skip: '非取込' };
+      const catColors = { ring: '#0ea5e9', tournament: 'var(--accent)', skip: 'var(--danger)' };
+
+      const CategoryPopup = showCategoryPopup ? (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.65)', zIndex: 9999,
+          display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 16 }}>
+          <div style={{ background: 'var(--bg-secondary)', borderRadius: 12, padding: 24,
+            width: '100%', maxWidth: 560, maxHeight: '80vh', display: 'flex', flexDirection: 'column',
+            boxShadow: '0 20px 60px rgba(0,0,0,0.5)', border: '1px solid var(--border)' }}>
+            <div style={{ fontWeight: 700, fontSize: 16, marginBottom: 4 }}>イベント分類</div>
+            <div style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 16 }}>
+              取込んだイベントの種別を選択してください。「非取込」にしたイベントは削除されます。
+            </div>
+            <div style={{ overflowY: 'auto', flex: 1, marginBottom: 16 }}>
+              {pendingEvents.map(ev => (
+                <div key={ev.importId} style={{ borderBottom: '1px solid var(--border)',
+                  paddingBottom: 12, marginBottom: 12 }}>
+                  <div style={{ fontWeight: 600, fontSize: 13, marginBottom: 6 }}>
+                    {(ev.pokerfansName || ev.pokerfansUrl || '').replace(/\s*\(Processed\)\s*/gi, '').trim() || ev.pokerfansUrl}
+                    {ev.date && <span style={{ marginLeft: 8, fontWeight: 400, fontSize: 11,
+                      color: 'var(--text-muted)' }}>{ev.date}</span>}
+                  </div>
+                  <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                    {['ring', 'tournament', 'skip'].map(cat => {
+                      const selected = pendingCategories[ev.importId] === cat;
+                      return (
+                        <label key={cat} style={{ display: 'flex', alignItems: 'center', gap: 5,
+                          cursor: 'pointer', padding: '4px 12px', borderRadius: 6, fontSize: 12,
+                          border: '1px solid ' + (selected ? catColors[cat] : 'var(--border)'),
+                          background: selected ? catColors[cat] + '22' : 'transparent',
+                          color: selected ? catColors[cat] : 'var(--text-secondary)',
+                          fontWeight: selected ? 600 : 400, transition: 'all 0.15s' }}>
+                          <input type="radio" name={ev.importId} value={cat}
+                            checked={selected}
+                            onChange={() => setPendingCategories(prev => ({ ...prev, [ev.importId]: cat }))}
+                            style={{ display: 'none' }} />
+                          {catLabels[cat]}
+                        </label>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
+              <button onClick={() => setShowCategoryPopup(false)}
+                style={{ padding: '7px 18px', borderRadius: 7, border: '1px solid var(--border)',
+                  background: 'transparent', color: 'var(--text-secondary)', cursor: 'pointer', fontSize: 13 }}>
+                キャンセル
+              </button>
+              <button onClick={confirmCategories}
+                style={{ padding: '7px 20px', borderRadius: 7, border: 'none',
+                  background: 'var(--accent)', color: 'var(--bg-primary)', cursor: 'pointer',
+                  fontSize: 13, fontWeight: 600 }}>
+                確定
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null;
+
+      return (
+        <div>
+          {CategoryPopup}
+
+          {/* Background import running banner */}
+          {(bgImportRunning || (!busy && bgImportLog.length > 0)) && (
+            <div style={{
+              background: bgImportRunning ? 'rgba(245,158,11,0.1)' : 'rgba(100,116,139,0.08)',
+              border: '1px solid ' + (bgImportRunning ? 'rgba(245,158,11,0.4)' : 'var(--border)'),
+              borderRadius: 10, padding: '12px 16px', marginBottom: 16
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                  {bgImportRunning && (
+                    <span style={{ display: 'inline-block', width: 8, height: 8, borderRadius: '50%',
+                      background: 'var(--accent)', animation: 'pulse 1.2s ease-in-out infinite' }} />
+                  )}
+                  <span style={{ fontSize: 13, fontWeight: 600,
+                    color: bgImportRunning ? 'var(--accent)' : 'var(--text-muted)' }}>
+                    {bgImportRunning ? 'バックグラウンドで取込中...' : '直近の取込ログ'}
+                  </span>
+                </div>
+                <div style={{ display: 'flex', gap: 6 }}>
+                  {bgImportRunning && (
+                    <button onClick={cancelImportLock} disabled={cancellingLock}
+                      style={{ fontSize: 11, padding: '3px 10px', borderRadius: 6, cursor: 'pointer',
+                        border: '1px solid var(--danger)', background: 'transparent',
+                        color: 'var(--danger)' }}>
+                      {cancellingLock ? '解除中...' : '強制停止'}
+                    </button>
+                  )}
+                  <button onClick={() => setBgImportLog([])}
+                    style={{ fontSize: 11, padding: '3px 8px', borderRadius: 6, cursor: 'pointer',
+                      border: '1px solid var(--border)', background: 'transparent', color: 'var(--text-muted)' }}>
+                    × 閉じる
+                  </button>
+                </div>
+              </div>
+              <div style={{ maxHeight: 160, overflowY: 'auto', fontSize: 11,
+                fontFamily: 'monospace', lineHeight: 1.6 }}>
+                {bgImportLog.slice(-30).map((m, i) => (
+                  <div key={i} style={{
+                    color: m.type === 'error' ? 'var(--danger)' : m.type === 'done' ? 'var(--positive)' : 'var(--text-secondary)'
+                  }}>
+                    {m.type === 'error' ? '✗ ' : m.type === 'done' ? '✓ ' : ''}{m.message}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div className="card" style={{ marginBottom: 16 }}>
+            <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginBottom:16}}>
+              <div className="card-title" style={{marginBottom:0}}>Sunvyイベント取込</div>
+              <button onClick={() => { setCredEmail(email); setCredPassword(''); setShowCredPopup(true); }}
+                title="認証情報を設定"
+                style={{background:'none',border:'1px solid var(--border)',borderRadius:6,padding:'4px 8px',cursor:'pointer',fontSize:16,color:'var(--text-secondary)',display:'flex',alignItems:'center',gap:4}}>
+                ⚙ <span style={{fontSize:11,color: email && hasPassword ? 'var(--positive)' : 'var(--warning, #f59e0b)'}}>
+                  {email && hasPassword ? '設定済' : '未設定'}
+                </span>
+              </button>
+            </div>
+
+            {/* Credentials status + gear icon */}
+            {showCredPopup && (
+              <div style={{position:'fixed',top:0,left:0,right:0,bottom:0,background:'rgba(0,0,0,0.4)',zIndex:200,display:'flex',alignItems:'center',justifyContent:'center',padding:'5vh 16px'}} onClick={() => setShowCredPopup(false)}>
+                <div style={{background:'var(--bg-card)',borderRadius:12,padding:24,width:'100%',maxWidth:400,boxShadow:'0 8px 32px rgba(0,0,0,0.25)'}} onClick={e => e.stopPropagation()}>
+                  <div style={{fontWeight:700,fontSize:15,marginBottom:16}}>Sunvy 認証情報</div>
+                  <div className="form-group">
+                    <label className="form-label">メールアドレス</label>
+                    <input className="form-input" type="email" placeholder="club.sunvy.jp のメール" value={credEmail} onChange={e => setCredEmail(e.target.value)} />
+                  </div>
+                  <div className="form-group">
+                    <label className="form-label">パスワード</label>
+                    <input className="form-input" type="password" placeholder="変更する場合のみ入力" value={credPassword} onChange={e => setCredPassword(e.target.value)} />
+                  </div>
+                  <div style={{display:'flex',gap:8,justifyContent:'flex-end',marginTop:8}}>
+                    <button className="btn btn-secondary btn-sm" onClick={() => setShowCredPopup(false)}>キャンセル</button>
+                    <button className="btn btn-primary btn-sm" onClick={saveCreds} disabled={credSaving || !credEmail}>{credSaving ? '保存中...' : '保存'}</button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Mode toggle */}
+            <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
+              {[['single','単日取込'],['range','期間指定']].map(([m, label]) => (
+                <button key={m} onClick={() => setImportMode(m)}
+                  style={{ padding: '5px 16px', borderRadius: 6, fontSize: 13, cursor: 'pointer', border: 'none',
+                    background: importMode === m ? 'var(--accent)' : 'var(--bg-hover)',
+                    color: importMode === m ? 'var(--bg-primary)' : 'var(--text-secondary)',
+                    fontWeight: importMode === m ? 600 : 400 }}>
+                  {label}
+                </button>
+              ))}
+            </div>
+
+            {/* Date inputs */}
+            <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 4 }}>
+              {importMode === 'single' ? (
+                <div className="form-group" style={{ flex: '1 1 160px' }}>
+                  <label className="form-label">取込日</label>
+                  <input className="form-input" type="date" value={singleDate}
+                    onChange={e => setSingleDate(e.target.value)} />
+                </div>
+              ) : (
+                <>
+                  <div className="form-group" style={{ flex: '1 1 150px' }}>
+                    <label className="form-label">開始日</label>
+                    <input className="form-input" type="date" value={rangeStart}
+                      onChange={e => setRangeStart(e.target.value)} />
+                  </div>
+                  <div className="form-group" style={{ flex: '1 1 150px' }}>
+                    <label className="form-label">終了日</label>
+                    <input className="form-input" type="date" value={rangeEnd}
+                      onChange={e => setRangeEnd(e.target.value)} />
+                  </div>
+                </>
+              )}
+            </div>
+
+            <button className="btn btn-primary" onClick={startImport} disabled={busy} style={{ marginTop: 4 }}>
+              {busy ? '取込中...' : '▶ データ取込開始'}
+            </button>
+          </div>
+
+          {/* Direct URL import */}
+          <div className="card" style={{ marginBottom: 16 }}>
+            <div className="card-title">イベント直接読込</div>
+            <div style={{ display: 'flex', gap: 10, alignItems: 'flex-end', flexWrap: 'wrap' }}>
+              <div className="form-group" style={{ flex: '1 1 280px', marginBottom: 0 }}>
+                <label className="form-label">Sunvy イベントURL（applyers）</label>
+                <input className="form-input" type="url"
+                  placeholder="https://club.sunvy.jp/tours/events/.../applyers"
+                  value={directUrl} onChange={e => setDirectUrl(e.target.value)}
+                  onKeyDown={e => { if (e.key === 'Enter' && !busy && !directBusy) importDirectUrl(); }}
+                  disabled={busy || directBusy} />
+              </div>
+              <button className="btn btn-primary" onClick={importDirectUrl}
+                disabled={busy || directBusy || !directUrl.trim()}
+                style={{ whiteSpace: 'nowrap', paddingLeft: 18, paddingRight: 18 }}>
+                {directBusy ? '取込中...' : '▶ 直接読込'}
+              </button>
+            </div>
+          </div>
+
+          {statusMsgs.length > 0 && (
+            <div className="card" style={{ marginBottom: 16 }}>
+              <div className="card-title" style={{ marginBottom: 8 }}>取込ログ</div>
+              <div style={{ maxHeight: 180, overflowY: 'auto', fontFamily: 'monospace', fontSize: 11,
+                background: 'var(--bg-primary)', borderRadius: 6, padding: '8px 10px' }}>
+                {statusMsgs.map((m, i) => (
+                  <div key={i} style={{ color: logColor[m.type] || 'var(--text-secondary)', marginBottom: 2, lineHeight: 1.4 }}>
+                    {m.msg}
+                  </div>
+                ))}
+                <div ref={logEndRef} />
+              </div>
+            </div>
+          )}
+
+          {importedEvents.length > 0 && (() => {
+            const sortedEvs = [...importedEvents].sort((a, b) => {
+              const da = a.date || a.importedAt || '';
+              const db = b.date || b.importedAt || '';
+              return db.localeCompare(da);
+            });
+
+            // Apply filters
+            const filteredEvs = sortedEvs.filter(ev => {
+              if (filterHasPlayers && (ev.results || []).length === 0) return false;
+              if (filterHideAdded && ev.addedToLeaderboard) return false;
+              return true;
+            });
+
+            const totalPages = Math.ceil(filteredEvs.length / IMPORT_PER_PAGE);
+            const safePage = Math.min(importPage, Math.max(0, totalPages - 1));
+            const pagedEvs = filteredEvs.slice(safePage * IMPORT_PER_PAGE, (safePage + 1) * IMPORT_PER_PAGE);
+
+            // Compact page numbers: always show first, last, current ±1, with ellipsis
+            const pageNums = (() => {
+              const nums = new Set([0, totalPages - 1, safePage, safePage - 1, safePage + 1].filter(n => n >= 0 && n < totalPages));
+              return [...nums].sort((a, b) => a - b);
+            })();
+
+            const FilterBtn = ({ active, onClick, children }) => (
+              <button onClick={onClick} style={{
+                padding: '3px 10px', borderRadius: 12, fontSize: 11, cursor: 'pointer',
+                border: '1px solid ' + (active ? 'var(--accent)' : 'var(--border)'),
+                background: active ? 'rgba(245,158,11,0.15)' : 'transparent',
+                color: active ? 'var(--accent)' : 'var(--text-muted)',
+                fontWeight: active ? 600 : 400, whiteSpace: 'nowrap',
+                transition: 'all 0.15s'
+              }}>{children}</button>
+            );
+
+            return (
+              <div className="card">
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
+                  <div className="card-title" style={{ marginBottom: 0 }}>
+                    取込済みイベント（{filteredEvs.length === importedEvents.length
+                      ? `${importedEvents.length}件`
+                      : `${filteredEvs.length}/${importedEvents.length}件`}）
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    {(() => {
+                      const uncatCount = importedEvents.filter(e => !e.eventType).length;
+                      return uncatCount > 0 ? (
+                        <button className="btn btn-sm"
+                          onClick={() => openCategoryPopup(importedEvents.filter(e => !e.eventType))}
+                          style={{ fontSize: 11, padding: '4px 10px', borderRadius: 6,
+                            background: 'rgba(245,158,11,0.15)', border: '1px solid rgba(245,158,11,0.5)',
+                            color: 'var(--accent)', cursor: 'pointer', whiteSpace: 'nowrap' }}>
+                          🏷 {uncatCount}件 未分類
+                        </button>
+                      ) : null;
+                    })()}
+                    {importedEvents.some(e => !e.date) && (
+                      <button className="btn btn-secondary btn-sm" onClick={backfillDates} disabled={backfillBusy}>
+                        {backfillBusy ? '補完中…' : '📅 日付を一括補完'}
+                      </button>
+                    )}
+                    {totalPages > 1 && (
+                      <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>
+                        {safePage + 1} / {totalPages} ページ
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Filter chips */}
+                <div style={{ display: 'flex', gap: 6, marginBottom: 12, flexWrap: 'wrap' }}>
+                  <FilterBtn active={filterHasPlayers} onClick={() => { setFilterHasPlayers(v => !v); setImportPage(0); }}>
+                    👥 参加者あり
+                  </FilterBtn>
+                  <FilterBtn active={filterHideAdded} onClick={() => { setFilterHideAdded(v => !v); setImportPage(0); }}>
+                    ✓ 追加済みを非表示
+                  </FilterBtn>
+                  {(filterHasPlayers || filterHideAdded) && (
+                    <button onClick={() => { setFilterHasPlayers(false); setFilterHideAdded(false); setImportPage(0); }}
+                      style={{ padding: '3px 8px', borderRadius: 12, fontSize: 11, cursor: 'pointer',
+                        border: '1px solid var(--border)', background: 'transparent',
+                        color: 'var(--text-muted)' }}>
+                      × クリア
+                    </button>
+                  )}
+                </div>
+
+                {pagedEvs.map(ev => {
+                  const expanded = !!expandedEvents[ev.importId];
+                  const matchedCount = (ev.results || []).filter(r => r.matchedPlayerId).length;
+                  const totalCount = (ev.results || []).length;
+                  const allMatched = matchedCount === totalCount;
+                  return (
+                    <div key={ev.importId} style={{ borderBottom: '1px solid var(--border)', paddingBottom: 12, marginBottom: 12 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', padding: '4px 0' }}
+                        onClick={() => toggleExpand(ev.importId)}>
+                        <span style={{ fontSize: 10, color: 'var(--text-muted)', width: 12 }}>{expanded ? '▼' : '▶'}</span>
+                        <span style={{ flex: 1, fontWeight: 500, fontSize: 13 }}>{(ev.pokerfansName || ev.pokerfansUrl || '').replace(/\s*\(Processed\)\s*/gi, '').trim() || ev.pokerfansUrl}</span>
+                        {ev.eventType && (
+                          <span style={{ fontSize: 10, whiteSpace: 'nowrap', padding: '1px 7px', borderRadius: 10,
+                            background: ev.eventType === 'ring' ? 'rgba(14,165,233,0.15)' : 'rgba(168,85,247,0.15)',
+                            color: ev.eventType === 'ring' ? '#0ea5e9' : '#a855f7' }}>
+                            {ev.eventType === 'ring' ? 'リングゲーム' : 'トーナメント'}
+                          </span>
+                        )}
+                        <span style={{ fontSize: 11, color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>{ev.date || '日付不明'}</span>
+                        <span style={{ fontSize: 11, whiteSpace: 'nowrap', color: allMatched ? 'var(--positive)' : '#f59e0b' }}>
+                          {matchedCount}/{totalCount}人
+                        </span>
+                        {ev.addedToLeaderboard && (
+                          <span style={{ fontSize: 10, color: 'var(--positive)', background: 'rgba(34,197,94,0.12)',
+                            padding: '1px 7px', borderRadius: 10, whiteSpace: 'nowrap' }}>追加済</span>
+                        )}
+                        <button
+                          onClick={e => { e.stopPropagation(); deleteImportedEvent(ev.importId, (ev.pokerfansName || ev.pokerfansUrl || '').replace(/\s*\(Processed\)\s*/gi, '').trim() || ev.pokerfansUrl); }}
+                          title="削除"
+                          style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)',
+                            fontSize: 14, padding: '2px 4px', lineHeight: 1, flexShrink: 0 }}>
+                          🗑
+                        </button>
+                      </div>
+                      {expanded && (
+                        <div style={{ marginTop: 10 }}>
+                          {(() => {
+                            const isRing = ev.eventType === 'ring';
+                            const getEdit = (ranking, field, def) =>
+                              localEdits[ev.importId]?.[ranking]?.[field] ?? def;
+                            const setEdit = (ranking, field, value) =>
+                              setLocalEdits(prev => ({
+                                ...prev,
+                                [ev.importId]: {
+                                  ...(prev[ev.importId] || {}),
+                                  [ranking]: { ...(prev[ev.importId]?.[ranking] || {}), [field]: value }
+                                }
+                              }));
+                            const inputStyle = {
+                              background: 'var(--bg-input)', color: 'var(--text-primary)',
+                              border: '1px solid var(--border)', borderRadius: 4,
+                              padding: '2px 6px', fontSize: 12, textAlign: 'right'
+                            };
+                            return (
+                              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12, marginBottom: 10 }}>
+                                <thead>
+                                  <tr style={{ background: 'var(--bg-primary)' }}>
+                                    <th style={{ padding: '4px 8px', textAlign: 'center', color: 'var(--text-secondary)', fontWeight: 500 }}>順位</th>
+                                    <th style={{ padding: '4px 8px', textAlign: 'left', color: 'var(--text-secondary)', fontWeight: 500 }}>Nickname</th>
+                                    {!isRing && <th style={{ padding: '4px 8px', textAlign: 'center', color: 'var(--accent)', fontWeight: 600 }}>Pts ✎</th>}
+                                    {isRing  && <th style={{ padding: '4px 8px', textAlign: 'center', color: 'var(--accent)', fontWeight: 600 }}>純増チップ ✎</th>}
+                                    <th style={{ padding: '4px 8px', textAlign: 'left', color: 'var(--text-secondary)', fontWeight: 500 }}>紐付けプレイヤー</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {(ev.results || []).map(r => (
+                                    <tr key={r.ranking} style={{ borderBottom: '1px solid var(--border)' }}>
+                                      <td style={{ padding: '3px 8px', textAlign: 'center' }}>
+                                        {!isRing ? (() => {
+                                          const isPart = getEdit(r.ranking, 'participation', false);
+                                          return (
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: 3, justifyContent: 'center' }}>
+                                              {!isPart && (
+                                                <input type="number" value={getEdit(r.ranking, 'rank', r.ranking)}
+                                                  onChange={e => setEdit(r.ranking, 'rank', Number(e.target.value))}
+                                                  style={{ ...inputStyle, width: 46, textAlign: 'center' }} />
+                                              )}
+                                              <button
+                                                onClick={() => setEdit(r.ranking, 'participation', !isPart)}
+                                                title="参加（非入賞）に切り替え"
+                                                style={{
+                                                  fontSize: 9, padding: '2px 6px', borderRadius: 8, cursor: 'pointer',
+                                                  border: '1px solid ' + (isPart ? 'var(--accent)' : 'var(--border)'),
+                                                  background: isPart ? 'rgba(99,102,241,0.25)' : 'transparent',
+                                                  color: isPart ? 'var(--accent)' : 'var(--text-muted)',
+                                                  whiteSpace: 'nowrap', lineHeight: 1.4
+                                                }}>参加</button>
+                                            </div>
+                                          );
+                                        })() : r.ranking}
+                                      </td>
+                                      <td style={{ padding: '3px 8px' }}>{r.nickname}</td>
+                                      {!isRing && (
+                                        <td style={{ padding: '3px 8px', textAlign: 'center' }}>
+                                          <input type="number" value={getEdit(r.ranking, 'points', 0)}
+                                            onChange={e => setEdit(r.ranking, 'points', Number(e.target.value))}
+                                            style={{ ...inputStyle, width: 72 }} />
+                                        </td>
+                                      )}
+                                      {isRing && (
+                                        <td style={{ padding: '3px 8px', textAlign: 'center' }}>
+                                          <input type="number" value={getEdit(r.ranking, 'netChips', 0)}
+                                            onChange={e => setEdit(r.ranking, 'netChips', Number(e.target.value))}
+                                            style={{ ...inputStyle, width: 90 }} />
+                                        </td>
+                                      )}
+                                      <td style={{ padding: '3px 8px' }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                                          <select value={r.matchedPlayerId || ''}
+                                            onChange={e => updateMatch(ev.importId, r.ranking, e.target.value || null)}
+                                            style={{ background: 'var(--bg-input)', color: 'var(--text-primary)',
+                                              border: '1px solid var(--border)', borderRadius: 4,
+                                              padding: '2px 4px', fontSize: 11, maxWidth: 160,
+                                              borderLeft: '3px solid ' + (r.matchStatus === 'auto' ? 'var(--positive)' : r.matchStatus === 'manual' ? 'var(--info)' : 'var(--danger)') }}>
+                                            <option value="">── 未設定 ──</option>
+                                            {players.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
+                                          </select>
+                                          {r.matchStatus === 'auto' && (
+                                            <span style={{ fontSize: 9, color: 'var(--positive)', background: 'rgba(34,197,94,0.12)',
+                                              padding: '1px 5px', borderRadius: 8, whiteSpace: 'nowrap' }}>自動</span>
+                                          )}
+                                          {r.matchStatus === 'manual' && (
+                                            <span style={{ fontSize: 9, color: 'var(--info)', background: 'rgba(59,130,246,0.12)',
+                                              padding: '1px 5px', borderRadius: 8, whiteSpace: 'nowrap' }}>手動</span>
+                                          )}
+                                        </div>
+                                      </td>
+                                    </tr>
+                                  ))}
+                                </tbody>
+                              </table>
+                            );
+                          })()}
+                          {ev.eventType !== 'skip' && (
+                            <div style={{ display: 'flex', gap: 8, alignItems: 'center', justifyContent: 'flex-end' }}>
+                              <button className="btn btn-primary"
+                                style={{ fontSize: 12, padding: '5px 14px', whiteSpace: 'nowrap' }}
+                                onClick={() => addToLeaderboard(ev.importId)}>
+                                {ev.addedToLeaderboard ? '🔄 再追加' : 'リーダーボードに追加'}
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+
+                {totalPages > 1 && (
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4, paddingTop: 8 }}>
+                    <button onClick={() => setImportPage(p => Math.max(0, p - 1))}
+                      disabled={safePage === 0}
+                      style={{ padding: '4px 10px', borderRadius: 6, border: '1px solid var(--border)', fontSize: 13,
+                        background: safePage === 0 ? 'transparent' : 'var(--bg-hover)',
+                        color: safePage === 0 ? 'var(--text-muted)' : 'var(--text-primary)',
+                        cursor: safePage === 0 ? 'default' : 'pointer' }}>
+                      ‹
+                    </button>
+                    {pageNums.map((n, i) => {
+                      const prev = pageNums[i - 1];
+                      return (
+                        <React.Fragment key={n}>
+                          {prev !== undefined && n - prev > 1 && (
+                            <span style={{ color: 'var(--text-muted)', fontSize: 12, padding: '0 2px' }}>…</span>
+                          )}
+                          <button onClick={() => setImportPage(n)}
+                            style={{ minWidth: 32, padding: '4px 6px', borderRadius: 6,
+                              border: '1px solid ' + (n === safePage ? 'var(--accent)' : 'var(--border)'),
+                              background: n === safePage ? 'var(--accent)' : 'var(--bg-hover)',
+                              color: n === safePage ? 'var(--bg-primary)' : 'var(--text-primary)',
+                              fontWeight: n === safePage ? 700 : 400, fontSize: 13, cursor: 'pointer' }}>
+                            {n + 1}
+                          </button>
+                        </React.Fragment>
+                      );
+                    })}
+                    <button onClick={() => setImportPage(p => Math.min(totalPages - 1, p + 1))}
+                      disabled={safePage === totalPages - 1}
+                      style={{ padding: '4px 10px', borderRadius: 6, border: '1px solid var(--border)', fontSize: 13,
+                        background: safePage === totalPages - 1 ? 'transparent' : 'var(--bg-hover)',
+                        color: safePage === totalPages - 1 ? 'var(--text-muted)' : 'var(--text-primary)',
+                        cursor: safePage === totalPages - 1 ? 'default' : 'pointer' }}>
+                      ›
+                    </button>
+                  </div>
+                )}
+              </div>
+            );
+          })()}
+
+          {importedEvents.length === 0 && !busy && (
+            <div style={{ color: 'var(--text-muted)', fontSize: 13, marginTop: 8 }}>
+              取込済みのイベントはありません。上のボタンで取込を開始してください。
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    // ==================== LEADERBOARD SECTION ====================
+    function LeaderboardSection({ players, showToast }) {
+      const [subTab, setSubTab] = useState('tournaments');
+      return (
+        <div>
+          <div className="admin-nav">
+            {[
+              { id: 'tournaments', label: 'トーナメント結果' },
+              { id: 'ringgames', label: 'リングゲーム' },
+              { id: 'import', label: 'データ取込' },
+              { id: 'settings', label: '設定' }
+            ].map(tab => (
+              <button key={tab.id}
+                className={`admin-nav-item ${subTab === tab.id ? 'active' : ''}`}
+                onClick={() => setSubTab(tab.id)}>
+                {tab.label}
+              </button>
+            ))}
+          </div>
+          {subTab === 'tournaments' && <TournamentResultsTab players={players} showToast={showToast} />}
+          {subTab === 'ringgames' && <RingGameResultsTab players={players} showToast={showToast} />}
+          {subTab === 'import' && <DataImportTab players={players} showToast={showToast} />}
+          {subTab === 'settings' && <SettingsTab showToast={showToast} />}
+        </div>
+      );
+    }
+
+    // ==================== CUSTOMER ANALYSIS SECTION ====================
+    function CustomerAnalysisSection({ players, showToast, isAdmin = false }) {
+      const [sunvyData, setSunvyData] = useState([]);
+      const [cachedAt, setCachedAt] = useState('');
+      const [cacheSource, setCacheSource] = useState('');
+      const [loading, setLoading] = useState(true);
+      const [sortBy, setSortBy] = useState('points');
+      const [sortDir, setSortDir] = useState('desc');
+      const [uploading, setUploading] = useState(false);
+      const [nameSearch, setNameSearch] = useState('');
+      const [dateFrom, setDateFrom] = useState('');
+      const [dateTo, setDateTo] = useState('');
+      const csvInputRef = React.useRef(null);
+
+      const loadCache = () => {
+        api('/api/sunvy/cache').then(data => {
+          if (data.members) {
+            setSunvyData(data.members);
+            setCachedAt(data.cachedAt || '');
+            setCacheSource(data.source || 'sunvy');
+          }
+          setLoading(false);
+        }).catch(() => setLoading(false));
+      };
+
+      useEffect(() => { loadCache(); }, []);
+
+      const handleCsvUpload = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        e.target.value = '';
+        setUploading(true);
+        try {
+          const form = new FormData();
+          form.append('file', file);
+          const resp = await fetch('/api/sunvy/upload-csv', { method: 'POST', body: form });
+          const data = await resp.json();
+          if (!resp.ok) throw new Error(data.error || 'アップロード失敗');
+          showToast(`✅ ${data.count}人のデータを取り込みました`);
+          loadCache();
+        } catch (err) {
+          showToast(err.message, 'error');
+        } finally {
+          setUploading(false);
+        }
+      };
+
+      // SunvyデータとプレイヤーをmemberCodeで突合（常にSunvyデータありのみ）
+      const baseRows = players
+        .map(p => {
+          const sm = sunvyData.find(m => m.memberCode && m.memberCode === p.memberCode);
+          if (!sm) return null;
+          return {
+            id: p.id,
+            name: p.name,
+            memberCode: p.memberCode || '',
+            points:    sm.points    || '',
+            dollars:   sm.dollars   || '',
+            lastVisit: sm.lastVisit || '',
+          };
+        })
+        .filter(Boolean);
+
+      // フィルター適用
+      const filteredRows = baseRows.filter(r => {
+        if (nameSearch && !r.name.toLowerCase().includes(nameSearch.toLowerCase())) return false;
+        if (dateFrom && r.lastVisit && r.lastVisit < dateFrom) return false;
+        if (dateTo   && r.lastVisit && r.lastVisit > dateTo)   return false;
+        // dateFrom/dateTo が指定されていて lastVisit が空の行は除外
+        if ((dateFrom || dateTo) && !r.lastVisit) return false;
+        return true;
+      });
+
+      const handleSort = (col) => {
+        if (sortBy === col) setSortDir(d => d === 'asc' ? 'desc' : 'asc');
+        else { setSortBy(col); setSortDir(col === 'name' ? 'asc' : 'desc'); }
+      };
+
+      const sortedRows = [...filteredRows].sort((a, b) => {
+        let av = a[sortBy], bv = b[sortBy];
+        const aEmpty = av === '' || av === null || av === undefined;
+        const bEmpty = bv === '' || bv === null || bv === undefined;
+        if (aEmpty && bEmpty) return 0;
+        if (aEmpty) return 1;
+        if (bEmpty) return -1;
+        if (sortBy === 'points' || sortBy === 'dollars') {
+          av = parseFloat(av) || 0;
+          bv = parseFloat(bv) || 0;
+        }
+        if (av < bv) return sortDir === 'asc' ? -1 : 1;
+        if (av > bv) return sortDir === 'asc' ? 1 : -1;
+        return 0;
+      });
+
+      const hasFilter = nameSearch || dateFrom || dateTo;
+
+      const SortIcon = ({ col }) => {
+        if (sortBy !== col) return <span style={{color: 'var(--text-muted)', marginLeft: 4}}>↕</span>;
+        return <span style={{color: 'var(--accent)', marginLeft: 4}}>{sortDir === 'asc' ? '↑' : '↓'}</span>;
+      };
+
+      if (loading) return <div style={{textAlign: 'center', padding: 40, color: 'var(--text-muted)'}}>読み込み中...</div>;
+
+      const sourceIcon  = cacheSource === 'csv' ? '📂' : '📡';
+      const sourceLabel = cacheSource === 'csv' ? 'CSVインポート' : 'Sunvyスクレイプ';
+
+      return (
+        <div style={{marginTop: 16}}>
+          {/* 隠しファイル入力 */}
+          <input ref={csvInputRef} type="file" accept=".csv" style={{display:'none'}} onChange={handleCsvUpload} />
+
+          {/* CSVアップロードボタン */}
+          <div style={{display:'flex', alignItems:'center', gap:10, marginBottom:12, flexWrap:'wrap'}}>
+            <button
+              className="btn btn-secondary"
+              style={{fontSize:12, padding:'6px 14px', display:'flex', alignItems:'center', gap:6}}
+              onClick={() => csvInputRef.current && csvInputRef.current.click()}
+              disabled={uploading}
+            >
+              {uploading ? '⏳ 取り込み中...' : '📂 CSVアップロード'}
+            </button>
+            <span style={{fontSize:11, color:'var(--text-muted)'}}>
+              Sunvy管理画面からダウンロードしたCSVを選択してください
+            </span>
+          </div>
+
+          {/* データソース情報 */}
+          {cachedAt ? (
+            <div style={{fontSize:12, color:'var(--text-muted)', marginBottom:12}}>
+              {sourceIcon} {sourceLabel}: {cachedAt.split('T')[0]} 取得 |&nbsp;
+              {hasFilter
+                ? <span>{sortedRows.length}人表示 / {baseRows.length}人該当</span>
+                : <span>{baseRows.length}人</span>}
+            </div>
+          ) : (
+            <div style={{
+              background:'rgba(245,158,11,0.1)', border:'1px solid var(--accent)',
+              borderRadius:8, padding:12, marginBottom:16, fontSize:13, color:'var(--text-secondary)'
+            }}>
+              ⚠ データがありません。「CSVアップロード」からSunvy管理画面のCSVを取り込むか、「プレイヤー情報取得」からスクレイプしてください。
+            </div>
+          )}
+
+          {/* 検索・フィルターバー */}
+          {cachedAt && (
+            <div style={{
+              display:'flex', gap:8, marginBottom:12, flexWrap:'wrap', alignItems:'center',
+              background:'var(--bg-secondary)', borderRadius:8, padding:'10px 12px'
+            }}>
+              {/* 名前検索 */}
+              <div style={{display:'flex', alignItems:'center', gap:6, flex:'1 1 160px', minWidth:160}}>
+                <span style={{fontSize:12, color:'var(--text-secondary)', whiteSpace:'nowrap'}}>🔍 名前</span>
+                <input
+                  className="form-input"
+                  style={{fontSize:12, padding:'5px 10px', height:32}}
+                  placeholder="プレイヤー名で検索..."
+                  value={nameSearch}
+                  onChange={e => setNameSearch(e.target.value)}
+                />
+              </div>
+
+              {/* 来店日From */}
+              <div style={{display:'flex', alignItems:'center', gap:6, flex:'1 1 160px', minWidth:160}}>
+                <span style={{fontSize:12, color:'var(--text-secondary)', whiteSpace:'nowrap'}}>📅 来店日</span>
+                <input
+                  type="date"
+                  className="form-input"
+                  style={{fontSize:12, padding:'5px 10px', height:32, colorScheme:'dark'}}
+                  value={dateFrom}
+                  onChange={e => setDateFrom(e.target.value)}
+                />
+              </div>
+
+              {/* 来店日To */}
+              <div style={{display:'flex', alignItems:'center', gap:6, flex:'1 1 130px', minWidth:130}}>
+                <span style={{fontSize:12, color:'var(--text-secondary)', whiteSpace:'nowrap'}}>〜</span>
+                <input
+                  type="date"
+                  className="form-input"
+                  style={{fontSize:12, padding:'5px 10px', height:32, colorScheme:'dark'}}
+                  value={dateTo}
+                  onChange={e => setDateTo(e.target.value)}
+                />
+              </div>
+
+              {/* クリアボタン */}
+              {hasFilter && (
+                <button
+                  className="btn btn-secondary"
+                  style={{fontSize:11, padding:'5px 10px', height:32, whiteSpace:'nowrap'}}
+                  onClick={() => { setNameSearch(''); setDateFrom(''); setDateTo(''); }}
+                >
+                  ✕ クリア
+                </button>
+              )}
+            </div>
+          )}
+
+          {/* テーブル */}
+          <div className="card" style={{padding:0, overflow:'hidden'}}>
+            <table className="admin-table">
+              <thead>
+                <tr>
+                  <th className="sortable" onClick={() => handleSort('name')}>
+                    プレイヤー名<SortIcon col="name" />
+                  </th>
+                  <th>メンバーコード</th>
+                  <th className="sortable" onClick={() => handleSort('points')} style={{textAlign:'right'}}>
+                    9Hポイント<SortIcon col="points" />
+                  </th>
+                  <th className="sortable" onClick={() => handleSort('dollars')} style={{textAlign:'right'}}>
+                    9Hドル<SortIcon col="dollars" />
+                  </th>
+                  <th className="sortable" onClick={() => handleSort('lastVisit')}>
+                    直近来店日<SortIcon col="lastVisit" />
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {sortedRows.map(r => (
+                  <tr key={r.id}>
+                    <td style={{fontWeight:500}}>{r.name}</td>
+                    <td style={{fontSize:11, color:'var(--text-muted)'}}>{r.memberCode || '-'}</td>
+                    <td style={{textAlign:'right'}}>
+                      {r.points
+                        ? <span style={{fontWeight:600}}>{Number(r.points).toLocaleString()}</span>
+                        : <span style={{color:'var(--text-muted)'}}>-</span>}
+                    </td>
+                    <td style={{textAlign:'right'}}>
+                      {r.dollars && r.dollars !== '0'
+                        ? <span style={{fontWeight:600, color:'var(--positive)'}}>{Number(r.dollars).toLocaleString()}</span>
+                        : r.dollars === '0'
+                          ? <span style={{color:'var(--text-muted)'}}>0</span>
+                          : <span style={{color:'var(--text-muted)'}}>-</span>}
+                    </td>
+                    <td style={{fontSize:12}}>
+                      {r.lastVisit || <span style={{color:'var(--text-muted)'}}>-</span>}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            {sortedRows.length === 0 && (
+              <div style={{textAlign:'center', padding:20, color:'var(--text-muted)'}}>
+                {hasFilter ? '条件に一致するプレイヤーがいません' : 'Sunvyデータのあるプレイヤーがいません'}
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    }
+
+    // ==================== PRIZE MANAGEMENT SECTION ====================
+    function PrizeManagementSection({ players, showToast }) {
+      const [prizes, setPrizes] = useState({ types: [], awards: [] });
+      const [loading, setLoading] = useState(true);
+      const [showTypeMaster, setShowTypeMaster] = useState(false); // モーダル
+      const [showTypeForm, setShowTypeForm] = useState(false);
+      const [newTypeName, setNewTypeName] = useState('');
+      const [newTypeDesc, setNewTypeDesc] = useState('');
+      const [showAwardForm, setShowAwardForm] = useState(false);
+      const todayStr = () => new Date().toLocaleDateString('sv-SE');
+      const [awardForm, setAwardForm] = useState({ playerId: '', typeId: '', note: '', occurredAt: todayStr(), quantity: 1 });
+      const [filterType, setFilterType] = useState('');
+      const [filterStatus, setFilterStatus] = useState('');
+      const [filterName, setFilterName] = useState('');
+      const [confirmToggle, setConfirmToggle] = useState(null); // { award } or null
+      const [confirmDelete, setConfirmDelete] = useState(null); // award id or null
+
+      const loadPrizes = async () => {
+        try { const data = await api('/api/prizes'); setPrizes(data); } catch (e) {}
+        setLoading(false);
+      };
+      useEffect(() => { loadPrizes(); }, []);
+
+      const addType = async () => {
+        if (!newTypeName.trim()) return;
+        try {
+          await api('/api/prizes/types', { method: 'POST', body: JSON.stringify({ name: newTypeName.trim(), description: newTypeDesc.trim() }) });
+          setNewTypeName(''); setNewTypeDesc(''); setShowTypeForm(false);
+          showToast('権利種別を追加しました'); loadPrizes();
+        } catch (e) { showToast(e.message, 'error'); }
+      };
+
+      const deleteType = async (id) => {
+        if (!confirm('この権利種別と関連する全付与記録を削除します。よろしいですか？')) return;
+        try {
+          await api(`/api/prizes/types/${id}`, { method: 'DELETE' });
+          showToast('削除しました'); loadPrizes();
+        } catch (e) { showToast(e.message, 'error'); }
+      };
+
+      const addAward = async () => {
+        if (!awardForm.playerId || !awardForm.typeId) { showToast('プレイヤーと権利種別を選択してください', 'error'); return; }
+        if (!awardForm.occurredAt) { showToast('権利発生日を入力してください', 'error'); return; }
+        if (!awardForm.quantity || awardForm.quantity < 1) { showToast('個数は1以上を入力してください', 'error'); return; }
+        try {
+          await api('/api/prizes/awards', { method: 'POST', body: JSON.stringify(awardForm) });
+          setAwardForm({ playerId: '', typeId: '', note: '', occurredAt: todayStr(), quantity: 1 });
+          setShowAwardForm(false);
+          showToast('権利を登録しました'); loadPrizes();
+        } catch (e) { showToast(e.message, 'error'); }
+      };
+
+      const toggleStatus = (award) => {
+        setConfirmToggle({ award });
+      };
+
+      const doToggleStatus = async () => {
+        if (!confirmToggle) return;
+        const award = confirmToggle.award;
+        const newStatus = award.status === '未付与' ? '付与済み' : '未付与';
+        setConfirmToggle(null);
+        try {
+          await api(`/api/prizes/awards/${award.id}`, { method: 'PUT', body: JSON.stringify({ status: newStatus }) });
+          loadPrizes();
+        } catch (e) { showToast(e.message, 'error'); }
+      };
+
+      const deleteAward = async (id) => {
+        try {
+          await api(`/api/prizes/awards/${id}`, { method: 'DELETE' });
+          showToast('削除しました'); loadPrizes();
+        } catch (e) { showToast(e.message, 'error'); }
+      };
+
+      const getPlayerName = (id) => { const p = players.find(p => p.id === id); return p ? p.name : id; };
+      const getTypeName   = (id) => { const t = prizes.types.find(t => t.id === id); return t ? t.name : id; };
+
+      const filteredAwards = prizes.awards.filter(a => {
+        if (filterType   && a.typeId !== filterType) return false;
+        if (filterStatus && a.status !== filterStatus) return false;
+        if (filterName) {
+          const name = getPlayerName(a.playerId).toLowerCase();
+          if (!name.includes(filterName.toLowerCase())) return false;
+        }
+        return true;
+      });
+
+      if (loading) return <div style={{textAlign:'center', padding:40, color:'var(--text-muted)'}}>読み込み中...</div>;
+
+      return (
+        <div style={{marginTop:16}}>
+
+          {/* ===== ステータス変更確認ダイアログ ===== */}
+          {confirmToggle && (
+            <div className="modal-overlay" onClick={() => setConfirmToggle(null)}>
+              <div className="modal-box" onClick={e => e.stopPropagation()} style={{maxWidth:360, textAlign:'center'}}>
+                <div style={{fontSize:18, fontWeight:700, marginBottom:12}}>ステータス変更</div>
+                <div style={{color:'var(--text-secondary)', marginBottom:8, fontSize:14}}>
+                  <span style={{fontWeight:600, color:'var(--text-primary)'}}>{(() => { const p = players.find(p => p.id === confirmToggle.award.playerId); return p ? p.name : confirmToggle.award.playerId; })()}</span> の権利ステータスを
+                </div>
+                <div style={{margin:'12px 0', display:'flex', alignItems:'center', justifyContent:'center', gap:12}}>
+                  <span className={`status-badge ${confirmToggle.award.status === '付与済み' ? 'given' : 'pending'}`} style={{cursor:'default'}}>
+                    {confirmToggle.award.status}
+                  </span>
+                  <span style={{color:'var(--text-muted)', fontSize:18}}>→</span>
+                  <span className={`status-badge ${confirmToggle.award.status === '未付与' ? 'given' : 'pending'}`} style={{cursor:'default'}}>
+                    {confirmToggle.award.status === '未付与' ? '付与済み' : '未付与'}
+                  </span>
+                </div>
+                <div style={{color:'var(--text-muted)', fontSize:13, marginBottom:20}}>に変更します。よろしいですか？</div>
+                <div style={{display:'flex', gap:10, justifyContent:'center'}}>
+                  <button className="btn btn-secondary" style={{minWidth:80}} onClick={() => setConfirmToggle(null)}>いいえ</button>
+                  <button className="btn btn-primary" style={{minWidth:80}} onClick={doToggleStatus}>はい</button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ===== 権利種別マスター モーダル ===== */}
+          {showTypeMaster && (
+            <div className="modal-overlay" onClick={() => { setShowTypeMaster(false); setShowTypeForm(false); }}>
+              <div className="modal-box" onClick={e => e.stopPropagation()} style={{maxWidth:520}}>
+                <div className="modal-header">
+                  <div className="modal-title">権利種別マスター</div>
+                  <button className="modal-close" onClick={() => { setShowTypeMaster(false); setShowTypeForm(false); }}>✕</button>
+                </div>
+
+                {/* 追加フォーム */}
+                <div style={{marginBottom:16}}>
+                  {!showTypeForm ? (
+                    <button className="btn btn-primary btn-sm" onClick={() => setShowTypeForm(true)}>+ 種別追加</button>
+                  ) : (
+                    <div className="inline-form">
+                      <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:8, marginBottom:8}}>
+                        <input className="form-input" placeholder="種別名（必須）例: JOPT *" value={newTypeName}
+                          onChange={e => setNewTypeName(e.target.value)} autoFocus />
+                        <input className="form-input" placeholder="説明（任意）" value={newTypeDesc}
+                          onChange={e => setNewTypeDesc(e.target.value)} />
+                      </div>
+                      <div style={{display:'flex', gap:8, justifyContent:'flex-end'}}>
+                        <button className="btn btn-secondary btn-sm" onClick={() => { setShowTypeForm(false); setNewTypeName(''); setNewTypeDesc(''); }}>キャンセル</button>
+                        <button className="btn btn-primary btn-sm" onClick={addType} disabled={!newTypeName.trim()}>追加</button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* 種別一覧 */}
+                {prizes.types.length === 0 ? (
+                  <div style={{textAlign:'center', padding:'20px 0', color:'var(--text-muted)', fontSize:13}}>
+                    権利種別がありません
+                  </div>
+                ) : (
+                  <table className="admin-table">
+                    <thead>
+                      <tr><th>権利種別名</th><th>説明</th><th style={{textAlign:'center'}}>登録数</th><th></th></tr>
+                    </thead>
+                    <tbody>
+                      {prizes.types.map(t => (
+                        <tr key={t.id}>
+                          <td style={{fontWeight:600}}>{t.name}</td>
+                          <td style={{fontSize:12, color:'var(--text-muted)'}}>{t.description || '-'}</td>
+                          <td style={{textAlign:'center'}}>
+                            <span style={{background:'var(--bg-hover)', borderRadius:12, padding:'2px 8px', fontSize:12}}>
+                              {prizes.awards.filter(a => a.typeId === t.id).length}件
+                            </span>
+                          </td>
+                          <td><button className="btn btn-danger btn-sm" onClick={() => deleteType(t.id)}>削除</button></td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* ===== 権利付与管理カード ===== */}
+          <div className="card">
+            {/* ヘッダー行 */}
+            <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:14, flexWrap:'wrap', gap:8}}>
+              <div className="card-title" style={{margin:0}}>権利付与管理</div>
+              <div style={{display:'flex', gap:8}}>
+                <button className="btn btn-secondary btn-sm" onClick={() => { setShowTypeMaster(true); setShowTypeForm(false); }}>
+                  権利種別マスター
+                </button>
+                <button className="btn btn-primary btn-sm"
+                  disabled={prizes.types.length === 0}
+                  onClick={() => setShowAwardForm(!showAwardForm)}>
+                  {showAwardForm ? 'キャンセル' : '+ 権利を登録'}
+                </button>
+              </div>
+            </div>
+
+            {/* 登録フォーム */}
+            {showAwardForm && (
+              <div className="inline-form">
+                <div style={{display:'grid', gridTemplateColumns:'140px 1fr 1fr 80px', gap:8, marginBottom:8, alignItems:'end'}}>
+                  <div>
+                    <div className="form-label" style={{marginBottom:4}}>権利発生日 *</div>
+                    <input type="date" className="form-input" style={{colorScheme:'dark', padding:'7px 8px', fontSize:13}}
+                      value={awardForm.occurredAt}
+                      onChange={e => setAwardForm(p => ({...p, occurredAt: e.target.value}))} />
+                  </div>
+                  <div>
+                    <div className="form-label" style={{marginBottom:4}}>権利種別 *</div>
+                    <select className="form-select" value={awardForm.typeId} onChange={e => setAwardForm(p => ({...p, typeId: e.target.value}))}>
+                      <option value="">選択してください</option>
+                      {prizes.types.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <div className="form-label" style={{marginBottom:4}}>プレイヤー *</div>
+                    <PlayerAutocomplete players={players} value={awardForm.playerId} onChange={v => setAwardForm(p => ({...p, playerId: v}))} />
+                  </div>
+                  <div>
+                    <div className="form-label" style={{marginBottom:4}}>個数 *</div>
+                    <input type="number" className="form-input" min="1" style={{padding:'7px 8px', fontSize:13, textAlign:'center'}}
+                      value={awardForm.quantity}
+                      onChange={e => setAwardForm(p => ({...p, quantity: Math.max(1, parseInt(e.target.value)||1)}))} />
+                  </div>
+                </div>
+                <div style={{display:'flex', gap:8}}>
+                  <input className="form-input" style={{flex:1}} placeholder="メモ（任意）例: 2025年1月度優勝" value={awardForm.note}
+                    onChange={e => setAwardForm(p => ({...p, note: e.target.value}))} />
+                  <button className="btn btn-primary btn-sm" onClick={addAward}>登録</button>
+                </div>
+              </div>
+            )}
+
+            {/* フィルター: 名前・種別・ステータス */}
+            <div style={{display:'flex', gap:8, marginBottom:14, flexWrap:'wrap', alignItems:'center'}}>
+              <input className="form-input" style={{flex:'1 1 140px', minWidth:120, padding:'7px 10px', fontSize:12}}
+                placeholder="🔍 名前で絞り込み"
+                value={filterName} onChange={e => setFilterName(e.target.value)} />
+              <select className="form-select" style={{flex:'1 1 140px', minWidth:120, padding:'7px 10px', fontSize:12}}
+                value={filterType} onChange={e => setFilterType(e.target.value)}>
+                <option value="">全種別</option>
+                {prizes.types.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
+              </select>
+              <select className="form-select" style={{flex:'0 0 120px', padding:'7px 10px', fontSize:12}}
+                value={filterStatus} onChange={e => setFilterStatus(e.target.value)}>
+                <option value="">全ステータス</option>
+                <option value="未付与">未付与</option>
+                <option value="付与済み">付与済み</option>
+              </select>
+              {(filterName || filterType || filterStatus) && (
+                <button className="btn btn-secondary btn-sm" style={{whiteSpace:'nowrap'}}
+                  onClick={() => { setFilterName(''); setFilterType(''); setFilterStatus(''); }}>
+                  ✕ クリア
+                </button>
+              )}
+            </div>
+
+            {/* テーブル */}
+            <table className="admin-table">
+              <thead>
+                <tr>
+                  <th>プレイヤー</th>
+                  <th>権利種別</th>
+                  <th style={{textAlign:'center'}}>個数</th>
+                  <th>権利発生日</th>
+                  <th>ステータス</th>
+                  <th>付与日</th>
+                  <th>メモ</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredAwards.map(a => (
+                  <tr key={a.id}>
+                    <td style={{fontWeight:500}}>{getPlayerName(a.playerId)}</td>
+                    <td style={{fontSize:12}}>{getTypeName(a.typeId)}</td>
+                    <td style={{textAlign:'center', fontWeight:600}}>{a.quantity || 1}</td>
+                    <td style={{fontSize:12, color:'var(--text-secondary)'}}>{a.occurredAt || '-'}</td>
+                    <td>
+                      <button className={`status-badge ${a.status==='付与済み' ? 'given' : 'pending'}`}
+                        onClick={() => toggleStatus(a)} title="クリックでステータス変更">
+                        {a.status}
+                      </button>
+                    </td>
+                    <td style={{fontSize:12, color:'var(--text-muted)'}}>
+                      {a.givenAt ? a.givenAt.split('T')[0] : '-'}
+                    </td>
+                    <td style={{fontSize:12, color:'var(--text-secondary)', maxWidth:100, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap'}}>
+                      {a.note || '-'}
+                    </td>
+                    <td>
+                      {confirmDelete === a.id ? (
+                        <div style={{display:'flex', gap:4, alignItems:'center'}}>
+                          <span style={{fontSize:11, color:'var(--danger)', whiteSpace:'nowrap'}}>削除？</span>
+                          <button className="btn btn-sm" style={{background:'var(--danger)', color:'#fff', padding:'3px 8px'}}
+                            onClick={() => { deleteAward(a.id); setConfirmDelete(null); }}>はい</button>
+                          <button className="btn btn-secondary btn-sm" style={{padding:'3px 8px'}}
+                            onClick={() => setConfirmDelete(null)}>いいえ</button>
+                        </div>
+                      ) : (
+                        <button className="btn btn-danger btn-sm" onClick={() => setConfirmDelete(a.id)}>削除</button>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            {filteredAwards.length === 0 && (
+              <div style={{textAlign:'center', padding:20, color:'var(--text-muted)', fontSize:13}}>
+                {prizes.types.length === 0
+                  ? '先に「権利種別マスター」から種別を追加してください'
+                  : (filterName || filterType || filterStatus) ? 'フィルター条件に一致する記録がありません' : '権利登録がありません'}
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    }
+
+    // ==================== MAIN APP ====================
+    function App() {
+      const [authenticated, setAuthenticated] = useState(false);
+      const [checking, setChecking] = useState(true);
+      const [role, setRole] = useState('');
+      const [currentEmail, setCurrentEmail] = useState('');
+      const [section, setSection] = useState(null);
+      const [players, setPlayers] = useState([]);
+      const [toast, setToast] = useState(null);
+      const [showUserMgmt, setShowUserMgmt] = useState(false);
+      const [showForgot, setShowForgot] = useState(false);
+
+      // URLにreset_tokenがあればリセット画面
+      const urlParams = new URLSearchParams(window.location.search);
+      const resetToken = urlParams.get('reset_token');
+
+      const showToast = (message, type = 'success') => setToast({ message, type });
+      const isAdmin = role === 'admin';
+
+      const loadPlayers = async () => {
+        try { const data = await api('/api/players'); setPlayers(data.players || []); } catch (err) {}
+      };
+
+      useEffect(() => {
+        api('/api/auth/check').then(data => {
+          setAuthenticated(data.authenticated);
+          setRole(data.role || '');
+          setCurrentEmail(data.email || '');
+          setChecking(false);
+          if (data.authenticated) loadPlayers();
+        }).catch(() => setChecking(false));
+      }, []);
+
+      const handleLogin = (res) => {
+        setAuthenticated(true);
+        setRole(res.role || '');
+        setCurrentEmail(res.email || '');
+        loadPlayers();
+      };
+
+      const handleLogout = async () => {
+        await api('/api/logout', { method: 'POST' });
+        setAuthenticated(false);
+        setRole('');
+        setCurrentEmail('');
+        setSection(null);
+      };
+
+      if (resetToken) return (
+        <ResetPasswordScreen token={resetToken} onDone={() => { window.history.replaceState({}, '', '/'); window.location.reload(); }} />
+      );
+
+      if (checking) return (
+        <div style={{display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', color: 'var(--text-muted)'}}>
+          読み込み中...
+        </div>
+      );
+      if (!authenticated) {
+        if (showForgot) return <ForgotPasswordScreen onBack={() => setShowForgot(false)} />;
+        return <LoginScreen onLogin={handleLogin} onForgot={() => setShowForgot(true)} />;
+      }
+
+      const sectionTitles = {
+        players: 'プレイヤー情報取得',
+        leaderboard: 'リーダーズボード',
+        analysis: '顧客データ分析',
+        prizes: '権利付与管理'
+      };
+
+      return (
+        <div className="container">
+          <div className="admin-header">
+            <div className="admin-header-title">
+              {section !== null && (
+                <button className="back-btn" onClick={() => setSection(null)} title="ポータルに戻る">←</button>
+              )}
+              {section !== null ? sectionTitles[section] : '9HIGH 仙台 管理ポータル'}
+            </div>
+            <div className="admin-header-actions">
+              <span style={{fontSize:11, color:'var(--text-muted)', marginRight:4}}>{currentEmail}</span>
+              {isAdmin && (
+                <button className="btn btn-secondary btn-sm" onClick={() => setShowUserMgmt(true)}>
+                  👥 アカウント
+                </button>
+              )}
+              <a href="/leaderboard" className="btn btn-secondary btn-sm">リーダーボード</a>
+              <button className="btn btn-secondary btn-sm" onClick={handleLogout}>ログアウト</button>
+            </div>
+          </div>
+
+          {section === null && <PortalHome onNavigate={setSection} />}
+          {section === 'players' && <PlayersTab players={players} onReload={loadPlayers} showToast={showToast} isAdmin={isAdmin} />}
+          {section === 'leaderboard' && <LeaderboardSection players={players} showToast={showToast} />}
+          {section === 'analysis' && <CustomerAnalysisSection players={players} showToast={showToast} isAdmin={isAdmin} />}
+          {section === 'prizes' && <PrizeManagementSection players={players} showToast={showToast} />}
+
+          {showUserMgmt && <UserManagementModal onClose={() => setShowUserMgmt(false)} showToast={showToast} currentEmail={currentEmail} />}
+          {toast && <Toast message={toast.message} type={toast.type} onClose={() => setToast(null)} />}
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>
