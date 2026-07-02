@@ -1,0 +1,95 @@
+{
+  "types": [
+    {
+      "id": "pt-49d9191a",
+      "name": "JOPT",
+      "description": "",
+      "createdAt": "2026-06-30T19:11:08.792776"
+    },
+    {
+      "id": "pt-3e825e92",
+      "name": "百花繚乱",
+      "description": "",
+      "createdAt": "2026-06-30T19:54:11.405219"
+    }
+  ],
+  "awards": [
+    {
+      "id": "aw-83921bf7",
+      "playerId": "p4fa57a23",
+      "typeId": "pt-49d9191a",
+      "status": "未付与",
+      "note": "",
+      "occurredAt": "2026-06-30",
+      "quantity": 1,
+      "createdAt": "2026-06-30T22:07:02.054504",
+      "givenAt": null
+    },
+    {
+      "id": "aw-b4bd5733",
+      "playerId": "pa327bf48",
+      "typeId": "pt-3e825e92",
+      "status": "未付与",
+      "note": "",
+      "occurredAt": "2026-06-30",
+      "quantity": 2,
+      "createdAt": "2026-06-30T22:07:14.625469",
+      "givenAt": null
+    },
+    {
+      "id": "aw-d8628ce6",
+      "playerId": "p-4b95ab5f",
+      "typeId": "pt-49d9191a",
+      "status": "未付与",
+      "note": "",
+      "occurredAt": "2026-06-30",
+      "quantity": 2,
+      "createdAt": "2026-06-30T22:07:52.602921",
+      "givenAt": null
+    },
+    {
+      "id": "aw-92a40991",
+      "playerId": "p4fa57a23",
+      "typeId": "pt-3e825e92",
+      "status": "付与済み",
+      "note": "",
+      "occurredAt": "2026-06-30",
+      "quantity": 1,
+      "createdAt": "2026-06-30T22:08:16.424058",
+      "givenAt": "2026-06-30T22:16:32.780642"
+    },
+    {
+      "id": "aw-1da5664e",
+      "playerId": "p4fa57a23",
+      "typeId": "pt-49d9191a",
+      "status": "未付与",
+      "note": "",
+      "occurredAt": "2026-06-30",
+      "quantity": 1,
+      "createdAt": "2026-06-30T22:34:25.701096",
+      "givenAt": null
+    },
+    {
+      "id": "aw-6a835304",
+      "playerId": "p4fa57a23",
+      "typeId": "pt-49d9191a",
+      "status": "未付与",
+      "note": "",
+      "occurredAt": "2026-06-30",
+      "quantity": 1,
+      "createdAt": "2026-06-30T22:35:13.139517",
+      "givenAt": null
+    },
+    {
+      "id": "aw-2d3ee7a5",
+      "playerId": "p4fa57a23",
+      "typeId": "pt-3e825e92",
+      "status": "未付与",
+      "note": "",
+      "occurredAt": "2026-06-30",
+      "quantity": 1,
+      "createdAt": "2026-06-30T22:38:47.123444",
+      "givenAt": null
+    }
+  ]
+}

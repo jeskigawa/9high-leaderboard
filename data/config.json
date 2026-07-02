@@ -1,5 +1,30 @@
 {
-  "password_hash": "3f21a8490cef2bfb60a9702e9d2ddb7a805c9bd1a263557dfd51a7d0e9dfa93e",
   "store_name": "9HIGH 仙台",
-  "store_subtitle": "月間リーダーボード"
+  "store_subtitle": "月間リーダーボード",
+  "users": [
+    {
+      "email": "admin@9high.jp",
+      "password_hash": "3f21a8490cef2bfb60a9702e9d2ddb7a805c9bd1a263557dfd51a7d0e9dfa93e",
+      "role": "admin"
+    },
+    {
+      "email": "kenkigawa@hotmail.com",
+      "password_hash": "3f21a8490cef2bfb60a9702e9d2ddb7a805c9bd1a263557dfd51a7d0e9dfa93e",
+      "role": "admin"
+    },
+    {
+      "email": "masamichitakada6219@gmail.com",
+      "password_hash": "3f21a8490cef2bfb60a9702e9d2ddb7a805c9bd1a263557dfd51a7d0e9dfa93e",
+      "role": "user"
+    }
+  ],
+  "pokerfans": {
+    "cookie": "_ga=GA1.2.1152282843.1782471793; _gid=GA1.2.1772141006.1782813874; _gat=1; JSESSIONID=7B7158C973836F4C160B83887C694B2E; remember-me=a2VpdGFuYWdhbWluZTAyMjlAb3V0bG9vay5qcDoxNzg0MDQ0NjgzNzg3OjRlZjA2OTI2NjI4NGNhNmIyYmQ4ZWIwZTRkMjIyZjQ3; _ga_BJY70873K4=GS2.2.s1782835062$o5$g1$t1782835083$j39$l0$h0",
+    "email": "kenkigawa@hotmail.com",
+    "password": "Abcd1234"
+  },
+  "sunvy_creds": {
+    "email": "nolimit.sendai@gmail.com",
+    "password": "higa9high"
+  }
 }

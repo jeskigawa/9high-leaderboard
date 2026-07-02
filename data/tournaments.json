@@ -18,115 +18,2446 @@
   ],
   "results": [
     {
-      "tournamentId": "weekly-nlh",
-      "date": "2026-06-01",
-      "entries": 24,
+      "tournamentId": "💰ポイントゲットトーナメント💰",
+      "date": "2026-06-30",
+      "entries": 13,
       "results": [
-        { "playerId": "p1", "playerName": "田中太郎", "rank": 1, "points": 100, "prize": 50000 },
-        { "playerId": "p2", "playerName": "佐藤花子", "rank": 2, "points": 70, "prize": 30000 },
-        { "playerId": "p3", "playerName": "鈴木一郎", "rank": 3, "points": 50, "prize": 20000 },
-        { "playerId": "p4", "playerName": "山田健二", "rank": 4, "points": 40, "prize": 0 },
-        { "playerId": "p5", "playerName": "高橋美咲", "rank": 5, "points": 30, "prize": 0 }
+        {
+          "playerId": "p3c1d0580",
+          "rank": 1,
+          "points": 4,
+          "playerName": "ささきんと",
+          "placed": true
+        },
+        {
+          "playerId": "p5594e2c4",
+          "rank": 2,
+          "points": 2,
+          "playerName": "U.",
+          "placed": true
+        },
+        {
+          "playerId": "pde391082",
+          "rank": 3,
+          "points": 1,
+          "playerName": "RYU",
+          "placed": true
+        },
+        {
+          "playerId": "p21fdcbbf",
+          "rank": null,
+          "points": 0,
+          "playerName": "y",
+          "placed": false
+        },
+        {
+          "playerId": "p3548294a",
+          "rank": null,
+          "points": 0,
+          "playerName": "たつにい",
+          "placed": false
+        },
+        {
+          "playerId": "pd6f43a02",
+          "rank": null,
+          "points": 0,
+          "playerName": "加藤",
+          "placed": false
+        },
+        {
+          "playerId": "p198a1bc9",
+          "rank": null,
+          "points": 0,
+          "playerName": "うみ",
+          "placed": false
+        }
       ]
     },
     {
-      "tournamentId": "weekly-nlh",
-      "date": "2026-06-08",
-      "entries": 28,
+      "tournamentId": "平日フリーロール",
+      "date": "2026-06-30",
+      "entries": 7,
       "results": [
-        { "playerId": "p2", "playerName": "佐藤花子", "rank": 1, "points": 100, "prize": 55000 },
-        { "playerId": "p6", "playerName": "伊藤直人", "rank": 2, "points": 70, "prize": 33000 },
-        { "playerId": "p1", "playerName": "田中太郎", "rank": 3, "points": 50, "prize": 22000 },
-        { "playerId": "p7", "playerName": "渡辺裕子", "rank": 4, "points": 40, "prize": 0 },
-        { "playerId": "p8", "playerName": "中村大輔", "rank": 5, "points": 30, "prize": 0 }
+        {
+          "playerId": "p21fdcbbf",
+          "rank": 1,
+          "points": 1,
+          "playerName": "y",
+          "placed": true
+        },
+        {
+          "playerId": "pff724822",
+          "rank": 2,
+          "points": 0,
+          "playerName": "しゅーと",
+          "placed": true
+        },
+        {
+          "playerId": "p14b5fe4a",
+          "rank": null,
+          "points": 0,
+          "playerName": "ひでき",
+          "placed": false
+        },
+        {
+          "playerId": "pd6f43a02",
+          "rank": null,
+          "points": 0,
+          "playerName": "加藤",
+          "placed": false
+        },
+        {
+          "playerId": "p3548294a",
+          "rank": null,
+          "points": 0,
+          "playerName": "たつにい",
+          "placed": false
+        },
+        {
+          "playerId": "pdad2e298",
+          "rank": null,
+          "points": 0,
+          "playerName": "かいせい",
+          "placed": false
+        },
+        {
+          "playerId": "p198a1bc9",
+          "rank": null,
+          "points": 0,
+          "playerName": "うみ",
+          "placed": false
+        }
       ]
     },
     {
-      "tournamentId": "weekly-nlh",
-      "date": "2026-06-15",
-      "entries": 22,
-      "results": [
-        { "playerId": "p3", "playerName": "鈴木一郎", "rank": 1, "points": 100, "prize": 44000 },
-        { "playerId": "p1", "playerName": "田中太郎", "rank": 2, "points": 70, "prize": 26000 },
-        { "playerId": "p9", "playerName": "小林真理", "rank": 3, "points": 50, "prize": 18000 },
-        { "playerId": "p5", "playerName": "高橋美咲", "rank": 4, "points": 40, "prize": 0 },
-        { "playerId": "p2", "playerName": "佐藤花子", "rank": 5, "points": 30, "prize": 0 }
-      ]
-    },
-    {
-      "tournamentId": "weekly-nlh",
-      "date": "2026-06-22",
-      "entries": 26,
-      "results": [
-        { "playerId": "p5", "playerName": "高橋美咲", "rank": 1, "points": 100, "prize": 52000 },
-        { "playerId": "p4", "playerName": "山田健二", "rank": 2, "points": 70, "prize": 31000 },
-        { "playerId": "p6", "playerName": "伊藤直人", "rank": 3, "points": 50, "prize": 21000 },
-        { "playerId": "p1", "playerName": "田中太郎", "rank": 4, "points": 40, "prize": 0 },
-        { "playerId": "p10", "playerName": "松本優", "rank": 5, "points": 30, "prize": 0 }
-      ]
-    },
-    {
-      "tournamentId": "monthly-deepstack",
-      "date": "2026-06-14",
-      "entries": 40,
-      "results": [
-        { "playerId": "p6", "playerName": "伊藤直人", "rank": 1, "points": 150, "prize": 120000 },
-        { "playerId": "p1", "playerName": "田中太郎", "rank": 2, "points": 105, "prize": 72000 },
-        { "playerId": "p3", "playerName": "鈴木一郎", "rank": 3, "points": 75, "prize": 48000 },
-        { "playerId": "p2", "playerName": "佐藤花子", "rank": 4, "points": 60, "prize": 24000 },
-        { "playerId": "p9", "playerName": "小林真理", "rank": 5, "points": 45, "prize": 0 }
-      ]
-    },
-    {
-      "tournamentId": "bounty-hunter",
-      "date": "2026-06-21",
-      "entries": 32,
-      "results": [
-        { "playerId": "p1", "playerName": "田中太郎", "rank": 1, "points": 120, "prize": 80000 },
-        { "playerId": "p5", "playerName": "高橋美咲", "rank": 2, "points": 84, "prize": 48000 },
-        { "playerId": "p7", "playerName": "渡辺裕子", "rank": 3, "points": 60, "prize": 32000 },
-        { "playerId": "p10", "playerName": "松本優", "rank": 4, "points": 48, "prize": 16000 },
-        { "playerId": "p4", "playerName": "山田健二", "rank": 5, "points": 36, "prize": 0 }
-      ]
-    },
-    {
-      "tournamentId": "weekly-nlh",
-      "date": "2026-05-04",
+      "tournamentId": "🆕9Highの日トーナメント🆕",
+      "date": "2026-06-29",
       "entries": 20,
       "results": [
-        { "playerId": "p8", "playerName": "中村大輔", "rank": 1, "points": 100, "prize": 40000 },
-        { "playerId": "p1", "playerName": "田中太郎", "rank": 2, "points": 70, "prize": 24000 },
-        { "playerId": "p9", "playerName": "小林真理", "rank": 3, "points": 50, "prize": 16000 }
+        {
+          "playerId": "p3c1d0580",
+          "rank": 1,
+          "points": 6,
+          "playerName": "ささきんと",
+          "placed": true
+        },
+        {
+          "playerId": "p5594e2c4",
+          "rank": 2,
+          "points": 4,
+          "playerName": "U.",
+          "placed": true
+        },
+        {
+          "playerId": "p24fdce77",
+          "rank": 3,
+          "points": 2,
+          "playerName": "takamimo",
+          "placed": true
+        },
+        {
+          "playerId": "p6356a724",
+          "rank": null,
+          "points": 0,
+          "playerName": "しの",
+          "placed": false
+        },
+        {
+          "playerId": "p4fa57a23",
+          "rank": null,
+          "points": 0,
+          "playerName": "きがわ",
+          "placed": false
+        },
+        {
+          "playerId": "p33ca0342",
+          "rank": null,
+          "points": 0,
+          "playerName": "WAT4",
+          "placed": false
+        },
+        {
+          "playerId": "p0325fb06",
+          "rank": null,
+          "points": 0,
+          "playerName": "んだ",
+          "placed": false
+        },
+        {
+          "playerId": "p9a3885e4",
+          "rank": null,
+          "points": 0,
+          "playerName": "寿司（ことぶきつかさ）",
+          "placed": false
+        },
+        {
+          "playerId": "pd7e45358",
+          "rank": null,
+          "points": 0,
+          "playerName": "みそ",
+          "placed": false
+        },
+        {
+          "playerId": "pde391082",
+          "rank": null,
+          "points": 0,
+          "playerName": "RYU",
+          "placed": false
+        },
+        {
+          "playerId": "p39ce463b",
+          "rank": null,
+          "points": 0,
+          "playerName": "NOA",
+          "placed": false
+        },
+        {
+          "playerId": "p1db1b93c",
+          "rank": null,
+          "points": 0,
+          "playerName": "tomi",
+          "placed": false
+        },
+        {
+          "playerId": "p68882dbe",
+          "rank": null,
+          "points": 0,
+          "playerName": "Sig",
+          "placed": false
+        }
       ]
     },
     {
-      "tournamentId": "weekly-nlh",
-      "date": "2026-05-11",
-      "entries": 25,
+      "tournamentId": "平日フリーロール",
+      "date": "2026-06-29",
+      "entries": 9,
       "results": [
-        { "playerId": "p3", "playerName": "鈴木一郎", "rank": 1, "points": 100, "prize": 50000 },
-        { "playerId": "p6", "playerName": "伊藤直人", "rank": 2, "points": 70, "prize": 30000 },
-        { "playerId": "p2", "playerName": "佐藤花子", "rank": 3, "points": 50, "prize": 20000 }
+        {
+          "playerId": "p39ce463b",
+          "rank": 1,
+          "points": 1,
+          "playerName": "NOA",
+          "placed": true
+        },
+        {
+          "playerId": "p3c1d0580",
+          "rank": 2,
+          "points": 1,
+          "playerName": "ささきんと",
+          "placed": true
+        },
+        {
+          "playerId": "p24fdce77",
+          "rank": null,
+          "points": 0,
+          "playerName": "takamimo",
+          "placed": false
+        },
+        {
+          "playerId": "p9a3885e4",
+          "rank": null,
+          "points": 0,
+          "playerName": "寿司（ことぶきつかさ）",
+          "placed": false
+        },
+        {
+          "playerId": "pd7e45358",
+          "rank": null,
+          "points": 0,
+          "playerName": "みそ",
+          "placed": false
+        },
+        {
+          "playerId": "p33ca0342",
+          "rank": null,
+          "points": 0,
+          "playerName": "WAT4",
+          "placed": false
+        },
+        {
+          "playerId": "p0325fb06",
+          "rank": null,
+          "points": 0,
+          "playerName": "んだ",
+          "placed": false
+        },
+        {
+          "playerId": "p4fa57a23",
+          "rank": null,
+          "points": 0,
+          "playerName": "きがわ",
+          "placed": false
+        },
+        {
+          "playerId": "pff724822",
+          "rank": null,
+          "points": 0,
+          "playerName": "しゅーと",
+          "placed": false
+        }
       ]
     },
     {
-      "tournamentId": "weekly-nlh",
-      "date": "2026-05-18",
-      "entries": 30,
+      "tournamentId": "9High Cup Gold Sponsored by Educo Inc.",
+      "date": "2026-06-28",
+      "entries": 66,
       "results": [
-        { "playerId": "p1", "playerName": "田中太郎", "rank": 1, "points": 100, "prize": 60000 },
-        { "playerId": "p5", "playerName": "高橋美咲", "rank": 2, "points": 70, "prize": 36000 },
-        { "playerId": "p4", "playerName": "山田健二", "rank": 3, "points": 50, "prize": 24000 }
+        {
+          "playerId": "p09778894",
+          "rank": 1,
+          "points": 10,
+          "playerName": "とく",
+          "placed": true
+        },
+        {
+          "playerId": "p986ac6b3",
+          "rank": 2,
+          "points": 6,
+          "playerName": "かとー",
+          "placed": true
+        },
+        {
+          "playerId": "p68882dbe",
+          "rank": 3,
+          "points": 5,
+          "playerName": "Sig",
+          "placed": true
+        },
+        {
+          "playerId": "pc0d90c0d",
+          "rank": 4,
+          "points": 2,
+          "playerName": "セイ",
+          "placed": true
+        },
+        {
+          "playerId": "p83383b7a",
+          "rank": null,
+          "points": 0,
+          "playerName": "葵",
+          "placed": false
+        },
+        {
+          "playerId": "p175ff5a6",
+          "rank": null,
+          "points": 0,
+          "playerName": "と。",
+          "placed": false
+        },
+        {
+          "playerId": "p2d784ba6",
+          "rank": null,
+          "points": 0,
+          "playerName": "いった",
+          "placed": false
+        },
+        {
+          "playerId": "pde2906c1",
+          "rank": null,
+          "points": 0,
+          "playerName": "うーじー",
+          "placed": false
+        },
+        {
+          "playerId": "p33ca0342",
+          "rank": null,
+          "points": 0,
+          "playerName": "WAT4",
+          "placed": false
+        },
+        {
+          "playerId": "p4fa57a23",
+          "rank": null,
+          "points": 0,
+          "playerName": "きがわ",
+          "placed": false
+        },
+        {
+          "playerId": "p0e28b75e",
+          "rank": null,
+          "points": 0,
+          "playerName": "ばっさー",
+          "placed": false
+        },
+        {
+          "playerId": "p6356a724",
+          "rank": null,
+          "points": 0,
+          "playerName": "しの",
+          "placed": false
+        },
+        {
+          "playerId": "pf4e90dcc",
+          "rank": null,
+          "points": 0,
+          "playerName": "道楽",
+          "placed": false
+        },
+        {
+          "playerId": "p9a3885e4",
+          "rank": null,
+          "points": 0,
+          "playerName": "寿司（ことぶきつかさ）",
+          "placed": false
+        },
+        {
+          "playerId": "p9fd94698",
+          "rank": null,
+          "points": 0,
+          "playerName": "あっきー。",
+          "placed": false
+        },
+        {
+          "playerId": "pda2a7c26",
+          "rank": null,
+          "points": 0,
+          "playerName": "👓逆巻アヤト👓",
+          "placed": false
+        },
+        {
+          "playerId": "pae9e6820",
+          "rank": null,
+          "points": 0,
+          "playerName": "うま",
+          "placed": false
+        },
+        {
+          "playerId": "p5594e2c4",
+          "rank": null,
+          "points": 0,
+          "playerName": "U.",
+          "placed": false
+        },
+        {
+          "playerId": "pde391082",
+          "rank": null,
+          "points": 0,
+          "playerName": "RYU",
+          "placed": false
+        },
+        {
+          "playerId": "pec135e18",
+          "rank": null,
+          "points": 0,
+          "playerName": "山田90",
+          "placed": false
+        },
+        {
+          "playerId": "p53acc708",
+          "rank": null,
+          "points": 0,
+          "playerName": "ゆうのすけ",
+          "placed": false
+        },
+        {
+          "playerId": "pa917375d",
+          "rank": null,
+          "points": 0,
+          "playerName": "かまき",
+          "placed": false
+        },
+        {
+          "playerId": "p39ce463b",
+          "rank": null,
+          "points": 0,
+          "playerName": "NOA",
+          "placed": false
+        },
+        {
+          "playerId": "pd6f43a02",
+          "rank": null,
+          "points": 0,
+          "playerName": "加藤",
+          "placed": false
+        },
+        {
+          "playerId": "p3548294a",
+          "rank": null,
+          "points": 0,
+          "playerName": "たつにい",
+          "placed": false
+        },
+        {
+          "playerId": "p0325fb06",
+          "rank": null,
+          "points": 0,
+          "playerName": "んだ",
+          "placed": false
+        },
+        {
+          "playerId": "p24fdce77",
+          "rank": null,
+          "points": 0,
+          "playerName": "takamimo",
+          "placed": false
+        },
+        {
+          "playerId": "p94cc4fa4",
+          "rank": null,
+          "points": 0,
+          "playerName": "石川",
+          "placed": false
+        },
+        {
+          "playerId": "p588d4978",
+          "rank": null,
+          "points": 0,
+          "playerName": "てし",
+          "placed": false
+        }
       ]
     },
     {
-      "tournamentId": "weekly-nlh",
-      "date": "2026-05-25",
-      "entries": 22,
+      "tournamentId": "9High Cup AFTER",
+      "date": "2026-06-28",
+      "entries": 15,
       "results": [
-        { "playerId": "p7", "playerName": "渡辺裕子", "rank": 1, "points": 100, "prize": 44000 },
-        { "playerId": "p10", "playerName": "松本優", "rank": 2, "points": 70, "prize": 26000 },
-        { "playerId": "p1", "playerName": "田中太郎", "rank": 3, "points": 50, "prize": 18000 }
+        {
+          "playerId": "p24fdce77",
+          "rank": 1,
+          "points": 5,
+          "playerName": "takamimo",
+          "placed": true
+        },
+        {
+          "playerId": "pde391082",
+          "rank": 2,
+          "points": 3,
+          "playerName": "RYU",
+          "placed": true
+        },
+        {
+          "playerId": "p175ff5a6",
+          "rank": 3,
+          "points": 1,
+          "playerName": "と。",
+          "placed": true
+        },
+        {
+          "playerId": "p6356a724",
+          "rank": null,
+          "points": 0,
+          "playerName": "しの",
+          "placed": false
+        },
+        {
+          "playerId": "pd067dcfb",
+          "rank": null,
+          "points": 0,
+          "playerName": "平凌治",
+          "placed": false
+        },
+        {
+          "playerId": "p39ce463b",
+          "rank": null,
+          "points": 0,
+          "playerName": "NOA",
+          "placed": false
+        },
+        {
+          "playerId": "p33ca0342",
+          "rank": null,
+          "points": 0,
+          "playerName": "WAT4",
+          "placed": false
+        },
+        {
+          "playerId": "p2d784ba6",
+          "rank": null,
+          "points": 0,
+          "playerName": "いった",
+          "placed": false
+        },
+        {
+          "playerId": "p94cc4fa4",
+          "rank": null,
+          "points": 0,
+          "playerName": "石川",
+          "placed": false
+        },
+        {
+          "playerId": "p4fa57a23",
+          "rank": null,
+          "points": 0,
+          "playerName": "きがわ",
+          "placed": false
+        },
+        {
+          "playerId": "p9fd94698",
+          "rank": null,
+          "points": 0,
+          "playerName": "あっきー。",
+          "placed": false
+        },
+        {
+          "playerId": "pa917375d",
+          "rank": null,
+          "points": 0,
+          "playerName": "かまき",
+          "placed": false
+        },
+        {
+          "playerId": "p3548294a",
+          "rank": null,
+          "points": 0,
+          "playerName": "たつにい",
+          "placed": false
+        }
+      ]
+    },
+    {
+      "tournamentId": "💰ポイントゲットトーナメント💰",
+      "date": "2026-06-30",
+      "entries": 7,
+      "results": [
+        {
+          "playerId": "p3c1d0580",
+          "rank": 1,
+          "points": 0,
+          "playerName": "ささきんと",
+          "placed": true
+        },
+        {
+          "playerId": "p5594e2c4",
+          "rank": 2,
+          "points": 0,
+          "playerName": "U.",
+          "placed": true
+        },
+        {
+          "playerId": "pde391082",
+          "rank": 3,
+          "points": 0,
+          "playerName": "RYU",
+          "placed": true
+        },
+        {
+          "playerId": "p21fdcbbf",
+          "rank": 4,
+          "points": 0,
+          "playerName": "y",
+          "placed": true
+        },
+        {
+          "playerId": "p3548294a",
+          "rank": 5,
+          "points": 0,
+          "playerName": "たつにい",
+          "placed": true
+        },
+        {
+          "playerId": "pd6f43a02",
+          "rank": 6,
+          "points": 0,
+          "playerName": "加藤",
+          "placed": true
+        },
+        {
+          "playerId": "p198a1bc9",
+          "rank": 7,
+          "points": 0,
+          "playerName": "うみ",
+          "placed": true
+        }
+      ]
+    },
+    {
+      "tournamentId": "🆕9Highの日トーナメント🆕(Processed)",
+      "date": "2026-06-29",
+      "entries": 13,
+      "name": "🆕9Highの日トーナメント🆕(Processed)",
+      "pokerfansUrl": "https://club.sunvy.jp/tours/events/2235638/applyers",
+      "results": [
+        {
+          "playerId": "p3c1d0580",
+          "playerName": "ささきんと",
+          "rank": 1,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "p5594e2c4",
+          "playerName": "U.",
+          "rank": 2,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "p24fdce77",
+          "playerName": "takamimo",
+          "rank": 3,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "p6356a724",
+          "playerName": "しの",
+          "rank": 4,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "p4fa57a23",
+          "playerName": "きがわ",
+          "rank": 5,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "p33ca0342",
+          "playerName": "WAT4",
+          "rank": 6,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "p0325fb06",
+          "playerName": "んだ",
+          "rank": 7,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "p9a3885e4",
+          "playerName": "寿司（ことぶきつかさ）",
+          "rank": 8,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "pd7e45358",
+          "playerName": "みそ",
+          "rank": 9,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "pde391082",
+          "playerName": "RYU",
+          "rank": 10,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "p39ce463b",
+          "playerName": "NOA",
+          "rank": 11,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "p1db1b93c",
+          "playerName": "tomi",
+          "rank": 12,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "p68882dbe",
+          "playerName": "Sig",
+          "rank": 13,
+          "points": 0,
+          "placed": true
+        }
+      ]
+    },
+    {
+      "tournamentId": "9High Cup Gold Sponsored by Educo Inc.(Processed)",
+      "date": "2026-06-28",
+      "entries": 29,
+      "name": "9High Cup Gold Sponsored by Educo Inc.(Processed)",
+      "pokerfansUrl": "https://club.sunvy.jp/tours/events/2235639/applyers",
+      "results": [
+        {
+          "playerId": "p09778894",
+          "playerName": "とく",
+          "rank": 1,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "p986ac6b3",
+          "playerName": "かとー",
+          "rank": 2,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "p68882dbe",
+          "playerName": "Sig",
+          "rank": 3,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "pc0d90c0d",
+          "playerName": "セイ",
+          "rank": 4,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "p83383b7a",
+          "playerName": "葵",
+          "rank": 5,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "p175ff5a6",
+          "playerName": "と。",
+          "rank": 6,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "p2d784ba6",
+          "playerName": "いった",
+          "rank": 7,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "pde2906c1",
+          "playerName": "うーじー",
+          "rank": 8,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "p33ca0342",
+          "playerName": "WAT4",
+          "rank": 9,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "p4fa57a23",
+          "playerName": "きがわ",
+          "rank": 10,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "p0e28b75e",
+          "playerName": "ばっさー",
+          "rank": 11,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "p6356a724",
+          "playerName": "しの",
+          "rank": 12,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "pf4e90dcc",
+          "playerName": "道楽",
+          "rank": 13,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "p9a3885e4",
+          "playerName": "寿司（ことぶきつかさ）",
+          "rank": 14,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "p9fd94698",
+          "playerName": "あっきー。",
+          "rank": 15,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "pda2a7c26",
+          "playerName": "👓逆巻アヤト👓",
+          "rank": 16,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "pae9e6820",
+          "playerName": "うま",
+          "rank": 17,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "p5594e2c4",
+          "playerName": "U.",
+          "rank": 18,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "pde391082",
+          "playerName": "RYU",
+          "rank": 19,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "pec135e18",
+          "playerName": "山田90",
+          "rank": 20,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "p53acc708",
+          "playerName": "ゆうのすけ",
+          "rank": 21,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "pa917375d",
+          "playerName": "かまき",
+          "rank": 22,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "p39ce463b",
+          "playerName": "NOA",
+          "rank": 23,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "pd6f43a02",
+          "playerName": "加藤",
+          "rank": 24,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "p3548294a",
+          "playerName": "たつにい",
+          "rank": 25,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "p0325fb06",
+          "playerName": "んだ",
+          "rank": 26,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "p24fdce77",
+          "playerName": "takamimo",
+          "rank": 27,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "p94cc4fa4",
+          "playerName": "石川",
+          "rank": 28,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "p588d4978",
+          "playerName": "てし",
+          "rank": 29,
+          "points": 0,
+          "placed": true
+        }
+      ]
+    },
+    {
+      "tournamentId": "きがわオーナー就任祭　#01フリーロール【1位はメインエントリー無料！】",
+      "date": "2026-06-27",
+      "entries": 13,
+      "name": "きがわオーナー就任祭　#01フリーロール【1位はメインエントリー無料！】",
+      "pokerfansUrl": "https://club.sunvy.jp/tours/events/2247311/applyers",
+      "results": [
+        {
+          "playerId": "pc0d90c0d",
+          "playerName": "セイ",
+          "rank": 1,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "p24fdce77",
+          "playerName": "takamimo",
+          "rank": 2,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "p4fa57a23",
+          "playerName": "きがわ",
+          "rank": 3,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "p00c4aa2d",
+          "playerName": "田中",
+          "rank": 4,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "p26e70b02",
+          "playerName": "ユウキ",
+          "rank": 5,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "pde391082",
+          "playerName": "RYU",
+          "rank": 6,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "pe5c38eb8",
+          "playerName": "りょう",
+          "rank": 7,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "p16e59d60",
+          "playerName": "シカさん",
+          "rank": 8,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "p9a3885e4",
+          "playerName": "寿司（ことぶきつかさ）",
+          "rank": 9,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "p21fdcbbf",
+          "playerName": "y",
+          "rank": 10,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "pde2906c1",
+          "playerName": "うーじー",
+          "rank": 11,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "pcd0e5c0f",
+          "playerName": "み。",
+          "rank": 12,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "p3c1d0580",
+          "playerName": "ささきんと",
+          "rank": 13,
+          "points": 0,
+          "placed": true
+        }
+      ]
+    },
+    {
+      "tournamentId": "きがわオーナー就任祭　#02Warm Up Turbo【2.7万NHD+新作Tシャツ3枚保証】(Processed)",
+      "date": "2026-06-27",
+      "entries": 19,
+      "name": "きがわオーナー就任祭　#02Warm Up Turbo【2.7万NHD+新作Tシャツ3枚保証】(Processed)",
+      "pokerfansUrl": "https://club.sunvy.jp/tours/events/2248664/applyers",
+      "results": [
+        {
+          "playerId": "p21fdcbbf",
+          "playerName": "y",
+          "rank": 1,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "pcd0e5c0f",
+          "playerName": "み。",
+          "rank": 2,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "p16e59d60",
+          "playerName": "シカさん",
+          "rank": 3,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "p9a3885e4",
+          "playerName": "寿司（ことぶきつかさ）",
+          "rank": 4,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "p6356a724",
+          "playerName": "しの",
+          "rank": 5,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "p3c1d0580",
+          "playerName": "ささきんと",
+          "rank": 6,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "pc0d90c0d",
+          "playerName": "セイ",
+          "rank": 7,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "pec135e18",
+          "playerName": "山田90",
+          "rank": 8,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "pde2906c1",
+          "playerName": "うーじー",
+          "rank": 9,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "p9fd94698",
+          "playerName": "あっきー。",
+          "rank": 10,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "pde391082",
+          "playerName": "RYU",
+          "rank": 11,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "p6eb2d6e8",
+          "playerName": "オング",
+          "rank": 12,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "p2c26ef47",
+          "playerName": "ミタマコト",
+          "rank": 13,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "pe5c38eb8",
+          "playerName": "りょう",
+          "rank": 14,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "p24fdce77",
+          "playerName": "takamimo",
+          "rank": 15,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "p4fa57a23",
+          "playerName": "きがわ",
+          "rank": 16,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "pd4b5e2df",
+          "playerName": "晴基",
+          "rank": 17,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "p26e70b02",
+          "playerName": "ユウキ",
+          "rank": 18,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "p59a675e4",
+          "playerName": "uniiiichan",
+          "rank": 19,
+          "points": 0,
+          "placed": true
+        }
+      ]
+    },
+    {
+      "tournamentId": "きがわオーナー就任祭　 #02Hyper 【1.5万NHD+新作Tシャツ2枚保証】(Processed)",
+      "date": "2026-06-27",
+      "entries": 18,
+      "name": "きがわオーナー就任祭　 #02Hyper 【1.5万NHD+新作Tシャツ2枚保証】(Processed)",
+      "pokerfansUrl": "https://club.sunvy.jp/tours/events/2276770/applyers",
+      "results": [
+        {
+          "playerId": "p15e41ebd",
+          "playerName": "パッ！",
+          "rank": 1,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "p5594e2c4",
+          "playerName": "U.",
+          "rank": 2,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "p1db1b93c",
+          "playerName": "tomi",
+          "rank": 3,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "pe5c38eb8",
+          "playerName": "りょう",
+          "rank": 4,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "pde2906c1",
+          "playerName": "うーじー",
+          "rank": 5,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "pec135e18",
+          "playerName": "山田90",
+          "rank": 6,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "pde391082",
+          "playerName": "RYU",
+          "rank": 7,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "p4fa57a23",
+          "playerName": "きがわ",
+          "rank": 8,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "p175ff5a6",
+          "playerName": "と。",
+          "rank": 9,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "p6356a724",
+          "playerName": "しの",
+          "rank": 10,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "pcd0e5c0f",
+          "playerName": "み。",
+          "rank": 11,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "p0fb5e6bf",
+          "playerName": "たいよう",
+          "rank": 12,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "pa917375d",
+          "playerName": "かまき",
+          "rank": 13,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "p24fdce77",
+          "playerName": "takamimo",
+          "rank": 14,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "p59a675e4",
+          "playerName": "uniiiichan",
+          "rank": 15,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "p304a9d73",
+          "playerName": "蘭",
+          "rank": 16,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "p5cb04b27",
+          "playerName": "たいよう",
+          "rank": 17,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "p16e59d60",
+          "playerName": "シカさん",
+          "rank": 18,
+          "points": 0,
+          "placed": true
+        }
+      ]
+    },
+    {
+      "tournamentId": "満足トーナメント👍",
+      "date": "2026-06-01",
+      "entries": 9,
+      "name": "満足トーナメント👍",
+      "pokerfansUrl": "https://club.sunvy.jp/tours/events/2225661/applyers",
+      "results": [
+        {
+          "playerId": "p3c1d0580",
+          "playerName": "ささきんと",
+          "rank": 1,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "pda6674e2",
+          "playerName": "笠谷陸太",
+          "rank": 2,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "p9a3885e4",
+          "playerName": "寿司（ことぶきつかさ）",
+          "rank": 3,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "p94cc4fa4",
+          "playerName": "石川",
+          "rank": 4,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "pe041f367",
+          "playerName": "宇宙1のたっちゃん",
+          "rank": 5,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "p0e28b75e",
+          "playerName": "ばっさー",
+          "rank": 6,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "p3548294a",
+          "playerName": "たつにい",
+          "rank": 7,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "pc7acfbc7",
+          "playerName": "わたり",
+          "rank": 8,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "pa3cd1899",
+          "playerName": "林宗治",
+          "rank": 9,
+          "points": 0,
+          "placed": true
+        }
+      ]
+    },
+    {
+      "tournamentId": "きがわオーナー就任祭　#03Main Event【30万NHD+新作Tシャツ7枚保証】",
+      "date": "2026-06-27",
+      "entries": 36,
+      "name": "きがわオーナー就任祭　#03Main Event【30万NHD+新作Tシャツ7枚保証】",
+      "pokerfansUrl": "https://club.sunvy.jp/tours/events/2254116/applyers",
+      "results": [
+        {
+          "playerId": "p73e0dd87",
+          "playerName": "ヴィニシウス•ジュニオール",
+          "rank": 1,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "p3c1d0580",
+          "playerName": "ささきんと",
+          "rank": 2,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "p21fdcbbf",
+          "playerName": "y",
+          "rank": 3,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "p462a887d",
+          "playerName": "栗パラくん！",
+          "rank": 4,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "p39ce463b",
+          "playerName": "NOA",
+          "rank": 5,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "pff08b6b1",
+          "playerName": "アンティあげるよ･ユウタ",
+          "rank": 6,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "p900d2358",
+          "playerName": "カメ",
+          "rank": 7,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "pd4b5e2df",
+          "playerName": "晴基",
+          "rank": 8,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "p26e70b02",
+          "playerName": "ユウキ",
+          "rank": 9,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "pdfb1eed4",
+          "playerName": "あゆみ",
+          "rank": 10,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "pc0d90c0d",
+          "playerName": "セイ",
+          "rank": 11,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "pae9e6820",
+          "playerName": "うま",
+          "rank": 12,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "p2ef3f4bd",
+          "playerName": "KSK",
+          "rank": 13,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "p24fdce77",
+          "playerName": "takamimo",
+          "rank": 14,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "p5594e2c4",
+          "playerName": "U.",
+          "rank": 15,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "p15e41ebd",
+          "playerName": "パッ！",
+          "rank": 16,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "p175ff5a6",
+          "playerName": "と。",
+          "rank": 17,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "pcd0e5c0f",
+          "playerName": "み。",
+          "rank": 18,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "pe5c38eb8",
+          "playerName": "りょう",
+          "rank": 19,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "p37f1138e",
+          "playerName": "たかたか",
+          "rank": 20,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "pec135e18",
+          "playerName": "山田90",
+          "rank": 21,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "p6356a724",
+          "playerName": "しの",
+          "rank": 22,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "pde391082",
+          "playerName": "RYU",
+          "rank": 23,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "p1db1b93c",
+          "playerName": "tomi",
+          "rank": 24,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "p6eb2d6e8",
+          "playerName": "オング",
+          "rank": 25,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "p68882dbe",
+          "playerName": "Sig",
+          "rank": 26,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "p4fa57a23",
+          "playerName": "きがわ",
+          "rank": 27,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "pde2906c1",
+          "playerName": "うーじー",
+          "rank": 28,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "p59a675e4",
+          "playerName": "uniiiichan",
+          "rank": 29,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "p83383b7a",
+          "playerName": "葵",
+          "rank": 30,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "p16e59d60",
+          "playerName": "シカさん",
+          "rank": 31,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "pfa789e24",
+          "playerName": "ゆずき",
+          "rank": 32,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "p5cb04b27",
+          "playerName": "たいよう",
+          "rank": 33,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "p304a9d73",
+          "playerName": "蘭",
+          "rank": 34,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "p94cc4fa4",
+          "playerName": "石川",
+          "rank": 35,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "p00c4aa2d",
+          "playerName": "田中",
+          "rank": 36,
+          "points": 0,
+          "placed": true
+        }
+      ]
+    },
+    {
+      "tournamentId": "平日フリーロール(Processed)",
+      "date": "2026-06-01",
+      "entries": 6,
+      "name": "平日フリーロール(Processed)",
+      "pokerfansUrl": "https://club.sunvy.jp/tours/events/2191940/applyers",
+      "results": [
+        {
+          "playerId": "pda6674e2",
+          "playerName": "笠谷陸太",
+          "rank": 1,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "p4ea837c1",
+          "playerName": "Roger",
+          "rank": 2,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "p9a3885e4",
+          "playerName": "寿司（ことぶきつかさ）",
+          "rank": 3,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "pa3cd1899",
+          "playerName": "林宗治",
+          "rank": 4,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "p3548294a",
+          "playerName": "たつにい",
+          "rank": 5,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "pff724822",
+          "playerName": "しゅーと",
+          "rank": 6,
+          "points": 0,
+          "placed": true
+        }
+      ]
+    },
+    {
+      "tournamentId": "💰ポイントゲットトーナメント💰",
+      "date": "2026-06-02",
+      "entries": 6,
+      "results": [
+        {
+          "playerId": "p4fa57a23",
+          "rank": 1,
+          "points": 0,
+          "playerName": "きがわ",
+          "placed": true
+        },
+        {
+          "playerId": "pf1bda463",
+          "rank": 2,
+          "points": 2,
+          "playerName": "yuki",
+          "placed": true
+        },
+        {
+          "playerId": "p0e28b75e",
+          "rank": 3,
+          "points": 1,
+          "playerName": "ばっさー",
+          "placed": true
+        },
+        {
+          "playerId": "p21fdcbbf",
+          "rank": null,
+          "points": 0,
+          "playerName": "y",
+          "placed": false
+        },
+        {
+          "playerId": "p3548294a",
+          "rank": null,
+          "points": 0,
+          "playerName": "たつにい",
+          "placed": false
+        },
+        {
+          "playerId": "pdae8cf8c",
+          "rank": null,
+          "points": 0,
+          "playerName": "ばごーん",
+          "placed": false
+        }
+      ]
+    },
+    {
+      "tournamentId": "平日フリーロール",
+      "date": "2026-06-02",
+      "entries": 4,
+      "results": [
+        {
+          "playerId": "p3548294a",
+          "rank": 1,
+          "points": 1,
+          "playerName": "たつにい",
+          "placed": true
+        },
+        {
+          "playerId": "pff724822",
+          "rank": 2,
+          "points": 0,
+          "playerName": "しゅーと",
+          "placed": true
+        },
+        {
+          "playerId": "pe3807d3d",
+          "rank": 3,
+          "points": 0,
+          "playerName": "おっちゃん",
+          "placed": true
+        },
+        {
+          "playerId": "p4ea837c1",
+          "rank": 4,
+          "points": 0,
+          "playerName": "Roger",
+          "placed": true
+        }
+      ]
+    },
+    {
+      "tournamentId": "🔫ディーラーバウンティトーナメント🔫",
+      "date": "2026-06-03",
+      "entries": 6,
+      "results": [
+        {
+          "playerId": "p3548294a",
+          "rank": 1,
+          "points": 4,
+          "playerName": "たつにい",
+          "placed": true
+        },
+        {
+          "playerId": "p1710d124",
+          "rank": 2,
+          "points": 2,
+          "playerName": "JIANG",
+          "placed": true
+        },
+        {
+          "playerId": "pde391082",
+          "rank": 3,
+          "points": 1,
+          "playerName": "RYU",
+          "placed": true
+        },
+        {
+          "playerId": "pd6f43a02",
+          "rank": null,
+          "points": 0,
+          "playerName": "加藤",
+          "placed": false
+        },
+        {
+          "playerId": "p1db1b93c",
+          "rank": null,
+          "points": 0,
+          "playerName": "tomi",
+          "placed": false
+        },
+        {
+          "playerId": "pde2906c1",
+          "rank": null,
+          "points": 0,
+          "playerName": "うーじー",
+          "placed": false
+        }
+      ]
+    },
+    {
+      "tournamentId": "平日フリーロール",
+      "date": "2026-06-03",
+      "entries": 4,
+      "results": [
+        {
+          "playerId": "p3548294a",
+          "rank": 1,
+          "points": 1,
+          "playerName": "たつにい",
+          "placed": true
+        },
+        {
+          "playerId": "pe041f367",
+          "rank": null,
+          "points": 0,
+          "playerName": "宇宙1のたっちゃん",
+          "placed": false
+        },
+        {
+          "playerId": "pde2906c1",
+          "rank": null,
+          "points": 0,
+          "playerName": "うーじー",
+          "placed": false
+        },
+        {
+          "playerId": "pa327bf48",
+          "rank": null,
+          "points": 0,
+          "playerName": "のむてん",
+          "placed": false
+        }
+      ]
+    },
+    {
+      "tournamentId": "9High Cup Bronze",
+      "date": "2026-06-05",
+      "entries": 20,
+      "name": "9High Cup Bronze",
+      "pokerfansUrl": "https://club.sunvy.jp/tours/events/2224137/applyers",
+      "results": [
+        {
+          "playerId": "p175ff5a6",
+          "playerName": "と。",
+          "rank": 1,
+          "points": 5,
+          "placed": true
+        },
+        {
+          "playerId": "p4fa57a23",
+          "playerName": "きがわ",
+          "rank": 2,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "p1663baa0",
+          "playerName": "ユイト",
+          "rank": 3,
+          "points": 2,
+          "placed": true
+        },
+        {
+          "playerId": "pc0d90c0d",
+          "playerName": "セイ",
+          "rank": 4,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "pae9e6820",
+          "playerName": "うま",
+          "rank": 5,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "p0e28b75e",
+          "playerName": "ばっさー",
+          "rank": 6,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "p3c1d0580",
+          "playerName": "ささきんと",
+          "rank": 7,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "pa327bf48",
+          "playerName": "のむてん",
+          "rank": 8,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "pf0b2560c",
+          "playerName": "Shin",
+          "rank": 9,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "pda2a7c26",
+          "playerName": "👓逆巻アヤト👓",
+          "rank": 10,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "p248b5f35",
+          "playerName": "soma",
+          "rank": 11,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "p09778894",
+          "playerName": "とく",
+          "rank": 12,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "p0325fb06",
+          "playerName": "んだ",
+          "rank": 13,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "p8317fd8e",
+          "playerName": "だいすけ",
+          "rank": 14,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "pd6f43a02",
+          "playerName": "加藤",
+          "rank": 15,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "pd2b194f5",
+          "playerName": "苔",
+          "rank": 16,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "p3548294a",
+          "playerName": "たつにい",
+          "rank": 17,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "pe041f367",
+          "playerName": "宇宙1のたっちゃん",
+          "rank": 18,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "p94cc4fa4",
+          "playerName": "石川",
+          "rank": 19,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "p39ce11af",
+          "playerName": "マサ",
+          "rank": 20,
+          "points": 0,
+          "placed": true
+        }
+      ]
+    },
+    {
+      "tournamentId": "平日フリーロール",
+      "date": "2026-06-04",
+      "entries": 7,
+      "name": "平日フリーロール",
+      "pokerfansUrl": "https://club.sunvy.jp/tours/events/2224081/applyers",
+      "results": [
+        {
+          "playerId": "p3548294a",
+          "playerName": "たつにい",
+          "rank": 1,
+          "points": 1,
+          "placed": true
+        },
+        {
+          "playerId": "p21fdcbbf",
+          "playerName": "y",
+          "rank": 2,
+          "points": 1,
+          "placed": true
+        },
+        {
+          "playerId": "p26e70b02",
+          "playerName": "ユウキ",
+          "rank": null,
+          "points": 0,
+          "placed": false
+        },
+        {
+          "playerId": "pdf56b91f",
+          "playerName": "64",
+          "rank": null,
+          "points": 0,
+          "placed": false
+        },
+        {
+          "playerId": "pe041f367",
+          "playerName": "宇宙1のたっちゃん",
+          "rank": null,
+          "points": 0,
+          "placed": false
+        },
+        {
+          "playerId": "pd457d8b1",
+          "playerName": "ちゃんしー",
+          "rank": null,
+          "points": 0,
+          "placed": false
+        },
+        {
+          "playerId": "pa327bf48",
+          "playerName": "のむてん",
+          "rank": null,
+          "points": 0,
+          "placed": false
+        }
+      ]
+    },
+    {
+      "tournamentId": "マルチプライズトーナメント",
+      "date": "2026-06-04",
+      "entries": 8,
+      "name": "マルチプライズトーナメント",
+      "pokerfansUrl": "https://club.sunvy.jp/tours/events/2225689/applyers",
+      "results": [
+        {
+          "playerId": "pa320784b",
+          "playerName": "ジン　ロイフラ",
+          "rank": 1,
+          "points": 4,
+          "placed": true
+        },
+        {
+          "playerId": "p3c1d0580",
+          "playerName": "ささきんと",
+          "rank": 2,
+          "points": 2,
+          "placed": true
+        },
+        {
+          "playerId": "p4fa57a23",
+          "playerName": "きがわ",
+          "rank": 3,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "p3548294a",
+          "playerName": "たつにい",
+          "rank": 4,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "p21fdcbbf",
+          "playerName": "y",
+          "rank": 5,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "p26e70b02",
+          "playerName": "ユウキ",
+          "rank": 6,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "pde2906c1",
+          "playerName": "うーじー",
+          "rank": 7,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "p1db1b93c",
+          "playerName": "tomi",
+          "rank": 8,
+          "points": 0,
+          "placed": true
+        }
+      ]
+    },
+    {
+      "tournamentId": "平日フリーロール～リニアturbo～",
+      "date": "2026-06-05",
+      "entries": 3,
+      "name": "平日フリーロール～リニアturbo～",
+      "pokerfansUrl": "https://club.sunvy.jp/tours/events/2224136/applyers",
+      "results": [
+        {
+          "playerId": "p94cc4fa4",
+          "playerName": "石川",
+          "rank": 1,
+          "points": 1,
+          "placed": true
+        },
+        {
+          "playerId": "pa327bf48",
+          "playerName": "のむてん",
+          "rank": null,
+          "points": 0,
+          "placed": false
+        },
+        {
+          "playerId": "p175ff5a6",
+          "playerName": "と。",
+          "rank": null,
+          "points": 0,
+          "placed": false
+        }
+      ]
+    },
+    {
+      "tournamentId": "🤓第2回のむCup🤓  #04 Crazy6",
+      "date": "2026-06-06",
+      "entries": 12,
+      "name": "🤓第2回のむCup🤓  #04 Crazy6",
+      "pokerfansUrl": "https://club.sunvy.jp/tours/events/2208469/applyers",
+      "results": [
+        {
+          "playerId": "pec135e18",
+          "playerName": "山田90",
+          "rank": 1,
+          "points": 6,
+          "placed": true
+        },
+        {
+          "playerId": "pd6f43a02",
+          "playerName": "加藤",
+          "rank": 2,
+          "points": 4,
+          "placed": true
+        },
+        {
+          "playerId": "pa917375d",
+          "playerName": "かまき",
+          "rank": 3,
+          "points": 2,
+          "placed": true
+        },
+        {
+          "playerId": "p4fa57a23",
+          "playerName": "きがわ",
+          "rank": 4,
+          "points": 0,
+          "placed": true
+        },
+        {
+          "playerId": "p588d4978",
+          "playerName": "てし",
+          "rank": null,
+          "points": 0,
+          "placed": false
+        },
+        {
+          "playerId": "p5594e2c4",
+          "playerName": "U.",
+          "rank": null,
+          "points": 0,
+          "placed": false
+        },
+        {
+          "playerId": "p175ff5a6",
+          "playerName": "と。",
+          "rank": null,
+          "points": 0,
+          "placed": false
+        },
+        {
+          "playerId": "p9a3885e4",
+          "playerName": "寿司（ことぶきつかさ）",
+          "rank": null,
+          "points": 0,
+          "placed": false
+        },
+        {
+          "playerId": "p3c1d0580",
+          "playerName": "ささきんと",
+          "rank": null,
+          "points": 0,
+          "placed": false
+        },
+        {
+          "playerId": "pae9e6820",
+          "playerName": "うま",
+          "rank": null,
+          "points": 0,
+          "placed": false
+        },
+        {
+          "playerId": "p3548294a",
+          "playerName": "たつにい",
+          "rank": null,
+          "points": 0,
+          "placed": false
+        },
+        {
+          "playerId": "pe041f367",
+          "playerName": "宇宙1のたっちゃん",
+          "rank": null,
+          "points": 0,
+          "placed": false
+        }
+      ]
+    },
+    {
+      "tournamentId": "平日フリーロール",
+      "date": "2026-07-01",
+      "entries": 6,
+      "name": "平日フリーロール",
+      "pokerfansUrl": "https://club.sunvy.jp/tours/events/2271284/applyers",
+      "results": [
+        {
+          "playerId": "p85d1cbc3",
+          "playerName": "Nagase",
+          "rank": 1,
+          "points": 1,
+          "placed": true
+        },
+        {
+          "playerId": "p-3b146541",
+          "playerName": "あかさ",
+          "rank": 2,
+          "points": 1,
+          "placed": true
+        },
+        {
+          "playerId": "p-ab9461e3",
+          "playerName": "ふっちー",
+          "rank": null,
+          "points": 0,
+          "placed": false
+        },
+        {
+          "playerId": "pff724822",
+          "playerName": "しゅーと",
+          "rank": null,
+          "points": 0,
+          "placed": false
+        },
+        {
+          "playerId": "p21fdcbbf",
+          "playerName": "y",
+          "rank": null,
+          "points": 0,
+          "placed": false
+        },
+        {
+          "playerId": "p588d4978",
+          "playerName": "てし",
+          "rank": null,
+          "points": 0,
+          "placed": false
+        }
+      ]
+    },
+    {
+      "tournamentId": "✈【JOPT】大型チケットサテライト【4枚保証】✈",
+      "date": "2026-07-01",
+      "entries": 15,
+      "results": [
+        {
+          "playerId": "pa320784b",
+          "rank": 1,
+          "points": 5,
+          "playerName": "ジン　ロイフラ",
+          "placed": true
+        },
+        {
+          "playerId": "p-ab9461e3",
+          "rank": 1,
+          "points": 5,
+          "playerName": "ふっちー",
+          "placed": true
+        },
+        {
+          "playerId": "p3548294a",
+          "rank": 1,
+          "points": 5,
+          "playerName": "たつにい",
+          "placed": true
+        },
+        {
+          "playerId": "p1663baa0",
+          "rank": 1,
+          "points": 5,
+          "playerName": "ユイト",
+          "placed": true
+        },
+        {
+          "playerId": "pd6f43a02",
+          "rank": 1,
+          "points": 5,
+          "playerName": "加藤",
+          "placed": true
+        },
+        {
+          "playerId": "p04d846b4",
+          "rank": null,
+          "points": 0,
+          "playerName": "サトー",
+          "placed": false
+        },
+        {
+          "playerId": "p-bcc081ed",
+          "rank": null,
+          "points": 0,
+          "playerName": "ジョン",
+          "placed": false
+        },
+        {
+          "playerId": "p21fdcbbf",
+          "rank": null,
+          "points": 0,
+          "playerName": "y",
+          "placed": false
+        },
+        {
+          "playerId": "p6356a724",
+          "rank": null,
+          "points": 0,
+          "playerName": "しの",
+          "placed": false
+        },
+        {
+          "playerId": "p588d4978",
+          "rank": null,
+          "points": 0,
+          "playerName": "てし",
+          "placed": false
+        },
+        {
+          "playerId": "p53acc708",
+          "rank": null,
+          "points": 0,
+          "playerName": "ゆうのすけ",
+          "placed": false
+        },
+        {
+          "playerId": "p-80dc1165",
+          "rank": null,
+          "points": 0,
+          "playerName": "みっ@患いカワウソ",
+          "placed": false
+        },
+        {
+          "playerId": "p83383b7a",
+          "rank": null,
+          "points": 0,
+          "playerName": "葵",
+          "placed": false
+        },
+        {
+          "playerId": "p85d1cbc3",
+          "rank": null,
+          "points": 0,
+          "playerName": "Nagase",
+          "placed": false
+        },
+        {
+          "playerId": "p3c1d0580",
+          "rank": null,
+          "points": 0,
+          "playerName": "ささきんと",
+          "placed": false
+        }
       ]
     }
   ]
