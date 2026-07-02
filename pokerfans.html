@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>競合店客数レポート — 9HIGH</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Segoe UI', 'Hiragino Sans', sans-serif; background: #1a1a2e; color: #e0e0e0; min-height: 100vh; }
+
+.topbar {
+  background: linear-gradient(135deg, #2BBBAD, #1a9e91);
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.4);
+}
+.topbar a { color: rgba(255,255,255,0.8); text-decoration: none; font-size: 13px; }
+.topbar a:hover { color: #fff; }
+.topbar h1 { color: #fff; font-size: 16px; font-weight: 700; flex: 1; }
+.topbar .sep { color: rgba(255,255,255,0.4); }
+
+.main { max-width: 1200px; margin: 0 auto; padding: 20px 16px; display: flex; gap: 16px; }
+
+.left-panel { width: 260px; flex-shrink: 0; display: flex; flex-direction: column; gap: 12px; }
+.right-panel { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 12px; }
+
+.card { background: #16213e; border: 1px solid #2a2a4a; border-radius: 12px; padding: 16px; }
+.card h2 {
+  font-size: 13px; color: #2BBBAD; margin-bottom: 12px; padding-bottom: 8px;
+  border-bottom: 1px solid #2a2a4a; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase;
+}
+
+label { display: block; font-size: 11px; color: #9e9e9e; margin-bottom: 3px; font-weight: 600; }
+input[type=month] {
+  width: 100%; padding: 8px 10px; background: #0f3460; border: 1px solid #2a2a6a;
+  border-radius: 6px; color: #e0e0e0; font-size: 12px; outline: none; transition: border-color 0.2s;
+}
+input[type=month]:focus { border-color: #2BBBAD; }
+.field { margin-bottom: 10px; }
+.field:last-child { margin-bottom: 0; }
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  padding: 8px 16px; border: none; border-radius: 7px; font-size: 12px; font-weight: 700;
+  cursor: pointer; transition: all 0.2s; white-space: nowrap;
+}
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn-primary { background: #2BBBAD; color: #fff; }
+.btn-primary:hover:not(:disabled) { background: #239e93; }
+.btn-success { background: #43a047; color: #fff; }
+.btn-success:hover:not(:disabled) { background: #2e7d32; }
+.btn-full { width: 100%; }
+
+.msg { padding: 8px 10px; border-radius: 6px; font-size: 12px; margin: 4px 0; line-height: 1.4; }
+.msg-ok { background: rgba(76,175,80,0.1); color: #81c784; border: 1px solid rgba(76,175,80,0.2); }
+.msg-err { background: rgba(244,67,54,0.1); color: #e57373; border: 1px solid rgba(244,67,54,0.2); }
+.msg-info { background: rgba(33,150,243,0.1); color: #64b5f6; border: 1px solid rgba(33,150,243,0.2); }
+.msg-warn { background: rgba(255,152,0,0.1); color: #ffb74d; border: 1px solid rgba(255,152,0,0.2); }
+
+.store-list { max-height: 240px; overflow-y: auto; border: 1px solid #2a2a4a; border-radius: 6px; }
+.store-item {
+  display: flex; align-items: center; gap: 8px; padding: 6px 10px;
+  border-bottom: 1px solid #1a1a3a; cursor: pointer; transition: background 0.15s;
+}
+.store-item:last-child { border-bottom: none; }
+.store-item:hover { background: rgba(43,187,173,0.08); }
+.store-item input[type=checkbox] { width: 14px; height: 14px; accent-color: #2BBBAD; cursor: pointer; flex-shrink: 0; }
+.store-item label { flex: 1; font-size: 12px; cursor: pointer; color: #e0e0e0; margin: 0; }
+.store-item .cid { font-size: 10px; color: #555; }
+
+.store-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+.store-bar .sel-cnt { font-size: 11px; color: #9e9e9e; }
+.store-bar .links a { font-size: 11px; color: #2BBBAD; cursor: pointer; text-decoration: underline; margin-left: 6px; }
+
+.tabs { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 8px; }
+.tab-btn {
+  padding: 5px 12px; border: 1px solid #2a2a4a; border-radius: 6px 6px 0 0;
+  background: #1a1a2e; color: #9e9e9e; font-size: 11px; cursor: pointer; transition: all 0.2s;
+}
+.tab-btn.active { background: #2BBBAD; color: #fff; border-color: #2BBBAD; }
+
+.result-table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 11px; }
+th { background: #2BBBAD; color: #fff; padding: 1px 3px; text-align: center; white-space: nowrap; line-height: 1.2; }
+td { padding: 1px 3px; text-align: center; border: 1px solid #2a2a4a; color: #e0e0e0; line-height: 1.3; vertical-align: middle; }
+tr:nth-child(even) td { background: rgba(255,255,255,0.02); }
+.td-left { text-align: left; font-weight: 600; white-space: nowrap; padding-left: 6px; }
+.td-total { font-weight: 700; background: rgba(255,193,7,0.08) !important; color: #ffd54f; }
+.td-we { background: rgba(33,150,243,0.07) !important; }
+.td-we.td-total { background: rgba(33,150,243,0.12) !important; }
+tfoot td { font-weight: 700; background: rgba(255,193,7,0.12) !important; color: #ffd54f; }
+
+.summary-table { margin-top: 16px; }
+.summary-table h3 { font-size: 12px; color: #9e9e9e; margin-bottom: 6px; font-weight: 600; }
+.summary-table th { background: #607d8b; }
+.srt-a, .srt-d { cursor: pointer; font-size: 8px; opacity: 0.45; margin-left: 2px; user-select: none; vertical-align: middle; }
+.srt-a:hover, .srt-d:hover { opacity: 1; }
+
+.hidden { display: none !important; }
+
+.empty-msg {
+  display: flex; align-items: center; justify-content: center; padding: 60px 20px;
+  color: #555; font-size: 14px; text-align: center; flex-direction: column; gap: 8px;
+}
+.empty-msg .icon { font-size: 40px; }
+
+.meta-badge {
+  background: rgba(43,187,173,0.08); border: 1px solid rgba(43,187,173,0.15);
+  border-radius: 6px; padding: 7px 10px; font-size: 11px; color: #9e9e9e; margin-top: 8px;
+}
+.meta-badge strong { color: #2BBBAD; }
+
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 4px; }
+
+@media (max-width: 700px) {
+  .main { flex-direction: column; }
+  .left-panel { width: 100%; }
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <a href="/">← 管理画面</a>
+  <span class="sep">|</span>
+  <h1>📈 競合店客数レポート</h1>
+</div>
+
+<div class="main">
+  <div class="left-panel">
+
+    <!-- Load -->
+    <div class="card">
+      <h2>データ</h2>
+      <button class="btn btn-primary btn-full" id="btn-load">🔄 データ読み込み</button>
+      <div id="msg-load" style="margin-top:6px;"></div>
+      <div id="data-meta" class="hidden"></div>
+    </div>
+
+    <!-- Stores -->
+    <div class="card">
+      <h2>店舗選択</h2>
+      <div id="stores-placeholder" class="msg msg-info" style="font-size:11px;">データ読み込み後に表示されます</div>
+      <div id="stores-area" class="hidden">
+        <div class="store-bar">
+          <span class="sel-cnt" id="sel-cnt">0 選択中</span>
+          <span class="links"><a id="sel-all">全選択</a><a id="desel-all">解除</a></span>
+        </div>
+        <div class="store-list" id="store-list"></div>
+      </div>
+    </div>
+
+    <!-- Period filter -->
+    <div class="card">
+      <h2>表示期間</h2>
+      <div id="period-placeholder" class="msg msg-info" style="font-size:11px;">データ読み込み後に設定できます</div>
+      <div id="period-area" class="hidden">
+        <div class="field">
+          <label>開始月</label>
+          <input type="month" id="view-start">
+        </div>
+        <div class="field">
+          <label>終了月</label>
+          <input type="month" id="view-end">
+        </div>
+        <button class="btn btn-primary btn-full" id="btn-apply" style="margin-top:4px;">適用</button>
+      </div>
+    </div>
+
+    <!-- Download -->
+    <div class="card">
+      <h2>出力</h2>
+      <button class="btn btn-success btn-full" id="btn-download" disabled>⬇ Excelダウンロード</button>
+    </div>
+
+  </div>
+
+  <div class="right-panel">
+    <div class="card" style="flex:1;min-height:400px;">
+      <div id="result-empty" class="empty-msg">
+        <div class="icon">📊</div>
+        <div>「🔄 データ読み込み」を押してください</div>
+      </div>
+      <div id="result-area" class="hidden">
+        <div class="tabs" id="result-tabs"></div>
+        <div id="result-tables"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const S = { clubs: {}, resultData: {}, dateList: [], startMonth: '', endMonth: '', viewDateList: [] };
+
+function $(id) { return document.getElementById(id); }
+function show(id) { $(id).classList.remove('hidden'); }
+function hide(id) { $(id).classList.add('hidden'); }
+function setMsg(id, type, text) { $(id).innerHTML = text ? `<div class="msg msg-${type}">${text}</div>` : ''; }
+
+function formatDate(d) {
+  const dt = new Date(d + 'T00:00:00');
+  const wd = ['日','月','火','水','木','金','土'][dt.getDay()];
+  return `${dt.getMonth()+1}/${dt.getDate()}(${wd})`;
+}
+function isWeekend(d) { const dt = new Date(d + 'T00:00:00'); return dt.getDay()===0||dt.getDay()===6; }
+
+function setupSummarySort(wrap) {
+  wrap.querySelectorAll('th[data-scol]').forEach(th => {
+    const col = parseInt(th.getAttribute('data-scol'));
+    const tbody = th.closest('table').querySelector('tbody');
+    const sort = (asc) => {
+      Array.from(tbody.rows).sort((a, b) => {
+        const av = parseFloat(a.cells[col].textContent) || 0;
+        const bv = parseFloat(b.cells[col].textContent) || 0;
+        return asc ? av - bv : bv - av;
+      }).forEach(r => tbody.appendChild(r));
+    };
+    th.querySelector('.srt-a').addEventListener('click', e => { e.stopPropagation(); sort(true); });
+    th.querySelector('.srt-d').addEventListener('click', e => { e.stopPropagation(); sort(false); });
+  });
+}
+
+function trunc10z(s) {
+  if (!s) return '';
+  let w = 0, i = 0, cut = s.length;
+  while (i < s.length) {
+    const c = s.charCodeAt(i);
+    if (c >= 0xD800 && c <= 0xDBFF) { w += 1; i += 2; }  // surrogate pair
+    else if (c > 0x7E) { w += 1; i += 1; }               // CJK/kana/full-width
+    else { w += 0.5; i += 1; }                            // ASCII half-width
+    if (w > 10) { cut = i - (c >= 0xD800 && c <= 0xDBFF ? 2 : 1); break; }
+  }
+  return cut < s.length ? s.substring(0, cut) + '…' : s;
+}
+
+function genDateList(sm, em) {
+  const dates = []; let [y, mo] = sm.split('-').map(Number); const [ey, emo] = em.split('-').map(Number);
+  while (y < ey || (y === ey && mo <= emo)) {
+    const last = new Date(y, mo, 0).getDate();
+    for (let d = 1; d <= last; d++) dates.push(`${y}-${String(mo).padStart(2,'0')}-${String(d).padStart(2,'0')}`);
+    mo++; if (mo > 12) { mo = 1; y++; }
+  }
+  return dates;
+}
+
+// ---- Load data from server ----
+$('btn-load').onclick = async function() {
+  this.disabled = true; this.textContent = '読み込み中...';
+  setMsg('msg-load', 'info', '読み込み中...');
+  hide('stores-area'); show('stores-placeholder');
+  hide('period-area'); show('period-placeholder');
+  hide('result-area'); show('result-empty');
+  $('btn-download').disabled = true;
+  $('data-meta').className = 'hidden';
+
+  try {
+    const r = await fetch('/api/pokerfans/data');
+    if (!r.ok) {
+      const d = await r.json().catch(() => ({}));
+      setMsg('msg-load', 'err', d.error || 'データの読み込みに失敗しました');
+      return;
+    }
+    const d = await r.json();
+    S.clubs = d.clubs || {};
+    S.resultData = d.resultData || {};
+    S.dateList = d.dateList || [];
+    S.startMonth = d.startMonth || '';
+    S.endMonth = d.endMonth || '';
+    S.viewDateList = [...S.dateList];
+
+    const clubCount = Object.keys(S.clubs).length;
+    const eventCount = Object.values(S.resultData).reduce((sum, cd) =>
+      sum + Object.values(cd).reduce((s2, evs) => s2 + evs.length, 0), 0);
+
+    setMsg('msg-load', 'ok', `✓ ${clubCount} 店舗、${eventCount} イベント`);
+
+    const meta = $('data-meta');
+    meta.className = 'meta-badge';
+    meta.innerHTML = `<strong>アップロード:</strong> ${d.uploadedAt || '不明'}`;
+
+    // Set period filter defaults to full range
+    $('view-start').value = S.startMonth;
+    $('view-end').value = S.endMonth;
+    $('view-start').min = S.startMonth;
+    $('view-start').max = S.endMonth;
+    $('view-end').min = S.startMonth;
+    $('view-end').max = S.endMonth;
+
+    renderStores();
+    show('stores-area'); hide('stores-placeholder');
+    show('period-area'); hide('period-placeholder');
+    renderResults();
+    $('btn-download').disabled = false;
+  } catch(e) {
+    setMsg('msg-load', 'err', 'エラー: ' + e.message);
+  }
+  this.disabled = false; this.textContent = '🔄 データ読み込み';
+};
+
+// ---- Period filter ----
+$('btn-apply').onclick = function() {
+  const vs = $('view-start').value;
+  const ve = $('view-end').value;
+  if (!vs || !ve) { return; }
+  if (vs > ve) { alert('終了月は開始月以降にしてください'); return; }
+  // Clamp to data range
+  const sm = vs < S.startMonth ? S.startMonth : vs;
+  const em = ve > S.endMonth ? S.endMonth : ve;
+  S.viewDateList = genDateList(sm, em).filter(d => S.dateList.includes(d));
+  renderResults();
+};
+
+// ---- Stores ----
+function renderStores() {
+  const list = $('store-list'); list.innerHTML = '';
+  Object.entries(S.clubs).forEach(([cid, name]) => {
+    const div = document.createElement('div'); div.className = 'store-item';
+    div.innerHTML = `<input type="checkbox" id="sc_${cid}" value="${cid}" checked><label for="sc_${cid}">${name}</label><span class="cid">ID:${cid}</span>`;
+    div.querySelector('input').addEventListener('change', () => { updateSelCount(); renderResults(); });
+    div.addEventListener('click', e => {
+      if (e.target.tagName !== 'INPUT') {
+        const cb = div.querySelector('input'); cb.checked = !cb.checked;
+        updateSelCount(); renderResults();
+      }
+    });
+    list.appendChild(div);
+  });
+  updateSelCount();
+}
+
+function updateSelCount() { $('sel-cnt').textContent = `${document.querySelectorAll('#store-list input:checked').length} 選択中`; }
+$('sel-all').onclick = () => { document.querySelectorAll('#store-list input').forEach(c => c.checked = true); updateSelCount(); renderResults(); };
+$('desel-all').onclick = () => { document.querySelectorAll('#store-list input').forEach(c => c.checked = false); updateSelCount(); renderResults(); };
+
+// ---- Render ----
+function renderResults() {
+  const selIds = Array.from(document.querySelectorAll('#store-list input:checked')).map(c => c.value);
+  const displayIds = selIds.filter(cid => S.resultData[cid]);
+
+  if (!displayIds.length || !S.viewDateList.length) {
+    show('result-empty'); hide('result-area');
+    return;
+  }
+
+  hide('result-empty'); show('result-area');
+  const tabs = $('result-tabs'), tables = $('result-tables');
+  tabs.innerHTML = ''; tables.innerHTML = '';
+
+  displayIds.forEach((cid, idx) => {
+    const name = S.clubs[cid] || `店舗${cid}`;
+    const tab = document.createElement('button');
+    tab.className = 'tab-btn' + (idx === 0 ? ' active' : '');
+    tab.textContent = name;
+    tab.onclick = () => {
+      tabs.querySelectorAll('.tab-btn').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      tables.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
+      document.getElementById(`tab_${cid}`).classList.remove('hidden');
+    };
+    tabs.appendChild(tab);
+
+    const wrap = document.createElement('div');
+    wrap.id = `tab_${cid}`;
+    wrap.className = 'tab-content' + (idx > 0 ? ' hidden' : '');
+    wrap.innerHTML = buildTableHTML(cid);
+    setupSummarySort(wrap);
+    tables.appendChild(wrap);
+  });
+}
+
+function buildTableHTML(cid) {
+  const sd = S.resultData[cid] || {};
+  const dateList = S.viewDateList;
+  const maxEv = Math.max(...dateList.map(d => (sd[d] || []).length), 0);
+  if (!maxEv) return '<div class="msg msg-info">この期間・店舗のデータはありません</div>';
+
+  const summary = {}; let grandTotal = 0;
+  let h = '<div class="result-table-wrap"><table><thead><tr><th>日付</th><th>合計</th>';
+  for (let i = 0; i < maxEv; i++) h += `<th>イベント</th><th>人数</th>`;
+  h += '</tr></thead><tbody>';
+
+  dateList.forEach(d => {
+    const evs = sd[d] || [], we = isWeekend(d);
+    const dayTotal = evs.reduce((s, e) => s + (e.count || 0), 0);
+    grandTotal += dayTotal;
+    h += `<tr><td class="td-left${we ? ' td-we' : ''}">${formatDate(d)}</td><td class="${we ? 'td-we ' : ' '}td-total">${dayTotal > 0 ? dayTotal : ''}</td>`;
+    evs.forEach(ev => {
+      h += `<td class="${we ? 'td-we' : ''}">${trunc10z(ev.title)}</td><td class="${we ? 'td-we' : ''}">${ev.count > 0 ? ev.count : ''}</td>`;
+      const t = ev.title || '不明';
+      if (!summary[t]) summary[t] = { scheduled: 0, actual: 0, total: 0 };
+      summary[t].scheduled++;
+      if (ev.count > 0) { summary[t].actual++; summary[t].total += ev.count; }
+    });
+    for (let p = evs.length; p < maxEv; p++) h += '<td></td><td></td>';
+    h += '</tr>';
+  });
+
+  h += `</tbody><tfoot><tr><td class="td-left">合計</td><td>${grandTotal}</td>`;
+  for (let i = 0; i < maxEv; i++) h += '<td></td><td></td>';
+  h += '</tr></tfoot></table></div>';
+
+  const srt = (label) => `${label} <span class="srt-a">△</span><span class="srt-d">▽</span>`;
+  h += `<div class="summary-table"><h3>イベント別サマリー</h3><table><thead><tr><th>イベント名</th><th data-scol="1">${srt('予定')}</th><th data-scol="2">${srt('実施')}</th><th data-scol="3">${srt('実施割合')}</th><th data-scol="4">${srt('参加総数')}</th><th data-scol="5">${srt('平均')}</th></tr></thead><tbody>`;
+  Object.entries(summary).sort(([a], [b]) => a.localeCompare(b)).forEach(([title, s]) => {
+    const pct = s.scheduled > 0 ? (s.actual / s.scheduled * 100).toFixed(1) : 0;
+    const avg = s.actual > 0 ? (s.total / s.actual).toFixed(1) : 0;
+    h += `<tr><td class="td-left">${title}</td><td>${s.scheduled}</td><td>${s.actual}</td><td>${pct}%</td><td>${s.total}</td><td>${avg}</td></tr>`;
+  });
+  h += '</tbody></table></div>';
+  return h;
+}
+
+// ---- Download (uses current view range) ----
+$('btn-download').onclick = async function() {
+  this.disabled = true; this.textContent = '生成中...';
+  try {
+    const selIds = Array.from(document.querySelectorAll('#store-list input:checked')).map(c => c.value);
+    const clubs = {}; selIds.forEach(id => { if (S.clubs[id]) clubs[id] = S.clubs[id]; });
+    const vs = $('view-start').value || S.startMonth;
+    const ve = $('view-end').value || S.endMonth;
+    const r = await fetch('/api/pokerfans/report', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ clubs, resultData: S.resultData, dateList: S.viewDateList, startMonth: vs, endMonth: ve })
+    });
+    if (!r.ok) { const d = await r.json().catch(() => ({})); alert(d.error || 'ダウンロード失敗'); return; }
+    const blob = await r.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url;
+    a.download = `pokerfans_${vs}_${ve}.xlsx`;
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  } catch(e) { alert('エラー: ' + e.message); }
+  this.disabled = false; this.textContent = '⬇ Excelダウンロード';
+};
+</script>
+</body>
+</html>
