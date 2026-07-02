@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Fix nginx config to correctly serve leaderboard pages"""
+"""Fix nginx config"""
 import subprocess
 import os
 
@@ -7,7 +7,7 @@ NGINX_CONF = r"""server {
     listen 80;
     server_name _;
 
-    # Admin panel (must come before /leaderboard/)
+    # Admin panel
     location ^~ /leaderboard/admin {
         root /var/www/leaderboard;
         try_files /index.html =404;
@@ -31,6 +31,13 @@ NGINX_CONF = r"""server {
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_read_timeout 60;
+    }
+
+    # Flask pages (pokerfans report etc)
+    location ^~ /pokerfans {
+        proxy_pass http://127.0.0.1:5000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
     }
 
     # Uploads served by Flask
@@ -69,10 +76,8 @@ with open('/etc/nginx/sites-available/leaderboard', 'w') as f:
 print("Testing nginx config...")
 result = subprocess.run(['nginx', '-t'])
 if result.returncode == 0:
-    print("Config OK. Restarting nginx...")
+    print("Config OK. Reloading nginx...")
     subprocess.run(['systemctl', 'reload', 'nginx'])
     print("Done!")
-    print("Test: http://160.251.123.221/leaderboard/")
-    print("Test: http://160.251.123.221/leaderboard/admin")
 else:
-    print("Config error! Check above.")
+    print("Config error!")
