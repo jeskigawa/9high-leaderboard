@@ -25,14 +25,19 @@ WP_PASS = '9highWP2024'
 print("=== 1. APT 更新 ===")
 run("apt-get update -qq")
 
-print("\n=== 2. PHP + MariaDB インストール ===")
+print("\n=== 2. PHP + MySQL インストール ===")
+# まず壊れたパッケージを修正
+run("apt-get install -f -y", check=False)
+# mysql-server (Ubuntu 20.04: MySQL 8.0 / Ubuntu 22.04: MySQL 8.0)
 run("DEBIAN_FRONTEND=noninteractive apt-get install -y "
     "php php-fpm php-mysql php-gd php-curl "
-    "php-xml php-mbstring php-zip mariadb-server wget")
+    "php-xml php-mbstring php-zip mysql-server wget")
 
-print("\n=== 3. MariaDB 起動 ===")
-run("systemctl start mariadb")
-run("systemctl enable mariadb")
+print("\n=== 3. MySQL 起動 ===")
+run("systemctl start mysql", check=False)
+run("systemctl start mysqld", check=False)
+run("systemctl enable mysql", check=False)
+run("systemctl enable mysqld", check=False)
 
 print("\n=== 4. WordPress DB 作成 ===")
 run(f'mysql -u root -e "CREATE DATABASE IF NOT EXISTS {WP_DB} CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"')
