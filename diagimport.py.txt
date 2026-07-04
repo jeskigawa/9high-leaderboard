@@ -1,0 +1,80 @@
+#!/usr/bin/env python3
+"""
+取込が失敗している原因を調べる診断スクリプト
+"""
+import subprocess, json, os, time
+
+APP  = '/var/www/leaderboard/app.py'
+DATA = '/var/www/leaderboard/data/sunvy_imported_events.json'
+
+# ── 1. サービス状態 ───────────────────────────────────────────────
+print("=== 1. leaderboard サービス状態 ===")
+r = subprocess.run(['systemctl', 'is-active', 'leaderboard'],
+                   capture_output=True, text=True)
+print(f"状態: {r.stdout.strip()}")
+
+# ── 2. スレッド版が適用済みか確認 ─────────────────────────────────
+print("\n=== 2. スレッド版Phase2 適用確認 ===")
+with open(APP) as f:
+    code = f.read()
+
+checks = [
+    ('threading.Event()',    'phase2_done = threading.Event()'),
+    ('phase2_started',      'phase2_started = [False]'),
+    ('_run_phase2 関数',    'def _run_phase2():'),
+    ('heartbeat while loop','while not phase2_done.wait(timeout=5):'),
+    ('ロック条件付き解放',  'if not phase2_started[0]:'),
+]
+for label, pattern in checks:
+    ok = 'OK' if pattern in code else 'WARNING: 見つかりません'
+    print(f"  {ok}: {label}")
+
+# ── 3. import-status API ──────────────────────────────────────────
+print("\n=== 3. import-status API ===")
+r2 = subprocess.run(['curl', '-s', 'http://localhost:5000/api/sunvy/import-status'],
+                    capture_output=True, text=True)
+try:
+    st = json.loads(r2.stdout)
+    print(f"running: {st.get('running')}")
+    logs = st.get('log', [])
+    print(f"ログ件数: {len(logs)}")
+    print("--- 直近30件のログ ---")
+    for entry in logs[-30:]:
+        print(f"  [{entry.get('type','?'):8s}] {entry.get('message','')}")
+except Exception as e:
+    print(f"APIエラー: {e}")
+    print(r2.stdout[:500])
+
+# ── 4. imported_events.json ───────────────────────────────────────
+print("\n=== 4. sunvy_imported_events.json ===")
+if os.path.exists(DATA):
+    mtime = os.path.getmtime(DATA)
+    print(f"最終更新: {time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(mtime))}")
+    with open(DATA) as f:
+        data = json.load(f)
+    events = data.get('events', [])
+    print(f"総イベント数: {len(events)}")
+    recent = sorted(events, key=lambda e: e.get('importedAt',''), reverse=True)[:5]
+    for e in recent:
+        print(f"  - {e.get('date','?')} {e.get('pokerfansName','?')[:30]} (取込: {e.get('importedAt','?')[:19]})")
+else:
+    print("ファイルが存在しません")
+
+# ── 5. 最新ジャーナルログ ─────────────────────────────────────────
+print("\n=== 5. 最新journalctlログ（最後の80行）===")
+r3 = subprocess.run(['journalctl', '-u', 'leaderboard', '-n', '80', '--no-pager'],
+                    capture_output=True, text=True)
+out = r3.stdout
+# Phase2 / エラー行だけ抽出して表示
+lines = out.splitlines()
+important = [l for l in lines if any(k in l for k in
+    ['Phase2', '_run_phase2', 'threading', 'Error', 'error', 'Exception',
+     'Traceback', 'LOCK', 'applyers', 'phase2', 'Worker', 'SystemExit',
+     'gunicorn', 'ImportError', 'ModuleNotFound', 'SUNVY'])]
+if important:
+    print("=== 重要行のみ ===")
+    for l in important:
+        print(l)
+else:
+    # 重要行がなければ後半40行を表示
+    print('\n'.join(lines[-40:]))
