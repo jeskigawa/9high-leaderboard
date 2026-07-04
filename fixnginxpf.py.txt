@@ -1,0 +1,22 @@
+#!/usr/bin/env python3
+import subprocess, shutil, re
+NGINX = '/etc/nginx/nginx.conf'
+shutil.copy(NGINX, '/tmp/nginx.conf.bak.pf')
+conf = open(NGINX).read()
+if '/pokerfans' in conf:
+    print('設定済み')
+else:
+    loc = '\n    location = /pokerfans {\n        alias /var/www/leaderboard/pokerfans.html;\n        default_type text/html;\n    }\n'
+    new = re.sub(r'(\s+location\s+/\s*\{)', loc + r'\1', conf, count=1)
+    if new == conf:
+        for i,l in enumerate(conf.splitlines(),1):
+            if 'location' in l: print(i,l)
+    else:
+        open(NGINX,'w').write(new)
+        r = subprocess.run(['nginx','-t'],capture_output=True,text=True)
+        if r.returncode==0:
+            subprocess.run(['systemctl','reload','nginx'])
+            print('完了')
+        else:
+            shutil.copy('/tmp/nginx.conf.bak.pf',NGINX)
+            print('Error:',r.stderr[:300])
