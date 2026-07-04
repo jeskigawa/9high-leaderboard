@@ -1,0 +1,25 @@
+#!/usr/bin/env python3
+"""startDate/startPage の JS箇所とファイル構造を確認"""
+APP = '/var/www/leaderboard/app.py'
+with open(APP, encoding='utf-8') as f:
+    lines = f.readlines()
+
+total = len(lines)
+print(f"総行数: {total}")
+
+# startDate が出てくる全行
+print("\n=== startDate 全出現箇所 ===")
+for i, line in enumerate(lines):
+    if 'startDate' in line:
+        print(f"{i+1:5}: {line.rstrip()[:120]}")
+
+# fetch( を含む行（JS側のAPI呼び出し）
+print("\n=== fetch( 全出現 ===")
+for i, line in enumerate(lines):
+    if "fetch('" in line or 'fetch("' in line or 'fetch(`' in line:
+        print(f"{i+1:5}: {line.rstrip()[:120]}")
+
+# ファイル末尾3行（HTMLの終わりを確認）
+print(f"\n=== 末尾5行 (行{total-4}-{total}) ===")
+for i in range(max(0, total-5), total):
+    print(f"{i+1:5}: {lines[i].rstrip()[:120]}")
