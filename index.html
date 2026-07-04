@@ -2383,6 +2383,7 @@
           const decoder = new TextDecoder();
           let buffer = '';
           const freshEvents = [];
+          let receivedDoneEvent = false;
           while (true) {
             const { done, value } = await reader.read();
             if (done) break;
@@ -2405,6 +2406,7 @@
                   showToast(evt.message, 'error');
                   addLog('error', '❌ ' + evt.message);
                 } else if (evt.type === 'done') {
+                  receivedDoneEvent = true;
                   addLog('ok', evt.message || (evt.count + '件取込完了'));
                   showToast(evt.message || (evt.count + '件取込完了'));
                   const newOnly = freshEvents.filter(ev => !ev.updatedAt);
@@ -2423,9 +2425,52 @@
               return [...map.values()];
             });
           }
+          // SSE接続が途中で切れた場合（サーバーは処理継続中）→ ポーリングで完了を待つ
+          if (!receivedDoneEvent) {
+            addLog('waiting', '⌛ 接続が切れました。サーバーでの処理を確認中...');
+            for (let poll = 0; poll < 72; poll++) { // 最大6分待機
+              await new Promise(r => setTimeout(r, 5000));
+              try {
+                const sr = await fetch('/api/sunvy/import-status');
+                const sd = await sr.json();
+                if (sd.recentLog && sd.recentLog.length > 0) {
+                  const last = sd.recentLog[sd.recentLog.length - 1];
+                  if (last.message) addLog('waiting', '📡 ' + last.message);
+                }
+                if (!sd.running) {
+                  addLog('ok', '✅ サーバーでの取込が完了しました');
+                  showToast('取込が完了しました');
+                  // インポート済みリストを再取得
+                  const evResp = await fetch('/api/sunvy/imported-events');
+                  const evData = await evResp.json();
+                  if (evData.events && evData.events.length > 0) {
+                    setImportedEvents(evData.events);
+                  }
+                  setImportPage(0);
+                  break;
+                }
+              } catch(pe) {}
+            }
+          }
         } catch(e) {
-          showToast(e.message || '取込エラー', 'error');
-          addLog('error', '❌ ' + (e.message || '取込エラー'));
+          // ネットワークエラーの場合もポーリングで完了確認
+          addLog('waiting', '⌛ 接続エラー。サーバーでの処理を確認中...');
+          for (let poll = 0; poll < 72; poll++) {
+            await new Promise(r => setTimeout(r, 5000));
+            try {
+              const sr = await fetch('/api/sunvy/import-status');
+              const sd = await sr.json();
+              if (!sd.running) {
+                addLog('ok', '✅ 取込完了（接続エラーからの復帰）');
+                showToast('取込が完了しました');
+                const evResp = await fetch('/api/sunvy/imported-events');
+                const evData = await evResp.json();
+                if (evData.events && evData.events.length > 0) setImportedEvents(evData.events);
+                setImportPage(0);
+                break;
+              }
+            } catch(pe2) {}
+          }
         } finally {
           setBusy(false);
         }
