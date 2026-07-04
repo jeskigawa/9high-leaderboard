@@ -1,0 +1,33 @@
+#!/usr/bin/env python3
+"""leaderboardディレクトリのファイル構成とHTMLファイルを確認"""
+import os, subprocess
+
+BASE = '/var/www/leaderboard'
+
+# ファイル一覧
+print("=== /var/www/leaderboard/ ファイル一覧 ===")
+for root, dirs, files in os.walk(BASE):
+    dirs[:] = [d for d in dirs if d not in ['__pycache__', '.git', 'node_modules']]
+    level = root.replace(BASE, '').count(os.sep)
+    indent = '  ' * level
+    print(f"{indent}{os.path.basename(root)}/")
+    subindent = '  ' * (level + 1)
+    for f in files:
+        fpath = os.path.join(root, f)
+        size = os.path.getsize(fpath)
+        print(f"{subindent}{f}  ({size} bytes)")
+
+# HTMLファイルの中にstartDate/import関連があるか確認
+print("\n=== HTMLファイル内のstartDate/fetch/import検索 ===")
+for root, dirs, files in os.walk(BASE):
+    dirs[:] = [d for d in dirs if d not in ['__pycache__', '.git']]
+    for f in files:
+        if f.endswith('.html') or f.endswith('.js'):
+            fpath = os.path.join(root, f)
+            try:
+                with open(fpath, encoding='utf-8', errors='ignore') as fh:
+                    for i, line in enumerate(fh, 1):
+                        if 'startDate' in line or 'import-events' in line or 'startPage' in line:
+                            print(f"{fpath}:{i}: {line.rstrip()[:100]}")
+            except Exception as e:
+                print(f"{fpath}: ERROR {e}")
