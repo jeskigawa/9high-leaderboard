@@ -1,0 +1,22 @@
+#!/usr/bin/env python3
+"""取込済みイベントの件数と最新エントリを確認"""
+import json, os
+
+DATA = '/var/www/leaderboard/data/sunvy_imported_events.json'
+stat = os.stat(DATA)
+print(f"ファイルサイズ: {stat.st_size:,} bytes")
+
+with open(DATA, encoding='utf-8') as f:
+    data = json.load(f)
+
+events = data.get('events', [])
+print(f"取込済みイベント総数: {len(events)} 件")
+
+# 最新5件を表示
+print("\n=== 最新5件 ===")
+for ev in events[-5:]:
+    print(f"  importId: {ev.get('importId','?')}")
+    print(f"  date:     {ev.get('date','?')}")
+    print(f"  title:    {ev.get('title','?')[:40]}")
+    print(f"  status:   {ev.get('status','?')}")
+    print("  ---")
