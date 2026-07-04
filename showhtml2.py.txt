@@ -1,0 +1,21 @@
+#!/usr/bin/env python3
+"""index.htmlのrangeStart入力欄とfetch呼び出し詳細"""
+HTML = '/var/www/leaderboard/index.html'
+with open(HTML, encoding='utf-8') as f:
+    lines = f.readlines()
+
+# 1) 行2355-2395 (fetch呼び出し周辺)
+print("=== 行2355-2395 ===")
+for i in range(2354, min(2395, len(lines))):
+    print(f"{i+1:5}: {lines[i].rstrip()}")
+
+# 2) rangeStart が含まれる行とその前後
+print("\n=== rangeStart 周辺 ===")
+shown = set()
+for i, line in enumerate(lines):
+    if 'rangeStart' in line or 'setRangeStart' in line:
+        for j in range(max(0,i-3), min(len(lines),i+4)):
+            if j not in shown:
+                shown.add(j)
+                print(f"{j+1:5}: {lines[j].rstrip()[:120]}")
+        print("---")
