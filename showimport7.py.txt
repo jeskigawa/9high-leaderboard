@@ -1,0 +1,28 @@
+#!/usr/bin/env python3
+"""行2517-2546のパラメータ受け取りとHTML内sunvy関連を確認"""
+APP = '/var/www/leaderboard/app.py'
+with open(APP, encoding='utf-8') as f:
+    lines = f.readlines()
+
+print("=== 行2517-2546 ===")
+for i in range(2516, 2546):
+    print(f"{i+1:5}: {lines[i].rstrip()}")
+
+# HTML内のstart_date系を幅広く探す (行3300以降 = テンプレート部分)
+print("\n=== HTML内 sunvy/start関連 input/button ===")
+for i, line in enumerate(lines):
+    if i < 3300:
+        continue
+    ls = line.rstrip()
+    if ('start' in ls.lower() or 'end' in ls.lower() or 'page' in ls.lower()) and \
+       ('input' in ls.lower() or 'button' in ls.lower() or 'select' in ls.lower()):
+        print(f"{i+1:5}: {ls[:120]}")
+
+# HTML内のsunvy import ボタン・モーダルを探す
+print("\n=== HTML内 sunvy import modal/form ===")
+for i, line in enumerate(lines):
+    if i < 3300:
+        continue
+    ls = line.rstrip()
+    if 'sunvy' in ls.lower() and ('modal' in ls.lower() or 'import' in ls.lower() or 'form' in ls.lower()):
+        print(f"{i+1:5}: {ls[:120]}")
