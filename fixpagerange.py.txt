@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
 """
 Phase1ページスキャン改善:
-1. SUNVY_MAX_PAGES を 100 に増やす（現在おそらく5）
+1. SUNVY_MAX_PAGES を 100 に増やす
 2. 期間指定の場合、日付から開始ページを計算してスキップ
-   例: 5月のイベント→今日から34日前→約17ページ目→12ページ目から開始（5ページバッファ）
 """
 import subprocess, sys, re
 
@@ -24,46 +23,58 @@ if m:
     print(f'OK: SUNVY_MAX_PAGES {old_val} -> 100')
     changes += 1
 else:
-    print('WARNING: SUNVY_MAX_PAGESが見つかりません（定数名が違う可能性）')
+    print('WARNING: SUNVY_MAX_PAGESが見つかりません')
 
 # ── Step 2: ループを開始ページ計算版に変更 ────────────────────────
-# 現在: for page in range(0, SUNVY_MAX_PAGES):
-# 変更後: 期間指定なら日付計算で開始ページをスキップ
-
 OLD_LOOP = '            for page in range(0, SUNVY_MAX_PAGES):'
-NEW_LOOP = '''\
-            # 期間指定の場合、日付から開始ページを計算（1ページ≒2日）
-            if mode == 'range' and eff_end:
-                try:
-                    from datetime import date as _date
-                    _today = _date.today()
-                    _end_d = _date.fromisoformat(eff_end)
-                    _days_ago = (_today - _end_d).days
-                    # 1ページ約2日、5ページのバッファを持たせる
-                    _start_page = max(0, _days_ago // 2 - 5)
-                except Exception:
-                    _start_page = 0
-            else:
-                _start_page = 0
-            if _start_page > 0:
-                yield f"data: {json.dumps({'type': 'status', 'message': f'ページ {_start_page + 1} からスキャン開始（{_start_page} ページスキップ）'})}\n\n"
-            for page in range(_start_page, SUNVY_MAX_PAGES):'''
+
+# NOTE: \\n\\n はこのファイル内では \n\n としてapp.pyに書き込まれる（SSE終端）
+NEW_LOOP = (
+    '            # 期間指定の場合、日付から開始ページを計算（1ページ約2日）\n'
+    "            if mode == 'range' and eff_end:\n"
+    '                try:\n'
+    '                    from datetime import date as _date\n'
+    '                    _today = _date.today()\n'
+    "                    _end_d = _date.fromisoformat(eff_end)\n"
+    '                    _days_ago = (_today - _end_d).days\n'
+    '                    _start_page = max(0, _days_ago // 2 - 5)\n'
+    '                except Exception:\n'
+    '                    _start_page = 0\n'
+    '            else:\n'
+    '                _start_page = 0\n'
+    '            if _start_page > 0:\n'
+    "                yield f\"data: {json.dumps({'type': 'status', 'message': f'ページ {_start_page + 1} からスキャン開始（{_start_page} ページスキップ）'})}\\n\\n\"\n"
+    '            for page in range(_start_page, SUNVY_MAX_PAGES):'
+)
 
 if OLD_LOOP in content:
     content = content.replace(OLD_LOOP, NEW_LOOP, 1)
     print('OK: ループをスマート開始ページ版に変更')
     changes += 1
 else:
-    print('ERROR: ループパターンが見つかりません。現在の行を確認:')
+    print('ERROR: ループパターンが見つかりません。現在の行:')
     for i, line in enumerate(content.splitlines(), 1):
-        if 'for page in range' in line and ('SUNVY' in line or 'MAX' in line):
+        if 'for page in range' in line and 'MAX' in line:
             print(f'  行{i}: {line}')
     sys.exit(1)
 
 if changes < 2:
-    print('WARNING: 一部の変更が適用されていません')
+    print('WARNING: 一部変更未適用')
 
-# ── Step 3: 書き込み＆再起動 ──────────────────────────────────────
+# ── Step 3: 構文チェック ──────────────────────────────────────────
+import tempfile, os
+with tempfile.NamedTemporaryFile(mode='w', suffix='.py', delete=False, encoding='utf-8') as tmp:
+    tmp.write(content)
+    tmp_path = tmp.name
+
+r = subprocess.run(['python3', '-m', 'py_compile', tmp_path], capture_output=True, text=True)
+os.unlink(tmp_path)
+if r.returncode != 0:
+    print(f'ERROR: 構文エラー!\n{r.stderr}')
+    sys.exit(1)
+print('OK: 構文チェック通過')
+
+# ── Step 4: 書き込み＆再起動 ──────────────────────────────────────
 with open(APP, 'w', encoding='utf-8') as f:
     f.write(content)
 print('OK: app.py を書き込みました')
@@ -75,15 +86,13 @@ status = r.stdout.strip()
 print(f'leaderboard: {status}')
 
 if status != 'active':
-    print('WARNING: サービスが起動していません！ ログ:')
-    r2 = subprocess.run(['journalctl', '-u', 'leaderboard', '-n', '20', '--no-pager'],
-                        capture_output=True, text=True)
-    print(r2.stdout[-2000:])
+    print('WARNING: 起動失敗。バックアップに戻します...')
+    subprocess.run(['cp', '/tmp/app.py.bak.pagerange', APP])
+    subprocess.run(['systemctl', 'restart', 'leaderboard'])
     sys.exit(1)
 
 print('')
 print('=== 完了 ===')
 print('次回の取込から:')
-print('  - 期間指定時は日付から開始ページを自動計算')
 print('  - 最大100ページまでスキャン（従来: 5ページ）')
-print('  - 5月分なら約12ページ目から開始（約17ページ目に到達）')
+print('  - 期間指定時は日付から開始ページを自動計算')
