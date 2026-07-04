@@ -1,0 +1,89 @@
+#!/usr/bin/env python3
+"""
+Phase1ページスキャン改善:
+1. SUNVY_MAX_PAGES を 100 に増やす（現在おそらく5）
+2. 期間指定の場合、日付から開始ページを計算してスキップ
+   例: 5月のイベント→今日から34日前→約17ページ目→12ページ目から開始（5ページバッファ）
+"""
+import subprocess, sys, re
+
+APP = '/var/www/leaderboard/app.py'
+with open(APP, encoding='utf-8') as f:
+    content = f.read()
+
+subprocess.run(['cp', APP, '/tmp/app.py.bak.pagerange'])
+
+changes = 0
+
+# ── Step 1: SUNVY_MAX_PAGES を 100 に変更 ─────────────────────────
+m = re.search(r'(SUNVY_MAX_PAGES\s*=\s*)(\d+)', content)
+if m:
+    old_val = m.group(2)
+    content = re.sub(r'SUNVY_MAX_PAGES\s*=\s*\d+',
+                     'SUNVY_MAX_PAGES = 100', content, count=1)
+    print(f'OK: SUNVY_MAX_PAGES {old_val} -> 100')
+    changes += 1
+else:
+    print('WARNING: SUNVY_MAX_PAGESが見つかりません（定数名が違う可能性）')
+
+# ── Step 2: ループを開始ページ計算版に変更 ────────────────────────
+# 現在: for page in range(0, SUNVY_MAX_PAGES):
+# 変更後: 期間指定なら日付計算で開始ページをスキップ
+
+OLD_LOOP = '            for page in range(0, SUNVY_MAX_PAGES):'
+NEW_LOOP = '''\
+            # 期間指定の場合、日付から開始ページを計算（1ページ≒2日）
+            if mode == 'range' and eff_end:
+                try:
+                    from datetime import date as _date
+                    _today = _date.today()
+                    _end_d = _date.fromisoformat(eff_end)
+                    _days_ago = (_today - _end_d).days
+                    # 1ページ約2日、5ページのバッファを持たせる
+                    _start_page = max(0, _days_ago // 2 - 5)
+                except Exception:
+                    _start_page = 0
+            else:
+                _start_page = 0
+            if _start_page > 0:
+                yield f"data: {json.dumps({'type': 'status', 'message': f'ページ {_start_page + 1} からスキャン開始（{_start_page} ページスキップ）'})}\n\n"
+            for page in range(_start_page, SUNVY_MAX_PAGES):'''
+
+if OLD_LOOP in content:
+    content = content.replace(OLD_LOOP, NEW_LOOP, 1)
+    print('OK: ループをスマート開始ページ版に変更')
+    changes += 1
+else:
+    print('ERROR: ループパターンが見つかりません。現在の行を確認:')
+    for i, line in enumerate(content.splitlines(), 1):
+        if 'for page in range' in line and ('SUNVY' in line or 'MAX' in line):
+            print(f'  行{i}: {line}')
+    sys.exit(1)
+
+if changes < 2:
+    print('WARNING: 一部の変更が適用されていません')
+
+# ── Step 3: 書き込み＆再起動 ──────────────────────────────────────
+with open(APP, 'w', encoding='utf-8') as f:
+    f.write(content)
+print('OK: app.py を書き込みました')
+
+subprocess.run(['systemctl', 'restart', 'leaderboard'])
+import time; time.sleep(2)
+r = subprocess.run(['systemctl', 'is-active', 'leaderboard'], capture_output=True, text=True)
+status = r.stdout.strip()
+print(f'leaderboard: {status}')
+
+if status != 'active':
+    print('WARNING: サービスが起動していません！ ログ:')
+    r2 = subprocess.run(['journalctl', '-u', 'leaderboard', '-n', '20', '--no-pager'],
+                        capture_output=True, text=True)
+    print(r2.stdout[-2000:])
+    sys.exit(1)
+
+print('')
+print('=== 完了 ===')
+print('次回の取込から:')
+print('  - 期間指定時は日付から開始ページを自動計算')
+print('  - 最大100ページまでスキャン（従来: 5ページ）')
+print('  - 5月分なら約12ページ目から開始（約17ページ目に到達）')
