@@ -1,0 +1,35 @@
+#!/usr/bin/env python3
+"""nginx に /pokerfans の location を追加して pokerfans.html を返す"""
+import subprocess, shutil, re
+
+NGINX = '/etc/nginx/nginx.conf'
+shutil.copy(NGINX, '/tmp/nginx.conf.bak.pf')
+
+conf = open(NGINX, encoding='utf-8').read()
+
+if '/pokerfans' in conf:
+    print('既に /pokerfans の設定があります')
+else:
+    loc = (
+        '\n'
+        '    location = /pokerfans {\n'
+        '        alias /var/www/leaderboard/pokerfans.html;\n'
+        '        default_type text/html;\n'
+        '    }\n'
+        '\n'
+    )
+    new = re.sub(r'(\s+location\s+/\s*\{)', loc + r'\1', conf, count=1)
+    if new == conf:
+        print('location / が見つかりませんでした。location行一覧:')
+        for i, l in enumerate(conf.splitlines(), 1):
+            if 'location' in l:
+                print(f'  行{i}: {l}')
+    else:
+        open(NGINX, 'w', encoding='utf-8').write(new)
+        r = subprocess.run(['nginx', '-t'], capture_output=True, text=True)
+        if r.returncode == 0:
+            subprocess.run(['systemctl', 'reload', 'nginx'])
+            print('完了: https://9high.net/pokerfans にアクセスできます')
+        else:
+            shutil.copy('/tmp/nginx.conf.bak.pf', NGINX)
+            print('nginxエラー（元に戻しました）:', r.stderr[:300])
