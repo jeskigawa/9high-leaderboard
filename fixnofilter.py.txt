@@ -1,0 +1,62 @@
+#!/usr/bin/env python3
+"""
+手動でstartPageを指定した場合はdate filterを外す
+_req_start_page >= 0 のとき date_filter_ok = False にする
+"""
+import subprocess, sys, re, tempfile, os
+
+APP = '/var/www/leaderboard/app.py'
+subprocess.run(['cp', APP, '/tmp/app.py.bak.nofilter'])
+
+with open(APP, encoding='utf-8') as f:
+    ac = f.read()
+
+# date_filter_ok の初期化行を確認
+print("=== date_filter_ok 定義行 ===")
+for i, line in enumerate(ac.splitlines(), 1):
+    if 'date_filter_ok' in line:
+        print(f"  行{i}: {line}")
+
+# _req_start_page >= 0 のブロックを探して date_filter_ok = False を追加
+# パターン:
+#   if _req_start_page >= 0:
+#       _start_page = _req_start_page
+m = re.search(
+    r'([ \t]*)if _req_start_page >= 0:\n\1([ \t]+)_start_page = _req_start_page',
+    ac
+)
+if not m:
+    print('ERROR: _req_start_page >= 0 ブロックが見つかりません')
+    sys.exit(1)
+
+outer_ind = m.group(1)
+inner_ind = m.group(1) + m.group(2)
+old_block = m.group(0)
+new_block = (
+    f'{outer_ind}if _req_start_page >= 0:\n'
+    f'{inner_ind}_start_page = _req_start_page\n'
+    f'{inner_ind}date_filter_ok = False  # 手動ページ指定時はdateフィルタ不使用'
+)
+
+ac = ac.replace(old_block, new_block, 1)
+print('OK: 手動startPage指定時にdate_filter_ok=Falseを追加')
+
+# 構文チェック
+with tempfile.NamedTemporaryFile(mode='w', suffix='.py', delete=False, encoding='utf-8') as tmp:
+    tmp.write(ac)
+    tp = tmp.name
+r = subprocess.run(['python3', '-m', 'py_compile', tp], capture_output=True, text=True)
+os.unlink(tp)
+if r.returncode != 0:
+    print(f'ERROR: 構文エラー!\n{r.stderr}')
+    sys.exit(1)
+print('OK: 構文チェック通過')
+
+with open(APP, 'w', encoding='utf-8') as f:
+    f.write(ac)
+
+subprocess.run(['systemctl', 'restart', 'leaderboard'])
+import time; time.sleep(2)
+r = subprocess.run(['systemctl', 'is-active', 'leaderboard'], capture_output=True, text=True)
+print(f'leaderboard: {r.stdout.strip()}')
+print('完了: 手動ページ指定時はdate filterなしでスキャン')
