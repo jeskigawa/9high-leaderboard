@@ -1,0 +1,44 @@
+#!/usr/bin/env python3
+"""Sunvy取込UIのHTML部分とパラメータ受け取り箇所を確認"""
+APP = '/var/www/leaderboard/app.py'
+with open(APP, encoding='utf-8') as f:
+    lines = f.readlines()
+
+# 1) sunvy/import エンドポイントのパラメータ受け取り箇所
+print("=== /sunvy/import パラメータ受け取り ===")
+for i, line in enumerate(lines):
+    ls = line.rstrip()
+    if ('sunvy' in ls.lower() and 'import' in ls.lower() and '@app.route' in ls) or \
+       ('eff_start' in ls and '=' in ls and 'request' in ls) or \
+       ('eff_end' in ls and '=' in ls and 'request' in ls) or \
+       ('start_page' in ls and 'request' in ls) or \
+       ('mode' in ls and 'request' in ls and ('get' in ls.lower() or 'json' in ls.lower())):
+        print(f"{i+1:5}: {ls}")
+
+# 2) HTMLの中のSunvy取込フォーム (start_date/end_date入力欄周辺)
+print("\n=== Sunvy取込フォーム HTML ===")
+in_section = False
+count = 0
+for i, line in enumerate(lines):
+    ls = line.rstrip()
+    if 'sunvy' in ls.lower() and ('form' in ls.lower() or 'import' in ls.lower() or 'modal' in ls.lower()):
+        in_section = True
+        count = 0
+    if in_section:
+        print(f"{i+1:5}: {ls}")
+        count += 1
+        if count > 40:
+            in_section = False
+            print("  ...")
+
+# 3) JS側のfetch/XMLHttpRequest でsunvyに送っている箇所
+print("\n=== JS: sunvy import 送信箇所 ===")
+for i, line in enumerate(lines):
+    ls = line.rstrip()
+    if ('sunvy' in ls.lower() or 'start_date' in ls or 'end_date' in ls) and \
+       ('fetch' in ls.lower() or 'xhr' in ls.lower() or 'eventSource' in ls.lower() or 'EventSource' in ls):
+        start = max(0, i-2)
+        end = min(len(lines), i+5)
+        for j in range(start, end):
+            print(f"{j+1:5}: {lines[j].rstrip()}")
+        print("---")
