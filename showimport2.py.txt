@@ -1,0 +1,40 @@
+#!/usr/bin/env python3
+"""Sunvy取込のルート定義とHTMLフォームを確認（短く収まるよう絞り込み）"""
+APP = '/var/www/leaderboard/app.py'
+with open(APP, encoding='utf-8') as f:
+    lines = f.readlines()
+
+# 1) eff_start / eff_end / mode を受け取っている行とその前後5行
+print("=== eff_start/eff_end/mode の受け取り ===")
+shown = set()
+for i, line in enumerate(lines):
+    ls = line.rstrip()
+    if ('eff_start' in ls or 'eff_end' in ls or ("mode" in ls and 'range' in ls)) and \
+       ('=' in ls) and ('request' in ls or 'req' in ls or 'get(' in ls):
+        for j in range(max(0,i-2), min(len(lines),i+3)):
+            if j not in shown:
+                shown.add(j)
+                print(f"{j+1:5}: {lines[j].rstrip()}")
+        print("---")
+
+# 2) Phase1のルート (@app.route) を探す - generate関数の直前
+print("\n=== Phase1 generate のルート定義 ===")
+for i, line in enumerate(lines):
+    ls = line.rstrip()
+    if '@app.route' in ls and i > 2400:
+        # 近くにSunvy/Phase/generateがあるか確認
+        ctx = ''.join(l for l in lines[i:i+15])
+        if 'sunvy' in ctx.lower() or 'phase' in ctx.lower() or 'generate' in ctx.lower():
+            for j in range(i, min(len(lines), i+12)):
+                print(f"{j+1:5}: {lines[j].rstrip()}")
+            print("---")
+
+# 3) HTMLの start_date / end_date input 付近
+print("\n=== HTML: start_date/end_date input ===")
+for i, line in enumerate(lines):
+    ls = line.rstrip()
+    if ('start_date' in ls or 'end_date' in ls or 'startDate' in ls or 'endDate' in ls) and \
+       ('input' in ls.lower() or 'type=' in ls.lower()):
+        for j in range(max(0,i-3), min(len(lines),i+4)):
+            print(f"{j+1:5}: {lines[j].rstrip()}")
+        print("---")
