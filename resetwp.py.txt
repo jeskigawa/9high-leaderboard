@@ -1,0 +1,54 @@
+import subprocess, glob
+
+# wp-cli の場所を探す
+wp = None
+for p in ['/usr/local/bin/wp', '/usr/bin/wp', '/var/www/wp', '/root/wp']:
+    r = subprocess.run(['test','-f',p],capture_output=True)
+    if r.returncode == 0:
+        wp = p
+        break
+
+if not wp:
+    # wp-cli をダウンロード
+    r = subprocess.run(['curl','-sO','https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar'],
+                       capture_output=True, cwd='/tmp')
+    wp = '/tmp/wp-cli.phar'
+
+# WordPress の場所を探す
+wpdir = None
+for p in ['/var/www/html', '/var/www/wordpress', '/var/www/9high']:
+    r = subprocess.run(['test','-f', p+'/wp-config.php'],capture_output=True)
+    if r.returncode == 0:
+        wpdir = p
+        break
+
+if not wpdir:
+    # find で探す
+    r = subprocess.run(['find','/var/www','-name','wp-config.php','-maxdepth','4'],
+                       capture_output=True, text=True)
+    paths = r.stdout.strip().split('\n')
+    if paths and paths[0]:
+        import os
+        wpdir = os.path.dirname(paths[0])
+
+print('wp-cli:', wp)
+print('wpdir:', wpdir)
+
+if wpdir:
+    # ユーザー一覧
+    r = subprocess.run(['php', wp, '--path='+wpdir, 'user', 'list',
+                        '--fields=ID,user_login,user_email,roles',
+                        '--allow-root'],
+                       capture_output=True, text=True)
+    print('=== WordPress users ===')
+    print(r.stdout or r.stderr)
+
+    # admin ユーザーのパスワードをリセット
+    new_pw = 'NineHigh2024!'
+    r2 = subprocess.run(['php', wp, '--path='+wpdir, 'user', 'update', '1',
+                         '--user_pass='+new_pw, '--allow-root'],
+                        capture_output=True, text=True)
+    print('reset result:', r2.stdout or r2.stderr)
+    print('new password:', new_pw)
+else:
+    print('ERROR: WordPress not found')
