@@ -1,0 +1,20 @@
+import subprocess
+
+# apt-get update のエラー確認
+print('=== apt-get update ===')
+r = subprocess.run('apt-get update 2>&1 | grep -E "ERR|WARN|ondrej|php"',
+                   shell=True, capture_output=True, text=True)
+print(r.stdout[-500:] or 'エラーなし')
+
+# PHP 8.0/8.1/8.2 それぞれ確認
+for v in ['8.0','8.1','8.2']:
+    r2 = subprocess.run(f'apt-cache show php{v}-fpm 2>&1 | head -3',
+                        shell=True, capture_output=True, text=True)
+    status = 'あり' if 'Version' in r2.stdout else 'なし'
+    print(f'php{v}-fpm: {status}')
+
+# GPGキー確認
+r3 = subprocess.run('apt-key list 2>/dev/null | grep -A1 ondrej',
+                    shell=True, capture_output=True, text=True)
+print('\n=== ondrej GPGキー ===')
+print(r3.stdout or 'なし')
