@@ -1,0 +1,23 @@
+import subprocess, os, re
+
+# InReleaseファイルの中身を確認 → 正しいPackagesファイルのパスを探す
+inrel = '/var/lib/apt/lists/ppa.launchpad.net_ondrej_php_ubuntu_dists_focal_InRelease'
+print('=== InRelease ファイルの構成 ===')
+txt = open(inrel).read()
+# binary-amd64 の行だけ抜き出す
+for l in txt.split('\n'):
+    if 'binary-amd64' in l or 'Packages' in l.lower():
+        print(l)
+
+# 利用可能な圧縮形式で試す
+base = 'http://ppa.launchpad.net/ondrej/php/ubuntu/dists/focal/main/binary-amd64/'
+for fn in ['Packages.xz', 'Packages.gz', 'Packages']:
+    url = base + fn
+    dest = f'/tmp/testpkg_{fn}'
+    r = subprocess.run(f'curl -sL --max-time 30 -w "%{{http_code}} %{{size_download}}" "{url}" -o "{dest}"',
+                       shell=True, capture_output=True, text=True)
+    size = os.path.getsize(dest) if os.path.exists(dest) else 0
+    print(f'{fn}: http={r.stdout.strip()} size={size}')
+    if size > 1000:
+        print(f'  -> {fn} が使えます')
+        break
