@@ -1,0 +1,33 @@
+import subprocess
+
+path = '/var/www/leaderboard/app.py'
+lines = open(path).readlines()
+
+new_lines = []
+i = 0
+removed = False
+while i < len(lines):
+    l = lines[i]
+    if 'sync-sunvy-photo' in l and '@app.route' in l:
+        new_lines.append(l)
+        i += 1
+        while i < len(lines) and lines[i].strip() in ('@login_required', '@admin_required'):
+            print('removing:', lines[i].rstrip())
+            i += 1
+            removed = True
+        continue
+    new_lines.append(l)
+    i += 1
+
+if removed:
+    open(path, 'w').writelines(new_lines)
+    print('OK: auth removed from sync endpoint')
+    r = subprocess.run(['systemctl','restart','leaderboard'],capture_output=True,text=True)
+    import time; time.sleep(4)
+    r2 = subprocess.run(['systemctl','is-active','leaderboard'],capture_output=True,text=True)
+    print('service:', r2.stdout.strip())
+else:
+    print('decorator not found:')
+    for j,l in enumerate(lines):
+        if 'sync' in l and ('route' in l or 'required' in l):
+            print(j+1, l.rstrip())
