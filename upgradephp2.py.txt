@@ -1,0 +1,67 @@
+import subprocess, re, os
+
+def run(cmd):
+    r = subprocess.run(cmd, shell=True, capture_output=True, text=True)
+    out = (r.stdout + r.stderr).strip()
+    if out:
+        print(out[-400:])
+    return r.returncode
+
+# Step1: nginx を php7.4 に戻す（前回の誤書き換えを修正）
+print('=== Step1: nginx を php7.4 に戻す ===')
+nginx_dirs = ['/etc/nginx/sites-enabled', '/etc/nginx/conf.d', '/etc/nginx/sites-available']
+for d in nginx_dirs:
+    if not os.path.isdir(d):
+        continue
+    for fn in os.listdir(d):
+        fp = os.path.join(d, fn)
+        if not os.path.isfile(fp):
+            continue
+        txt = open(fp).read()
+        new = re.sub(r'php8\.2-fpm\.sock', 'php7.4-fpm.sock', txt)
+        if new != txt:
+            open(fp, 'w').write(new)
+            print('戻した:', fp)
+
+run('systemctl reload nginx')
+print('nginx php7.4に戻しました')
+
+# Step2: PHP 8.2 を正しくインストール
+print('\n=== Step2: PHP 8.2 インストール ===')
+run('apt-get install -y software-properties-common')
+run('LC_ALL=C.UTF-8 add-apt-repository -y ppa:ondrej/php')
+run('apt-get update')
+rc = run('apt-get install -y php8.2 php8.2-fpm php8.2-mysql php8.2-curl php8.2-xml php8.2-mbstring php8.2-zip')
+print('install rc:', rc)
+
+# Step3: php8.2-fpm 確認・起動
+r = subprocess.run(['systemctl','status','php8.2-fpm'], capture_output=True, text=True)
+if 'could not be found' in r.stderr or 'not-found' in r.stdout:
+    print('ERROR: php8.2-fpm がインストールされていません')
+    print('WordPress は php7.4 のまま動いています')
+else:
+    run('systemctl enable php8.2-fpm')
+    run('systemctl start php8.2-fpm')
+    print('php8.2-fpm 起動OK')
+
+    # Step4: nginx を php8.2 に切り替え
+    print('\n=== Step4: nginx を php8.2 に切り替え ===')
+    for d in nginx_dirs:
+        if not os.path.isdir(d):
+            continue
+        for fn in os.listdir(d):
+            fp = os.path.join(d, fn)
+            if not os.path.isfile(fp):
+                continue
+            txt = open(fp).read()
+            new = re.sub(r'php7\.4-fpm\.sock', 'php8.2-fpm.sock', txt)
+            if new != txt:
+                open(fp, 'w').write(new)
+                print('更新:', fp)
+
+    if run('nginx -t') == 0:
+        run('systemctl reload nginx')
+        print('nginx 8.2に切り替え完了')
+
+r2 = subprocess.run(['php','-v'], capture_output=True, text=True)
+print('\n最終PHP:', r2.stdout.split('\n')[0])
