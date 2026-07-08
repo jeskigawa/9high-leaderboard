@@ -1,0 +1,25 @@
+import hashlib, json
+
+path = '/var/www/leaderboard/app.py'
+lines = open(path).readlines()
+
+print('=== find_user ===')
+for i, l in enumerate(lines):
+    if 'def find_user' in l:
+        for j, ll in enumerate(lines[i:i+20], i+1):
+            print(j, ll.rstrip())
+        break
+
+print()
+print('=== login test ===')
+cfg = '/var/www/leaderboard/data/config.json'
+c = json.load(open(cfg))
+users = c.get('users', [])
+print('users count:', len(users))
+ph = hashlib.sha256('Abcd1234'.encode()).hexdigest()
+u = next((x for x in users if x.get('email') == 'admin@9high.jp'), None)
+if u:
+    match = u.get('password_hash', '') == ph
+    print('admin found, hash OK:', match)
+else:
+    print('admin NOT FOUND in config')
