@@ -1,0 +1,56 @@
+import subprocess, re, os
+
+def run(cmd):
+    r = subprocess.run(cmd, shell=True, capture_output=True, text=True)
+    out = (r.stdout + r.stderr).strip()
+    if out:
+        print(out[-300:])
+    return r.returncode
+
+# 現在のPHPバージョン確認
+r = subprocess.run(['php','-v'], capture_output=True, text=True)
+print('現在:', r.stdout.split('\n')[0])
+
+# PHP 8.2 インストール
+print('\n--- PHP 8.2 インストール中 ---')
+run('add-apt-repository -y ppa:ondrej/php')
+run('apt-get update -qq')
+run('apt-get install -y php8.2 php8.2-fpm php8.2-mysql php8.2-curl '
+    'php8.2-xml php8.2-mbstring php8.2-zip php8.2-gd php8.2-intl')
+
+# php8.2-fpm 起動
+run('systemctl enable php8.2-fpm')
+run('systemctl start php8.2-fpm')
+
+# nginx 設定を php8.2-fpm に切り替え
+nginx_dirs = ['/etc/nginx/sites-enabled', '/etc/nginx/conf.d', '/etc/nginx/sites-available']
+updated = []
+for d in nginx_dirs:
+    if not os.path.isdir(d):
+        continue
+    for fn in os.listdir(d):
+        fp = os.path.join(d, fn)
+        if not os.path.isfile(fp):
+            continue
+        txt = open(fp).read()
+        new = re.sub(r'php\d+\.\d+-fpm\.sock', 'php8.2-fpm.sock', txt)
+        new = re.sub(r'127\.0\.0\.1:90\d\d', 'unix:/run/php/php8.2-fpm.sock', new)
+        if new != txt:
+            open(fp, 'w').write(new)
+            updated.append(fp)
+            print('更新:', fp)
+
+if not updated:
+    print('nginx設定: 変更なし（手動確認が必要かも）')
+
+# nginx リロード
+rc = run('nginx -t')
+if rc == 0:
+    run('systemctl reload nginx')
+    print('\nnginx リロード完了')
+else:
+    print('\nERROR: nginx設定にエラーがあります')
+
+r2 = subprocess.run(['php','-v'], capture_output=True, text=True)
+print('\n更新後:', r2.stdout.split('\n')[0])
+print('完了')
