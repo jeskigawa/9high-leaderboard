@@ -1,0 +1,51 @@
+import subprocess, re, os
+
+def apt(pkg):
+    r = subprocess.run(f'apt-get install -y {pkg}',
+                       shell=True, capture_output=True, text=True,
+                       env={**os.environ, 'DEBIAN_FRONTEND':'noninteractive'})
+    ok = r.returncode == 0
+    print(f'  {pkg}: {"OK" if ok else "SKIP"}')
+    return ok
+
+# PHP 8.2 パッケージを一個ずつインストール
+print('=== PHP 8.2 インストール ===')
+core_ok = apt('php8.2') and apt('php8.2-fpm')
+if not core_ok:
+    print('ERROR: php8.2-fpm が入りません。中止します。')
+    exit(1)
+
+for pkg in ['php8.2-mysql','php8.2-curl','php8.2-mbstring',
+            'php8.2-xml','php8.2-zip','php8.2-gd','php8.2-intl']:
+    apt(pkg)
+
+# php8.2-fpm 起動
+subprocess.run('systemctl enable php8.2-fpm && systemctl start php8.2-fpm',
+               shell=True)
+r = subprocess.run(['systemctl','is-active','php8.2-fpm'],
+                   capture_output=True, text=True)
+print('php8.2-fpm:', r.stdout.strip())
+if r.stdout.strip() != 'active':
+    print('ERROR: php8.2-fpm が起動しませんでした')
+    exit(1)
+
+# nginx を php8.2 に切り替え
+print('\n=== nginx 切り替え ===')
+for d in ['/etc/nginx/sites-enabled','/etc/nginx/conf.d','/etc/nginx/sites-available']:
+    if not os.path.isdir(d): continue
+    for fn in os.listdir(d):
+        fp = os.path.join(d, fn)
+        if not os.path.isfile(fp): continue
+        txt = open(fp).read()
+        new = re.sub(r'php7\.4-fpm\.sock', 'php8.2-fpm.sock', txt)
+        if new != txt:
+            open(fp,'w').write(new)
+            print('更新:', fp)
+
+rc = subprocess.run('nginx -t', shell=True, capture_output=True).returncode
+if rc == 0:
+    subprocess.run('systemctl reload nginx', shell=True)
+    print('nginx 切り替え完了')
+
+r2 = subprocess.run(['php','-v'], capture_output=True, text=True)
+print('\n最終PHP:', r2.stdout.split('\n')[0])
