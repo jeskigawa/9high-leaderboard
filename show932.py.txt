@@ -1,0 +1,4 @@
+path = '/var/www/leaderboard/app.py'
+lines = open(path).readlines()
+for i, l in enumerate(lines[900:937], 901):
+    print(i, l.rstrip())
