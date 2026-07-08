@@ -1,0 +1,11 @@
+import json, hashlib
+cfg = '/var/www/leaderboard/data/config.json'
+config = json.load(open(cfg))
+config['users'] = [
+    {'email': 'admin@9high.jp', 'password_hash': hashlib.sha256('Abcd1234'.encode()).hexdigest(), 'role': 'admin'},
+    {'email': 'jeskigawa@gmail.com', 'password_hash': hashlib.sha256('Abcd1234'.encode()).hexdigest(), 'role': 'admin'}
+]
+json.dump(config, open(cfg, 'w'), ensure_ascii=False, indent=2)
+print('OK: users saved')
+for u in config['users']:
+    print(u['email'], u['role'])
