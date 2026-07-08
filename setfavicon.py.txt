@@ -1,0 +1,28 @@
+import subprocess, os
+
+svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="5 10 83 113"><rect x="5" y="10" width="83" height="113" rx="8" fill="#0f172a"/><path fill="#C3181F" d="M68.896,17.493c-5.928-3.155-12.818-4.754-20.476-4.754c-7.556,0-14.42,1.602-20.405,4.761c-5.943,3.139-10.706,7.437-14.155,12.775c-3.434,5.313-5.103,11.173-5.103,17.912c0,6.344,1.531,11.918,4.68,17.039c3.149,5.129,7.453,9.287,12.793,12.359c4.71,2.709,9.975,4.235,15.652,4.533l8.26,0.434c0.472,0.025,0.729,0.563,0.451,0.946L25.328,118.39c-0.476,0.655-0.005,1.577,0.806,1.577H46.98c0.329,0,0.637-0.164,0.823-0.437l31.766-46.806c5.652-8.286,8.518-16.541,8.518-24.537c0-6.737-1.669-12.595-5.1-17.91C79.527,24.93,74.787,20.629,68.896,17.493 M50.028,68.79c-12.121,0.966-22.202-9.116-21.237-21.235c0.76-9.538,8.487-17.265,18.026-18.026c12.119-0.965,22.2,9.116,21.235,21.238C67.292,60.304,59.564,68.03,50.028,68.79"/></svg>\n'
+
+static_dir = '/var/www/leaderboard/static'
+os.makedirs(static_dir, exist_ok=True)
+with open(static_dir + '/favicon.svg', 'w') as f:
+    f.write(svg)
+print('wrote favicon.svg')
+
+html_path = '/var/www/leaderboard/index.html'
+lines = open(html_path).readlines()
+if any('rel="icon"' in l for l in lines):
+    print('favicon link already present')
+else:
+    link = '  <link rel="icon" href="/leaderboard/static/favicon.svg" type="image/svg+xml">\n'
+    new = []
+    for l in lines:
+        new.append(l)
+        if '<head>' in l:
+            new.append(link)
+    open(html_path, 'w').writelines(new)
+    print('added favicon link to index.html')
+
+r = subprocess.run(['systemctl','restart','leaderboard'],capture_output=True,text=True)
+import time; time.sleep(4)
+r2 = subprocess.run(['systemctl','is-active','leaderboard'],capture_output=True,text=True)
+print('service:', r2.stdout.strip())
