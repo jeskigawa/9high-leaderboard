@@ -1,0 +1,125 @@
+import subprocess, time
+
+f2 = '/var/www/leaderboard/index.html'
+s2 = open(f2).read()
+
+# 1. popupConfirmDelete state variable 追加
+A1 = "      const [detailEditForm, setDetailEditForm] = useState({});"
+B1 = ("      const [detailEditForm, setDetailEditForm] = useState({});\n"
+      "      const [popupConfirmDelete, setPopupConfirmDelete] = useState(false);")
+n1 = s2.count(A1); s2 = s2.replace(A1, B1)
+print('1 state:', n1)
+
+# 2. ポップアップを閉じる時に popupConfirmDelete もリセット（2箇所）
+A2 = 'onClick={() => { setDetailAward(null); setDetailEditMode(false); }}'
+B2 = 'onClick={() => { setDetailAward(null); setDetailEditMode(false); setPopupConfirmDelete(false); }}'
+n2 = s2.count(A2); s2 = s2.replace(A2, B2)
+print('2 close handlers:', n2)
+
+# 3. 詳細ポップアップの下部: 削除ボタン(確認付き) + 修正ボタン
+A3 = ("                    <div style={{display:'flex',justifyContent:'flex-end',marginTop:16}}>\n"
+      "                      <button className=\"btn btn-primary btn-sm\" onClick={() => {\n"
+      "                        setDetailEditForm({\n"
+      "                          playerId:   detailAward.playerId,\n"
+      "                          typeId:     detailAward.typeId,\n"
+      "                          occurredAt: detailAward.occurredAt||'',\n"
+      "                          quantity:   detailAward.quantity||1,\n"
+      "                          reason:     detailAward.reason||detailAward.note||'',\n"
+      "                          gameId:     detailAward.gameId||'',\n"
+      "                          status:     detailAward.status,\n"
+      "                        });\n"
+      "                        setDetailEditMode(true);\n"
+      "                      }}>修正</button>\n"
+      "                    </div>")
+B3 = ("                    <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginTop:16}}>\n"
+      "                      {!popupConfirmDelete ? (\n"
+      "                        <button className=\"btn btn-danger btn-sm\"\n"
+      "                          onClick={() => setPopupConfirmDelete(true)}>削除</button>\n"
+      "                      ) : (\n"
+      "                        <div style={{display:'flex',gap:8,alignItems:'center'}}>\n"
+      "                          <span style={{color:'var(--danger)',fontSize:13,fontWeight:600}}>本当に削除しますか？</span>\n"
+      "                          <button className=\"btn btn-secondary btn-sm\"\n"
+      "                            onClick={() => setPopupConfirmDelete(false)}>いいえ</button>\n"
+      "                          <button className=\"btn btn-sm\" style={{background:'var(--danger)',color:'#fff',padding:'4px 12px'}}\n"
+      "                            onClick={async () => {\n"
+      "                              try {\n"
+      "                                await api('/api/prizes/awards/'+detailAward.id,{method:'DELETE'});\n"
+      "                                setDetailAward(null); setPopupConfirmDelete(false);\n"
+      "                                showToast('削除しました'); loadPrizes();\n"
+      "                              } catch(e) { showToast(e.message,'error'); }\n"
+      "                            }}>はい</button>\n"
+      "                        </div>\n"
+      "                      )}\n"
+      "                      <button className=\"btn btn-primary btn-sm\" onClick={() => {\n"
+      "                        setDetailEditForm({\n"
+      "                          playerId:   detailAward.playerId,\n"
+      "                          typeId:     detailAward.typeId,\n"
+      "                          occurredAt: detailAward.occurredAt||'',\n"
+      "                          quantity:   detailAward.quantity||1,\n"
+      "                          reason:     detailAward.reason||detailAward.note||'',\n"
+      "                          gameId:     detailAward.gameId||'',\n"
+      "                          status:     detailAward.status,\n"
+      "                        });\n"
+      "                        setDetailEditMode(true);\n"
+      "                      }}>修正</button>\n"
+      "                    </div>")
+n3 = s2.count(A3); s2 = s2.replace(A3, B3)
+print('3 footer:', n3)
+
+# 4. 一覧の操作セル: 削除ボタンを除去し詳細のみに
+A4 = ("                    <td>\n"
+      "                      <div style={{display:'flex',gap:4,flexWrap:'wrap',alignItems:'center'}}>\n"
+      "                        <button className=\"btn btn-secondary btn-sm\"\n"
+      "                          onClick={() => { setDetailAward(a); setDetailEditMode(false); }}>詳細</button>\n"
+      "                        {confirmDelete === a.id ? (\n"
+      "                          <div style={{display:'flex', gap:4, alignItems:'center'}}>\n"
+      "                            <span style={{fontSize:11, color:'var(--danger)', whiteSpace:'nowrap'}}>削除？</span>\n"
+      "                            <button className=\"btn btn-sm\" style={{background:'var(--danger)', color:'#fff', padding:'3px 8px'}}\n"
+      "                              onClick={() => { deleteAward(a.id); setConfirmDelete(null); }}>はい</button>\n"
+      "                            <button className=\"btn btn-secondary btn-sm\" style={{padding:'3px 8px'}}\n"
+      "                              onClick={() => setConfirmDelete(null)}>いいえ</button>\n"
+      "                          </div>\n"
+      "                        ) : (\n"
+      "                          <button className=\"btn btn-danger btn-sm\" onClick={() => setConfirmDelete(a.id)}>削除</button>\n"
+      "                        )}\n"
+      "                      </div>\n"
+      "                    </td>")
+B4 = ("                    <td>\n"
+      "                      <button className=\"btn btn-secondary btn-sm\"\n"
+      "                        onClick={() => { setDetailAward(a); setDetailEditMode(false); setPopupConfirmDelete(false); }}>詳細</button>\n"
+      "                    </td>")
+n4 = s2.count(A4); s2 = s2.replace(A4, B4)
+print('4 action cell:', n4)
+
+# 5. テーブルヘッダーに GameID 列追加
+A5 = "                  <th></th>\n                </tr>"
+B5 = "                  <th>GameID</th>\n                  <th></th>\n                </tr>"
+n5 = s2.count(A5); s2 = s2.replace(A5, B5)
+print('5 th GameID:', n5)
+
+# 6. テーブル行に GameID セル追加（付与日の次・詳細ボタンの前）
+A6 = ("                    <td style={{fontSize:12, color:'var(--text-muted)'}}>\n"
+      "                      {a.givenAt ? a.givenAt.split('T')[0] : '-'}\n"
+      "                    </td>\n"
+      "                    <td>\n"
+      "                      <button className=\"btn btn-secondary btn-sm\"\n"
+      "                        onClick={() => { setDetailAward(a); setDetailEditMode(false); setPopupConfirmDelete(false); }}>詳細</button>\n"
+      "                    </td>")
+B6 = ("                    <td style={{fontSize:12, color:'var(--text-muted)'}}>\n"
+      "                      {a.givenAt ? a.givenAt.split('T')[0] : '-'}\n"
+      "                    </td>\n"
+      "                    <td style={{fontSize:12, color:'var(--text-secondary)'}}>{a.gameId || '-'}</td>\n"
+      "                    <td>\n"
+      "                      <button className=\"btn btn-secondary btn-sm\"\n"
+      "                        onClick={() => { setDetailAward(a); setDetailEditMode(false); setPopupConfirmDelete(false); }}>詳細</button>\n"
+      "                    </td>")
+n6 = s2.count(A6); s2 = s2.replace(A6, B6)
+print('6 row GameID:', n6)
+
+open(f2, 'w').write(s2)
+print('index.html saved')
+
+r = subprocess.run(['systemctl','restart','leaderboard'], capture_output=True, text=True)
+time.sleep(3)
+r2 = subprocess.run(['systemctl','is-active','leaderboard'], capture_output=True, text=True)
+print('service:', r2.stdout.strip())
