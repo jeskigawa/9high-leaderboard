@@ -1,5 +1,0 @@
-conf=open('/etc/nginx/nginx.conf').read()
-for i,l in enumerate(conf.splitlines(),1):
-    kw=['server_name','location','proxy_pass','include','fastcgi_pass']
-    if any(k in l for k in kw):
-        print(i,l)
