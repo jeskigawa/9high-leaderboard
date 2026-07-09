@@ -1,3 +1,0 @@
-import subprocess
-r = subprocess.run(['cat','/etc/nginx/nginx.conf'],capture_output=True,text=True)
-print(r.stdout[:4000])
