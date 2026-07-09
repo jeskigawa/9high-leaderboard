@@ -1,0 +1,232 @@
+import subprocess, time
+
+# ===== STEP 1: app.py =====
+f = '/var/www/leaderboard/app.py'
+s = open(f).read()
+
+A1 = "        'note':       req.get('note', ''),\n"
+B1 = "        'reason':     req.get('reason', req.get('note', '')),\n        'gameId':     req.get('gameId', ''),\n"
+n1 = s.count(A1); s = s.replace(A1, B1)
+print('1a reason+gameId in create:', n1)
+
+A2 = ("            if 'note' in req:\n"
+      "                a['note'] = req['note']\n"
+      "            save_json('prizes.json', data)\n")
+B2 = ("            if 'reason' in req:\n"
+      "                a['reason'] = req['reason']\n"
+      "            if 'gameId' in req:\n"
+      "                a['gameId'] = req['gameId']\n"
+      "            if 'playerId' in req:\n"
+      "                a['playerId'] = req['playerId']\n"
+      "            if 'typeId' in req:\n"
+      "                a['typeId'] = req['typeId']\n"
+      "            if 'occurredAt' in req:\n"
+      "                a['occurredAt'] = req['occurredAt']\n"
+      "            if 'quantity' in req:\n"
+      "                a['quantity'] = int(req['quantity'])\n"
+      "            save_json('prizes.json', data)\n")
+n2 = s.count(A2); s = s.replace(A2, B2)
+print('1b update_award expanded:', n2)
+
+open(f, 'w').write(s)
+print('app.py saved')
+
+# ===== STEP 2: index.html =====
+f2 = '/var/www/leaderboard/index.html'
+s2 = open(f2).read()
+
+# 2a: awardForm state + new state vars
+A3 = "      const [awardForm, setAwardForm] = useState({ playerId: '', typeId: '', note: '', occurredAt: todayStr(), quantity: 1 });"
+B3 = ("      const [awardForm, setAwardForm] = useState({ playerId: '', typeId: '', reason: '', gameId: '', occurredAt: todayStr(), quantity: 1 });\n"
+      "      const [detailAward, setDetailAward] = useState(null);\n"
+      "      const [detailEditMode, setDetailEditMode] = useState(false);\n"
+      "      const [detailEditForm, setDetailEditForm] = useState({});")
+n3 = s2.count(A3); s2 = s2.replace(A3, B3)
+print('2a state vars:', n3)
+
+# 2b: addAward reset
+A4 = "          setAwardForm({ playerId: '', typeId: '', note: '', occurredAt: todayStr(), quantity: 1 });"
+B4 = "          setAwardForm({ playerId: '', typeId: '', reason: '', gameId: '', occurredAt: todayStr(), quantity: 1 });"
+n4 = s2.count(A4); s2 = s2.replace(A4, B4)
+print('2b addAward reset:', n4)
+
+# 2c: registration form memo -> reason+gameId
+A5 = ("                <div style={{display:'flex', gap:8}}>\n"
+      "                  <input className=\"form-input\" style={{flex:1}} placeholder=\"メモ（任意）例: 2025年1月度優勝\" value={awardForm.note}\n"
+      "                    onChange={e => setAwardForm(p => ({...p, note: e.target.value}))} />\n"
+      "                  <button className=\"btn btn-primary btn-sm\" onClick={addAward}>登録</button>\n"
+      "                </div>")
+B5 = ("                <div style={{display:'flex', gap:8}}>\n"
+      "                  <input className=\"form-input\" style={{flex:2}} placeholder=\"付与理由（任意）例: 2025年1月度優勝\" value={awardForm.reason}\n"
+      "                    onChange={e => setAwardForm(p => ({...p, reason: e.target.value}))} />\n"
+      "                  <input className=\"form-input\" style={{flex:1}} placeholder=\"GameID（任意）\" value={awardForm.gameId}\n"
+      "                    onChange={e => setAwardForm(p => ({...p, gameId: e.target.value}))} />\n"
+      "                  <button className=\"btn btn-primary btn-sm\" onClick={addAward}>登録</button>\n"
+      "                </div>")
+n5 = s2.count(A5); s2 = s2.replace(A5, B5)
+print('2c reg form:', n5)
+
+# 2d: insert detail popup before type master modal
+POPUP = """          {/* ===== 詳細・修正ポップアップ ===== */}
+          {detailAward && (
+            <div className="modal-overlay" onClick={() => { setDetailAward(null); setDetailEditMode(false); }}>
+              <div className="modal-box" onClick={e => e.stopPropagation()} style={{maxWidth:500}}>
+                <div className="modal-header">
+                  <div className="modal-title">{detailEditMode ? '権利修正' : '権利詳細'}</div>
+                  <button className="modal-close" onClick={() => { setDetailAward(null); setDetailEditMode(false); }}>✕</button>
+                </div>
+                {!detailEditMode ? (
+                  <div>
+                    <table style={{width:'100%',borderCollapse:'collapse'}}>
+                      <tbody>
+                        {[
+                          ['権利発生日', detailAward.occurredAt||'-'],
+                          ['権利種別',   getTypeName(detailAward.typeId)],
+                          ['プレイヤー', getPlayerName(detailAward.playerId)],
+                          ['個数',       String(detailAward.quantity||1)],
+                          ['付与理由',   detailAward.reason||detailAward.note||'-'],
+                          ['GameID',     detailAward.gameId||'-'],
+                          ['ステータス', detailAward.status],
+                          ['付与日',     detailAward.givenAt ? detailAward.givenAt.split('T')[0] : '-'],
+                        ].map(([lbl,val]) => (
+                          <tr key={lbl}>
+                            <td style={{padding:'8px 10px',color:'var(--text-muted)',fontSize:13,width:'32%',verticalAlign:'top',borderBottom:'1px solid var(--border)'}}>{lbl}</td>
+                            <td style={{padding:'8px 10px',color:'var(--text-primary)',fontSize:14,fontWeight:500,borderBottom:'1px solid var(--border)'}}>{val}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                    <div style={{display:'flex',justifyContent:'flex-end',marginTop:16}}>
+                      <button className="btn btn-primary btn-sm" onClick={() => {
+                        setDetailEditForm({
+                          playerId:   detailAward.playerId,
+                          typeId:     detailAward.typeId,
+                          occurredAt: detailAward.occurredAt||'',
+                          quantity:   detailAward.quantity||1,
+                          reason:     detailAward.reason||detailAward.note||'',
+                          gameId:     detailAward.gameId||'',
+                          status:     detailAward.status,
+                        });
+                        setDetailEditMode(true);
+                      }}>修正</button>
+                    </div>
+                  </div>
+                ) : (
+                  <div>
+                    <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10,marginBottom:10}}>
+                      <div>
+                        <div className="form-label" style={{marginBottom:4}}>権利発生日 *</div>
+                        <input type="date" className="form-input" style={{colorScheme:'dark'}}
+                          value={detailEditForm.occurredAt}
+                          onChange={e => setDetailEditForm(p => ({...p,occurredAt:e.target.value}))} />
+                      </div>
+                      <div>
+                        <div className="form-label" style={{marginBottom:4}}>権利種別 *</div>
+                        <select className="form-select" value={detailEditForm.typeId}
+                          onChange={e => setDetailEditForm(p => ({...p,typeId:e.target.value}))}>
+                          {prizes.types.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
+                        </select>
+                      </div>
+                      <div>
+                        <div className="form-label" style={{marginBottom:4}}>プレイヤー *</div>
+                        <PlayerAutocomplete players={players} value={detailEditForm.playerId}
+                          onChange={v => setDetailEditForm(p => ({...p,playerId:v}))} />
+                      </div>
+                      <div>
+                        <div className="form-label" style={{marginBottom:4}}>個数 *</div>
+                        <input type="number" className="form-input" min="1" style={{textAlign:'center'}}
+                          value={detailEditForm.quantity}
+                          onChange={e => setDetailEditForm(p => ({...p,quantity:Math.max(1,parseInt(e.target.value)||1)}))} />
+                      </div>
+                    </div>
+                    <div style={{marginBottom:10}}>
+                      <div className="form-label" style={{marginBottom:4}}>付与理由</div>
+                      <input className="form-input" style={{width:'100%'}} placeholder="付与理由（任意）"
+                        value={detailEditForm.reason}
+                        onChange={e => setDetailEditForm(p => ({...p,reason:e.target.value}))} />
+                    </div>
+                    <div style={{marginBottom:10}}>
+                      <div className="form-label" style={{marginBottom:4}}>GameID</div>
+                      <input className="form-input" style={{width:'100%'}} placeholder="GameID（任意）"
+                        value={detailEditForm.gameId}
+                        onChange={e => setDetailEditForm(p => ({...p,gameId:e.target.value}))} />
+                    </div>
+                    <div style={{display:'flex',gap:10,justifyContent:'flex-end',marginTop:4}}>
+                      <button className="btn btn-secondary btn-sm"
+                        onClick={() => setDetailEditMode(false)}>キャンセル</button>
+                      <button className="btn btn-primary btn-sm"
+                        onClick={async () => {
+                          try {
+                            const updated = await api('/api/prizes/awards/'+detailAward.id,
+                              {method:'PUT',body:JSON.stringify(detailEditForm)});
+                            setDetailAward({...detailAward,...updated});
+                            setDetailEditMode(false);
+                            showToast('保存しました');
+                            loadPrizes();
+                          } catch(e) { showToast(e.message,'error'); }
+                        }}>保存</button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+"""
+
+A6 = "          {/* ===== 権利種別マスター モーダル ===== */}\n          {showTypeMaster && ("
+B6 = POPUP + "          {/* ===== 権利種別マスター モーダル ===== */}\n          {showTypeMaster && ("
+n6 = s2.count(A6); s2 = s2.replace(A6, B6)
+print('2d popup:', n6)
+
+# 2e: table header - remove メモ column
+A7 = "                  <th>メモ</th>\n                  <th></th>"
+B7 = "                  <th></th>"
+n7 = s2.count(A7); s2 = s2.replace(A7, B7)
+print('2e th memo:', n7)
+
+# 2f: remove memo cell from rows + add 詳細 button to action cell
+A8 = ("                    <td style={{fontSize:12, color:'var(--text-secondary)', maxWidth:100, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap'}}>\n"
+      "                      {a.note || '-'}\n"
+      "                    </td>\n"
+      "                    <td>\n"
+      "                      {confirmDelete === a.id ? (\n"
+      "                        <div style={{display:'flex', gap:4, alignItems:'center'}}>\n"
+      "                          <span style={{fontSize:11, color:'var(--danger)', whiteSpace:'nowrap'}}>削除？</span>\n"
+      "                          <button className=\"btn btn-sm\" style={{background:'var(--danger)', color:'#fff', padding:'3px 8px'}}\n"
+      "                            onClick={() => { deleteAward(a.id); setConfirmDelete(null); }}>はい</button>\n"
+      "                          <button className=\"btn btn-secondary btn-sm\" style={{padding:'3px 8px'}}\n"
+      "                            onClick={() => setConfirmDelete(null)}>いいえ</button>\n"
+      "                        </div>\n"
+      "                      ) : (\n"
+      "                        <button className=\"btn btn-danger btn-sm\" onClick={() => setConfirmDelete(a.id)}>削除</button>\n"
+      "                      )}\n"
+      "                    </td>")
+B8 = ("                    <td>\n"
+      "                      <div style={{display:'flex',gap:4,flexWrap:'wrap',alignItems:'center'}}>\n"
+      "                        <button className=\"btn btn-secondary btn-sm\"\n"
+      "                          onClick={() => { setDetailAward(a); setDetailEditMode(false); }}>詳細</button>\n"
+      "                        {confirmDelete === a.id ? (\n"
+      "                          <div style={{display:'flex', gap:4, alignItems:'center'}}>\n"
+      "                            <span style={{fontSize:11, color:'var(--danger)', whiteSpace:'nowrap'}}>削除？</span>\n"
+      "                            <button className=\"btn btn-sm\" style={{background:'var(--danger)', color:'#fff', padding:'3px 8px'}}\n"
+      "                              onClick={() => { deleteAward(a.id); setConfirmDelete(null); }}>はい</button>\n"
+      "                            <button className=\"btn btn-secondary btn-sm\" style={{padding:'3px 8px'}}\n"
+      "                              onClick={() => setConfirmDelete(null)}>いいえ</button>\n"
+      "                          </div>\n"
+      "                        ) : (\n"
+      "                          <button className=\"btn btn-danger btn-sm\" onClick={() => setConfirmDelete(a.id)}>削除</button>\n"
+      "                        )}\n"
+      "                      </div>\n"
+      "                    </td>")
+n8 = s2.count(A8); s2 = s2.replace(A8, B8)
+print('2f row action:', n8)
+
+open(f2, 'w').write(s2)
+print('index.html saved')
+
+# restart service
+r = subprocess.run(['systemctl','restart','leaderboard'], capture_output=True, text=True)
+time.sleep(3)
+r2 = subprocess.run(['systemctl','is-active','leaderboard'], capture_output=True, text=True)
+print('service:', r2.stdout.strip())
