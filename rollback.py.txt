@@ -1,0 +1,82 @@
+import subprocess, time, re, os
+
+print('=== ROLLBACK START ===')
+
+# 1. app.py から leaderboard-pub ルートと strict_slashes を削除
+fa = '/var/www/leaderboard/app.py'
+sa = open(fa).read()
+removed = 0
+for sig in [
+    "\n\n@app.route('/leaderboard-pub', strict_slashes=False)\ndef leaderboard_pub_page():\n    return send_from_directory('.', 'leaderboard-pub.html')",
+    "\n\n@app.route('/leaderboard-pub')\ndef leaderboard_pub_page():\n    return send_from_directory('.', 'leaderboard-pub.html')",
+]:
+    n = sa.count(sig); sa = sa.replace(sig, ''); removed += n
+sa = sa.replace("@app.route('/leaderboard', strict_slashes=False)", "@app.route('/leaderboard')")
+open(fa, 'w').write(sa)
+print('1 app.py pub route removed:', removed)
+print('  routes:', re.findall(r"@app\.route\([^)]+\)", sa))
+
+# 2. Nginx から leaderboard-pub location を削除
+r = subprocess.run(['grep', '-rl', 'leaderboard-pub', '/etc/nginx'], capture_output=True, text=True)
+for nf in [f.strip() for f in r.stdout.strip().split('\n') if f.strip()]:
+    ncfg = open(nf).read()
+    idx = ncfg.find('location /leaderboard-pub')
+    if idx == -1:
+        continue
+    st = idx
+    while st > 1 and ncfg[st-1] in ' \n\t':
+        st -= 1
+    st += 1
+    b = ncfg.find('{', idx); d = 0; en = b
+    for i in range(b, len(ncfg)):
+        if ncfg[i] == '{': d += 1
+        elif ncfg[i] == '}':
+            d -= 1
+            if d == 0: en = i+1; break
+    open(nf, 'w').write(ncfg[:st] + ncfg[en:])
+    r2 = subprocess.run(['nginx', '-t'], capture_output=True, text=True)
+    if r2.returncode == 0:
+        subprocess.run(['systemctl', 'reload', 'nginx'], capture_output=True)
+        print('2 nginx reverted:', nf)
+    else:
+        open(nf, 'w').write(ncfg)
+        print('2 nginx -t failed, restored:', r2.stderr[-200:])
+
+# 3. 現在の nginx の leaderboard 設定を表示
+print('3 current nginx leaderboard lines:')
+r = subprocess.run(['grep', '-rn', 'leaderboard\|proxy_pass', '/etc/nginx/sites-enabled'],
+                   capture_output=True, text=True)
+print(r.stdout[:2000])
+
+# 4. leaderboard-pub.html を削除
+pub = '/var/www/leaderboard/leaderboard-pub.html'
+if os.path.exists(pub):
+    os.remove(pub)
+    print('4 leaderboard-pub.html removed')
+else:
+    print('4 leaderboard-pub.html not present')
+
+# 5. index.html の壊れたdivを修正（fixpub step 3c で欠けた </div>）
+fi = '/var/www/leaderboard/index.html'
+si = open(fi, encoding='utf-8').read()
+old = '                )}\n            </div>\n          )}\n'
+new = '                )}\n              </div>\n            </div>\n          )}\n'
+n = si.count(old)
+si = si.replace(old, new)
+open(fi, 'w', encoding='utf-8').write(si)
+print('5 index.html div fix:', n)
+
+# 6. Flask 再起動
+subprocess.run(['systemctl', 'restart', 'leaderboard'], capture_output=True)
+time.sleep(3)
+r = subprocess.run(['systemctl', 'is-active', 'leaderboard'], capture_output=True, text=True)
+print('6 flask service:', r.stdout.strip())
+
+# 7. 確認テスト
+for p in ['/leaderboard', '/leaderboard-pub']:
+    r = subprocess.run(['curl', '-s', '-o', '/dev/null', '-w', '%{http_code}',
+                        'http://127.0.0.1:5000' + p], capture_output=True, text=True)
+    print('  Flask' + p + ' ->', r.stdout)
+
+print('=== DONE ===')
+print('https://9high.net/leaderboard を確認してください')
