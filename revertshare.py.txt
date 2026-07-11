@@ -1,0 +1,52 @@
+import subprocess, time
+
+f = '/var/www/leaderboard/9high-leaderboard.html'
+s = open(f, encoding='utf-8').read()
+
+# 1. Remove share CSS block
+css_start = '\n    .share-btn {'
+css_end = '.share-post:hover { background: #222; }'
+i1 = s.find(css_start)
+i2 = s.find(css_end)
+if i1 != -1 and i2 != -1:
+    s = s[:i1] + s[i2 + len(css_end):]
+    print('1 CSS removed')
+else:
+    print('1 CSS: not found i1=%d i2=%d' % (i1, i2))
+
+# 2. Remove X SHARE JS block
+js_start = '\n\n      // ===== X SHARE ====='
+js_end = '\n\n      return ('
+i1 = s.find(js_start)
+i2 = s.find(js_end, i1) if i1 != -1 else -1
+if i1 != -1 and i2 != -1:
+    s = s[:i1] + s[i2:]
+    print('2 JS block removed')
+else:
+    print('2 JS: not found i1=%d i2=%d' % (i1, i2))
+
+# 3. Remove share button line
+btn = '\n              <button className="share-btn" onClick={doShare}>\U0001d54f ポスト</button>'
+n3 = s.count(btn)
+s = s.replace(btn, '')
+print('3 button removed:', n3)
+
+# 4. Remove modal overlay block
+modal_start = '          {showShareModal && ('
+modal_end = '          )}\n          <div className="header">'
+i1 = s.find(modal_start)
+i2 = s.find(modal_end, i1) if i1 != -1 else -1
+if i1 != -1 and i2 != -1:
+    keep = '          <div className="header">'
+    s = s[:i1] + keep
+    print('4 modal removed')
+else:
+    print('4 modal: not found i1=%d i2=%d' % (i1, i2))
+
+open(f, 'w', encoding='utf-8').write(s)
+print('saved')
+
+r = subprocess.run(['systemctl', 'restart', 'leaderboard'], capture_output=True, text=True)
+time.sleep(3)
+r2 = subprocess.run(['systemctl', 'is-active', 'leaderboard'], capture_output=True, text=True)
+print('service:', r2.stdout.strip())

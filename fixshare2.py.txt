@@ -1,0 +1,300 @@
+import subprocess, time
+
+f = '/var/www/leaderboard/index.html'
+s = open(f, encoding='utf-8').read()
+
+# 1. Add CSS for share button before </style>
+old1 = '  </style>'
+new1 = """    /* ===== X SHARE ===== */
+    .lb-share-btn {
+      background: #000; color: #fff;
+      border: 2px solid #444; border-radius: 8px;
+      padding: 7px 18px; font-size: 14px; font-weight: 700;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .lb-share-btn:hover { background: #222; border-color: #888; }
+    .lb-share-overlay {
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.82); z-index: 9999;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .lb-share-dialog {
+      background: #fff; border-radius: 14px; padding: 20px;
+      max-width: 92vw; width: 480px;
+    }
+    .lb-share-dialog img { width: 100%; border-radius: 8px; margin-bottom: 12px; display: block; }
+    .lb-share-hint { font-size: 11px; color: #999; text-align: center; margin-bottom: 12px; }
+    .lb-share-actions { display: flex; gap: 10px; }
+    .lb-share-dl { flex: 1; background: #333; color: #fff; padding: 11px 0; border-radius: 8px; text-decoration: none; text-align: center; font-size: 14px; font-weight: 600; display: block; }
+    .lb-share-dl:hover { background: #555; }
+    .lb-share-post { flex: 1; background: #000; color: #fff; border: none; padding: 11px 0; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 600; }
+    .lb-share-post:hover { background: #222; }
+  </style>"""
+
+n1 = s.count(old1)
+s = s.replace(old1, new1)
+print('1 CSS:', n1)
+
+# 2. Add state + data fetch + top3 + doShare after subTab state
+old2 = '      const [subTab, setSubTab] = useState(\'tournaments\');\n      return ('
+new2 = """      const [subTab, setSubTab] = useState('tournaments');
+
+      // ===== X SHARE =====
+      const [showShareModal, setShowShareModal] = useState(false);
+      const [shareImgUrl, setShareImgUrl] = useState(null);
+      const [tData, setTData] = useState({ results: [] });
+      const [rData, setRData] = useState({ sessions: [] });
+
+      useEffect(() => {
+        api('/api/tournaments').then(d => setTData(d || { results: [] })).catch(() => {});
+        api('/api/ringgames').then(d => setRData(d || { sessions: [] })).catch(() => {});
+      }, []);
+
+      const shareNow = new Date();
+      const shareYear = shareNow.getFullYear();
+      const shareMon = shareNow.getMonth() + 1;
+
+      const tTop3 = React.useMemo(() => {
+        const filtered = (tData.results || []).filter(r => {
+          const d = new Date(r.date);
+          return d.getFullYear() === shareYear && d.getMonth() + 1 === shareMon;
+        });
+        const pm = {};
+        filtered.forEach(ev => {
+          (ev.results || []).forEach(res => {
+            const k = res.playerId || ('__' + res.playerName);
+            if (!pm[k]) pm[k] = { ...res, totalPoints: 0, wins: 0, details: [] };
+            pm[k].totalPoints += (res.points || 0);
+            if ((res.points || 0) > 0) pm[k].wins++;
+            pm[k].details.push(res);
+          });
+        });
+        return Object.values(pm)
+          .filter(p => p.totalPoints > 0 || p.wins > 0)
+          .sort((a, b) => {
+            if (b.totalPoints !== a.totalPoints) return b.totalPoints - a.totalPoints;
+            if (b.wins !== a.wins) return b.wins - a.wins;
+            const rA = a.details.length > 0 ? a.wins / a.details.length : 0;
+            const rB = b.details.length > 0 ? b.wins / b.details.length : 0;
+            return rB - rA;
+          })
+          .slice(0, 3);
+      }, [tData, shareYear, shareMon]);
+
+      const rTop3 = React.useMemo(() => {
+        const flat = (rData.sessions || []).flatMap(sess =>
+          (sess.players || []).map(p => ({ ...p, date: sess.date }))
+        );
+        const filtered = flat.filter(sv => {
+          const d = new Date(sv.date);
+          return d.getFullYear() === shareYear && d.getMonth() + 1 === shareMon;
+        });
+        const pm = {};
+        filtered.forEach(sv => {
+          const k = sv.playerId || ('__' + sv.playerName);
+          if (!pm[k]) pm[k] = { playerId: sv.playerId || null, playerName: sv.playerName, totalChips: 0, positiveChips: 0 };
+          pm[k].totalChips += (sv.netChips || 0);
+          if (sv.netChips > 0) pm[k].positiveChips += sv.netChips;
+        });
+        return Object.values(pm)
+          .filter(p => p.totalChips !== 0 || p.positiveChips > 0)
+          .sort((a, b) => b.positiveChips - a.positiveChips)
+          .slice(0, 3);
+      }, [rData, shareYear, shareMon]);
+
+      const doShare = () => {
+        const W = 1080, H = 680;
+        const canvas = document.createElement('canvas');
+        canvas.width = W; canvas.height = H;
+        const ctx = canvas.getContext('2d');
+        if (!ctx.roundRect) ctx.roundRect = function(x, y, w, h, r) { this.rect(x, y, w, h); };
+
+        // Background
+        ctx.fillStyle = '#0b0b18';
+        ctx.fillRect(0, 0, W, H);
+
+        // Header bar
+        ctx.fillStyle = '#C3181F';
+        ctx.fillRect(0, 0, W, 90);
+
+        // 9HIGH logo text
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 50px sans-serif';
+        ctx.textAlign = 'left';
+        ctx.fillText('9HIGH', 34, 62);
+
+        // Subtitle
+        ctx.font = '18px sans-serif';
+        ctx.fillStyle = 'rgba(255,255,255,0.88)';
+        ctx.fillText('Sendai Leaders Board', 170, 42);
+
+        // Date
+        const now = new Date();
+        const mm = now.getMonth() + 1;
+        const dd = now.getDate();
+        ctx.font = '15px sans-serif';
+        ctx.fillStyle = 'rgba(255,255,255,0.68)';
+        ctx.fillText(shareYear + '\\u5e74' + shareMon + '\\u6708' + dd + '\\u65e5\\u6642\\u70b9', 170, 68);
+
+        // Panel backgrounds
+        ctx.fillStyle = '#10101f';
+        ctx.fillRect(0, 90, 540, H - 90);
+        ctx.fillStyle = '#0c0c1a';
+        ctx.fillRect(540, 90, 540, H - 90);
+
+        // Vertical divider
+        ctx.strokeStyle = '#2a2a44';
+        ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(540, 90); ctx.lineTo(540, H); ctx.stroke();
+
+        // Section titles
+        ctx.font = 'bold 20px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillStyle = '#d4a017';
+        ctx.fillText('\\u30c8\\u30fc\\u30ca\\u30e1\\u30f3\\u30c8', 270, 128);
+        ctx.fillStyle = '#00c8e0';
+        ctx.fillText('\\u30ea\\u30f3\\u30b0\\u30b2\\u30fc\\u30e0', 810, 128);
+
+        // Player name helper
+        const gname = (p) => {
+          const pl = players.find(x => x.id === p.playerId) || {};
+          const nm = pl.nickname || p.playerName || '-';
+          ctx.font = 'bold 18px sans-serif';
+          if (ctx.measureText(nm).width <= 110) return nm;
+          let t = nm;
+          while (t.length > 1 && ctx.measureText(t + '\\u2026').width > 110) t = t.slice(0, -1);
+          return t + '\\u2026';
+        };
+
+        const drawCard = (cx, cy, rankLabel, color, name, scoreStr) => {
+          ctx.beginPath();
+          ctx.arc(cx, cy - 46, 24, 0, Math.PI * 2);
+          ctx.fillStyle = color; ctx.fill();
+          ctx.fillStyle = '#000';
+          ctx.font = 'bold 14px sans-serif';
+          ctx.textAlign = 'center';
+          ctx.fillText(rankLabel, cx, cy - 40);
+          ctx.beginPath();
+          ctx.roundRect(cx - 74, cy - 18, 148, 118, 8);
+          ctx.fillStyle = color + '22'; ctx.fill();
+          ctx.strokeStyle = color; ctx.lineWidth = 1.5; ctx.stroke();
+          ctx.fillStyle = '#ffffff';
+          ctx.font = 'bold 18px sans-serif';
+          ctx.textAlign = 'center';
+          ctx.fillText(name, cx, cy + 24);
+          ctx.fillStyle = color;
+          ctx.font = 'bold 15px sans-serif';
+          ctx.fillText(scoreStr, cx, cy + 54);
+        };
+
+        const drawPodium = (top3, baseX, isRing) => {
+          const medals = ['#d4a017', '#a8a8c0', '#b87333'];
+          const labels = ['1st', '2nd', '3rd'];
+          const slots = [
+            { pi: 1, cx: baseX + 108, cy: 372 },
+            { pi: 0, cx: baseX + 270, cy: 322 },
+            { pi: 2, cx: baseX + 432, cy: 392 }
+          ];
+          slots.forEach(({ pi, cx, cy }) => {
+            const p = top3[pi];
+            if (!p) return;
+            const scoreStr = isRing
+              ? '+' + p.positiveChips.toLocaleString('ja-JP')
+              : p.totalPoints.toLocaleString('ja-JP') + 'pt';
+            drawCard(cx, cy, labels[pi], medals[pi], gname(p), scoreStr);
+          });
+        };
+
+        drawPodium(tTop3, 0, false);
+        drawPodium(rTop3, 540, true);
+
+        // Footer
+        ctx.fillStyle = '#070710';
+        ctx.fillRect(0, 636, W, 44);
+        ctx.fillStyle = '#44445a';
+        ctx.font = '15px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('https://9high.net/leaderboard/', W / 2, 663);
+
+        setShareImgUrl(canvas.toDataURL('image/png'));
+        setShowShareModal(true);
+      };
+      // ===== END X SHARE =====
+
+      return ("""
+
+n2 = s.count(old2)
+s = s.replace(old2, new2)
+print('2 state+fns:', n2)
+
+# 3. Add modal + share button to LeaderboardSection return
+old3 = ('        <div>\n'
+        '          <div className="admin-nav">\n'
+        '            {[\n'
+        '              { id: \'tournaments\', label: \'トーナメント結果\' },\n'
+        '              { id: \'ringgames\', label: \'リングゲーム\' },\n'
+        '              { id: \'import\', label: \'データ取込\' },\n'
+        '              { id: \'settings\', label: \'設定\' }\n'
+        '            ].map(tab => (\n'
+        '              <button key={tab.id}\n'
+        '                className={`admin-nav-item ${subTab === tab.id ? \'active\' : \'\'}`}\n'
+        '                onClick={() => setSubTab(tab.id)}>\n'
+        '                {tab.label}\n'
+        '              </button>\n'
+        '            ))}\n'
+        '          </div>\n'
+        '          {subTab === \'tournaments\' && <TournamentResultsTab')
+
+new3 = ('        <div>\n'
+        '          {showShareModal && (\n'
+        '            <div className="lb-share-overlay" onClick={() => setShowShareModal(false)}>\n'
+        '              <div className="lb-share-dialog" onClick={e => e.stopPropagation()}>\n'
+        '                <div style={{display:\'flex\',justifyContent:\'space-between\',alignItems:\'center\',marginBottom:12}}>\n'
+        '                  <span style={{fontWeight:700,fontSize:16}}>\U0001d54f にポスト</span>\n'
+        '                  <button onClick={() => setShowShareModal(false)} style={{background:\'none\',border:\'none\',fontSize:22,cursor:\'pointer\',color:\'#888\',lineHeight:1}}>×</button>\n'
+        '                </div>\n'
+        '                {shareImgUrl && <img src={shareImgUrl} alt="ranking" />}\n'
+        '                <p className="lb-share-hint">①画像をダウンロード　②Xに投稿ボタンで投稿画面へ　③画像を添付</p>\n'
+        '                <div className="lb-share-actions">\n'
+        '                  {shareImgUrl && (\n'
+        '                    <a className="lb-share-dl" href={shareImgUrl} download="9high-ranking.png">画像をダウンロード</a>\n'
+        '                  )}\n'
+        '                  <button className="lb-share-post" onClick={() => {\n'
+        '                    const now = new Date();\n'
+        '                    const txt = (now.getMonth()+1) + \'月\' + now.getDate() + \'日時点のランキングボードが更新されました！！\\n\\n#仙台ポーカー\\n#9High仙台\\n\\nランキング詳細は↓\\nhttps://9high.net/leaderboard/\';\n'
+        '                    window.open(\'https://twitter.com/intent/tweet?text=\' + encodeURIComponent(txt), \'_blank\');\n'
+        '                  }}>\U0001d54f に投稿</button>\n'
+        '                </div>\n'
+        '              </div>\n'
+        '            </div>\n'
+        '          )}\n'
+        '          <div style={{display:\'flex\',justifyContent:\'space-between\',alignItems:\'center\',marginBottom:4}}>\n'
+        '            <div className="admin-nav" style={{flex:1,marginBottom:0}}>\n'
+        '              {[\n'
+        '                { id: \'tournaments\', label: \'トーナメント結果\' },\n'
+        '                { id: \'ringgames\', label: \'リングゲーム\' },\n'
+        '                { id: \'import\', label: \'データ取込\' },\n'
+        '                { id: \'settings\', label: \'設定\' }\n'
+        '              ].map(tab => (\n'
+        '                <button key={tab.id}\n'
+        '                  className={`admin-nav-item ${subTab === tab.id ? \'active\' : \'\'}`}\n'
+        '                  onClick={() => setSubTab(tab.id)}>\n'
+        '                  {tab.label}\n'
+        '                </button>\n'
+        '              ))}\n'
+        '            </div>\n'
+        '            <button className="lb-share-btn" onClick={doShare}>\U0001d54f ランキングをポスト</button>\n'
+        '          </div>\n'
+        '          {subTab === \'tournaments\' && <TournamentResultsTab')
+
+n3 = s.count(old3)
+s = s.replace(old3, new3)
+print('3 JSX:', n3)
+
+open(f, 'w', encoding='utf-8').write(s)
+print('saved')
+
+r = subprocess.run(['systemctl', 'restart', 'leaderboard'], capture_output=True, text=True)
+time.sleep(3)
+r2 = subprocess.run(['systemctl', 'is-active', 'leaderboard'], capture_output=True, text=True)
+print('service:', r2.stdout.strip())
