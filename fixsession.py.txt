@@ -1,0 +1,37 @@
+import subprocess, time
+
+f = '/var/www/leaderboard/app.py'
+s = open(f).read()
+
+# 1. secret_key を固定化（ファイルに保存して再起動後も維持）+ セッション有効期限30日
+old1 = "app.secret_key = secrets.token_hex(32)"
+new1 = ("# 再起動後もセッションを維持するため固定キーをファイルに保存\n"
+        "import os as _os\n"
+        "_KEY_FILE = _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), 'secret_key.txt')\n"
+        "if _os.path.exists(_KEY_FILE):\n"
+        "    app.secret_key = open(_KEY_FILE).read().strip()\n"
+        "else:\n"
+        "    _k = secrets.token_hex(32)\n"
+        "    open(_KEY_FILE, 'w').write(_k)\n"
+        "    app.secret_key = _k\n"
+        "app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=30)")
+
+n1 = s.count(old1)
+s = s.replace(old1, new1)
+print('1 secret_key:', n1)
+
+# 2. ログイン時に session.permanent = True を追加
+old2 = "    session['authenticated'] = True\n    session['email'] = user['email']\n    session['role'] = user['role']"
+new2 = "    session.permanent = True\n    session['authenticated'] = True\n    session['email'] = user['email']\n    session['role'] = user['role']"
+
+n2 = s.count(old2)
+s = s.replace(old2, new2)
+print('2 session.permanent:', n2)
+
+open(f, 'w').write(s)
+print('app.py saved')
+
+r = subprocess.run(['systemctl','restart','leaderboard'], capture_output=True, text=True)
+time.sleep(3)
+r2 = subprocess.run(['systemctl','is-active','leaderboard'], capture_output=True, text=True)
+print('service:', r2.stdout.strip())
