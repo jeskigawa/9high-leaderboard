@@ -1,0 +1,101 @@
+import subprocess, sys
+
+print('=== NGINX SITES-ENABLED ===')
+r = subprocess.run(['ls', '-la', '/etc/nginx/sites-enabled'], capture_output=True, text=True)
+print(r.stdout)
+
+# Find config containing leaderboard or 5000
+leaderboard_file = None
+leaderboard_cfg = None
+
+for base in ['/etc/nginx/sites-enabled', '/etc/nginx/sites-available']:
+    r = subprocess.run(['ls', base], capture_output=True, text=True)
+    for name in r.stdout.strip().split('\n'):
+        name = name.strip()
+        if not name:
+            continue
+        path = base + '/' + name
+        try:
+            s = open(path).read()
+            if 'leaderboard' in s or '127.0.0.1:5000' in s:
+                leaderboard_file = path
+                leaderboard_cfg = s
+                print('=== CONFIG FILE:', path, '===')
+                print(s)
+                print('=== END CONFIG ===')
+                break
+        except Exception as e:
+            print('skip', path, e)
+    if leaderboard_file:
+        break
+
+if not leaderboard_file:
+    print('ERROR: leaderboard nginx config not found')
+    sys.exit(1)
+
+# Add /leaderboard-pub if missing
+if '/leaderboard-pub' in leaderboard_cfg:
+    print('leaderboard-pub already in nginx config - no change needed')
+else:
+    print('Adding /leaderboard-pub to nginx...')
+
+    # Find the leaderboard location block
+    idx = leaderboard_cfg.find('location /leaderboard')
+    if idx == -1:
+        idx = leaderboard_cfg.find('location ~ /leaderboard')
+    if idx == -1:
+        idx = leaderboard_cfg.find('proxy_pass')
+
+    if idx == -1:
+        print('ERROR: Cannot find leaderboard location block')
+        print('Full config:')
+        print(leaderboard_cfg)
+        sys.exit(1)
+
+    # Find the opening { and matching }
+    brace_start = leaderboard_cfg.find('{', idx)
+    depth = 0
+    brace_end = brace_start
+    for i in range(brace_start, len(leaderboard_cfg)):
+        if leaderboard_cfg[i] == '{':
+            depth += 1
+        elif leaderboard_cfg[i] == '}':
+            depth -= 1
+            if depth == 0:
+                brace_end = i + 1
+                break
+
+    lb_block = leaderboard_cfg[idx:brace_end]
+    print('Found block:')
+    print(repr(lb_block))
+
+    # Create pub block by replacing path
+    pub_block = lb_block
+    if 'location /leaderboard {' in pub_block:
+        pub_block = pub_block.replace('location /leaderboard {', 'location /leaderboard-pub {', 1)
+    elif 'location /leaderboard/ {' in pub_block:
+        pub_block = pub_block.replace('location /leaderboard/ {', 'location /leaderboard-pub {', 1)
+    else:
+        # Generic: replace first occurrence of location line
+        lines = lb_block.split('\n')
+        lines[0] = '    location /leaderboard-pub {'
+        pub_block = '\n'.join(lines)
+
+    new_cfg = leaderboard_cfg[:brace_end] + '\n\n' + pub_block + leaderboard_cfg[brace_end:]
+
+    open(leaderboard_file, 'w').write(new_cfg)
+    print('Written new config')
+
+    # Test
+    r = subprocess.run(['nginx', '-t'], capture_output=True, text=True)
+    print('nginx -t returncode:', r.returncode)
+    print(r.stdout + r.stderr)
+
+    if r.returncode == 0:
+        subprocess.run(['systemctl', 'reload', 'nginx'], capture_output=True)
+        print('=== nginx reloaded OK ===')
+        print('https://9high.net/leaderboard-pub should now work')
+    else:
+        # Restore
+        open(leaderboard_file, 'w').write(leaderboard_cfg)
+        print('ERROR: nginx -t failed, restored original - manual fix needed')
