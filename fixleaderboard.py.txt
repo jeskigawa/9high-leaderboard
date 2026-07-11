@@ -1,0 +1,61 @@
+import subprocess, time, re
+
+# Diagnose
+print('=== STATUS ===')
+r = subprocess.run(['systemctl', 'is-active', 'leaderboard'], capture_output=True, text=True)
+print('active:', r.stdout.strip())
+
+r2 = subprocess.run(['journalctl', '-u', 'leaderboard', '--no-pager', '-n', '30'], capture_output=True, text=True)
+print('=== LOGS ===')
+print(r2.stdout[-2500:])
+
+# Fix app.py - duplicate route causes Flask startup failure
+print('=== APP.PY ===')
+fa = '/var/www/leaderboard/app.py'
+sa = open(fa).read()
+
+pub = "\n\n@app.route('/leaderboard-pub')\ndef leaderboard_pub_page():\n    return send_from_directory('.', 'leaderboard-pub.html')"
+cnt = sa.count(pub)
+print('pub route occurrences:', cnt)
+
+if cnt > 1:
+    # Remove duplicates, keep the first one
+    first = sa.find(pub)
+    sa = sa[:first + len(pub)] + sa[first + len(pub):].replace(pub, '')
+    open(fa, 'w').write(sa)
+    print('removed', cnt - 1, 'duplicate(s) from app.py')
+elif cnt == 0:
+    print('route not in app.py yet - adding now')
+    anchor = ("@app.route('/leaderboard')\n"
+              "def public_leaderboard():\n"
+              "    return send_from_directory('.', '9high-leaderboard.html')")
+    if anchor in sa:
+        sa2 = sa.replace(anchor, anchor + pub)
+        open(fa, 'w').write(sa2)
+        print('route added OK')
+    else:
+        print('ERROR: anchor not found')
+        print('routes found:', re.findall(r"@app\.route\('[^']+'\)", sa))
+else:
+    print('route count = 1, app.py looks fine')
+
+# Syntax check
+try:
+    compile(open(fa).read(), fa, 'exec')
+    print('app.py syntax: OK')
+except SyntaxError as e:
+    print('app.py SYNTAX ERROR:', e)
+
+# Confirm 9high-leaderboard.html is intact
+fh = '/var/www/leaderboard/9high-leaderboard.html'
+sh = open(fh, encoding='utf-8').read()
+print('9high-leaderboard.html size:', len(sh))
+
+# Restart
+print('=== RESTART ===')
+subprocess.run(['systemctl', 'restart', 'leaderboard'], capture_output=True, text=True)
+time.sleep(3)
+r = subprocess.run(['systemctl', 'is-active', 'leaderboard'], capture_output=True, text=True)
+print('service:', r.stdout.strip())
+r2 = subprocess.run(['journalctl', '-u', 'leaderboard', '--no-pager', '-n', '10'], capture_output=True, text=True)
+print(r2.stdout[-1000:])
