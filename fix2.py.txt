@@ -1,0 +1,109 @@
+import subprocess, time
+
+fh = '/var/www/leaderboard/9high-leaderboard.html'
+s = open(fh, encoding='utf-8').read()
+
+print('=== 現在の状態 ===')
+for kw in ['doShare', 'showShareModal', 'shareImgUrl', 'share-btn']:
+    cnt = s.count(kw)
+    if cnt:
+        idx = s.find(kw)
+        ctx = s[max(0,idx-50):idx+70].replace('\n','\\n')
+        print(kw + ':', cnt, '->', ctx[:100])
+    else:
+        print(kw + ': 0')
+
+changed = False
+
+# FIX 1: onClick={doShare} を削除
+if 'onClick={doShare}' in s:
+    s = s.replace(' onClick={doShare}', '')
+    print('fix1: doShare onClick 削除')
+    changed = True
+
+# FIX 2: {showShareModal && (...)} ブロックを括弧カウントで削除
+while '{showShareModal' in s:
+    i1 = s.find('{showShareModal')
+    depth = 0
+    end = -1
+    for j in range(i1, min(i1 + 8000, len(s))):
+        if s[j] == '{':
+            depth += 1
+        elif s[j] == '}':
+            depth -= 1
+            if depth == 0:
+                end = j + 1
+                break
+    if end == -1:
+        print('fix2: showShareModal ブロック終端が見つかりません')
+        break
+    print('fix2: showShareModal ブロック削除 (%d文字)' % (end - i1))
+    s = s[:i1] + s[end:]
+    changed = True
+
+# FIX 3: share-btn ボタンを削除
+for cls in ['share-btn', 'lb-share-btn']:
+    while 'className="' + cls + '"' in s:
+        i_cls = s.find('className="' + cls + '"')
+        i_start = s.rfind('<button', 0, i_cls)
+        i_end = s.find('</button>', i_cls)
+        if i_start != -1 and i_end != -1:
+            print('fix3: %s ボタン削除' % cls)
+            s = s[:i_start] + s[i_end + 9:]
+            changed = True
+        else:
+            break
+
+# FIX 4: state宣言行を削除
+for state in [
+    "const [showShareModal, setShowShareModal] = useState(false);",
+    "const [shareImgUrl, setShareImgUrl] = useState(null);",
+    "const [shareTxt, setShareTxt] = useState('');"
+]:
+    if state in s:
+        idx = s.find(state)
+        line_start = s.rfind('\n', 0, idx) + 1
+        line_end = s.find('\n', idx)
+        if line_end == -1:
+            line_end = len(s)
+        s = s[:line_start] + s[line_end + 1:]
+        print('fix4: state削除:', state[:40])
+        changed = True
+
+if changed:
+    open(fh, 'w', encoding='utf-8').write(s)
+    print('=== ファイル保存完了 ===')
+else:
+    print('=== 変更なし（対象なし）===')
+
+print('=== 修正後 ===')
+for kw in ['doShare', 'showShareModal', 'shareImgUrl']:
+    print(kw + ':', s.count(kw))
+
+# Nginx確認
+print('=== NGINX ===')
+for base in ['/etc/nginx/sites-enabled']:
+    r = subprocess.run(['ls', base], capture_output=True, text=True)
+    for name in r.stdout.strip().split('\n'):
+        name = name.strip()
+        if not name:
+            continue
+        path = base + '/' + name
+        try:
+            cfg = open(path).read()
+            if '5000' in cfg or 'leaderboard' in cfg.lower():
+                print('設定ファイル:', path)
+                for line in cfg.split('\n'):
+                    line = line.strip()
+                    if line and ('location' in line or 'proxy_pass' in line):
+                        print(' ', line)
+        except Exception as e:
+            print('skip', e)
+
+# サービス再起動
+subprocess.run(['systemctl', 'restart', 'leaderboard'], capture_output=True)
+time.sleep(3)
+r = subprocess.run(['systemctl', 'is-active', 'leaderboard'], capture_output=True, text=True)
+print('service:', r.stdout.strip())
+r2 = subprocess.run(['journalctl', '-u', 'leaderboard', '--no-pager', '-n', '8'], capture_output=True, text=True)
+print(r2.stdout[-800:])
