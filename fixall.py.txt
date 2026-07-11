@@ -1,0 +1,62 @@
+import subprocess, re, os, time, shutil
+
+print('=== FILES IN /var/www/leaderboard ===')
+files = os.listdir('/var/www/leaderboard')
+print(sorted(files))
+
+print('=== FLASK ROUTES ===')
+fa = '/var/www/leaderboard/app.py'
+sa = open(fa).read()
+print(re.findall(r"@app\.route\([^)]+\)", sa))
+
+print('=== FLASK DIRECT HTTP TEST ===')
+for p in ['/', '/leaderboard', '/leaderboard/', '/leaderboard-pub']:
+    r = subprocess.run(['curl', '-s', '-o', '/dev/null', '-w', '%{http_code}',
+                        'http://127.0.0.1:5000' + p], capture_output=True, text=True)
+    print(p, '->', r.stdout)
+
+print('=== NGINX CONFIGS WITH LEADERBOARD ===')
+r = subprocess.run(['grep', '-rl', 'leaderboard', '/etc/nginx'], capture_output=True, text=True)
+for nf in [f.strip() for f in r.stdout.strip().split('\n') if f.strip()]:
+    print('--- ' + nf + ' ---')
+    print(open(nf).read())
+
+print('=== FIX 1: strict_slashes=False on /leaderboard ===')
+sa2 = sa
+n1 = sa2.count("@app.route('/leaderboard')\n")
+sa2 = sa2.replace("@app.route('/leaderboard')\n",
+                  "@app.route('/leaderboard', strict_slashes=False)\n")
+print('/leaderboard fix:', n1)
+n2 = sa2.count("@app.route('/leaderboard-pub')\n")
+sa2 = sa2.replace("@app.route('/leaderboard-pub')\n",
+                  "@app.route('/leaderboard-pub', strict_slashes=False)\n")
+print('/leaderboard-pub fix:', n2)
+open(fa, 'w').write(sa2)
+
+print('=== FIX 2: ensure leaderboard-pub.html exists ===')
+if 'leaderboard-pub.html' not in files:
+    try:
+        shutil.copy('/tmp/r/leaderboard-pub.html', '/var/www/leaderboard/leaderboard-pub.html')
+        print('copied OK')
+    except Exception as e:
+        print('ERROR:', e)
+else:
+    size = os.path.getsize('/var/www/leaderboard/leaderboard-pub.html')
+    print('already exists, size:', size)
+
+print('=== RESTART FLASK ===')
+subprocess.run(['systemctl', 'restart', 'leaderboard'], capture_output=True)
+time.sleep(3)
+r = subprocess.run(['systemctl', 'is-active', 'leaderboard'], capture_output=True, text=True)
+print('service:', r.stdout.strip())
+
+print('=== TEST AFTER FIX ===')
+for p in ['/leaderboard', '/leaderboard/', '/leaderboard-pub']:
+    r = subprocess.run(['curl', '-s', '-o', '/dev/null', '-w', '%{http_code}',
+                        'http://127.0.0.1:5000' + p], capture_output=True, text=True)
+    print(p, '->', r.stdout)
+
+print('=== CONTENT CHECK /leaderboard-pub ===')
+r = subprocess.run(['curl', '-s', 'http://127.0.0.1:5000/leaderboard-pub'],
+                   capture_output=True, text=True)
+print('first 80 chars:', repr(r.stdout[:80]))
