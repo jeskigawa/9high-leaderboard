@@ -1,0 +1,38 @@
+import subprocess, time
+
+f = '/var/www/leaderboard/app.py'
+s = open(f).read()
+
+# 1. secret_key: try/exceptで安全に固定化 + セッション30日有効
+old1 = 'app.secret_key = secrets.token_hex(32)'
+new1 = """_sk_path = '/var/www/leaderboard/secret_key.txt'
+try:
+    _sk = open(_sk_path).read().strip()
+    assert len(_sk) > 10
+except Exception:
+    _sk = secrets.token_hex(32)
+    open(_sk_path, 'w').write(_sk)
+app.secret_key = _sk
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=30)"""
+
+n1 = s.count(old1)
+s = s.replace(old1, new1)
+print('1 secret_key:', n1)
+
+# 2. ログイン時にsession.permanentをTrueに（未設定の場合のみ）
+if 'session.permanent = True' not in s:
+    old2 = "    session['authenticated'] = True\n    session['email'] = user['email']\n    session['role'] = user['role']"
+    new2 = "    session.permanent = True\n    session['authenticated'] = True\n    session['email'] = user['email']\n    session['role'] = user['role']"
+    n2 = s.count(old2)
+    s = s.replace(old2, new2)
+    print('2 session.permanent:', n2)
+else:
+    print('2 session.permanent: already set')
+
+open(f, 'w').write(s)
+print('saved')
+
+r = subprocess.run(['systemctl','restart','leaderboard'], capture_output=True, text=True)
+time.sleep(3)
+r2 = subprocess.run(['systemctl','is-active','leaderboard'], capture_output=True, text=True)
+print('service:', r2.stdout.strip())
