@@ -1,0 +1,18 @@
+import subprocess, shutil, time, os
+
+src = '/tmp/r/9high-leaderboard.html'
+dst = '/var/www/leaderboard/9high-leaderboard.html'
+
+print('src size:', os.path.getsize(src), 'bytes')
+print('dst size (broken):', os.path.getsize(dst), 'bytes')
+
+shutil.copy(src, dst)
+print('COPIED')
+print('dst size (restored):', os.path.getsize(dst), 'bytes')
+
+subprocess.run(['systemctl', 'restart', 'leaderboard'], capture_output=True)
+time.sleep(3)
+r = subprocess.run(['systemctl', 'is-active', 'leaderboard'], capture_output=True, text=True)
+print('service:', r.stdout.strip())
+print('=== 完了 ===')
+print('https://9high.net/leaderboard/ を確認してください')
