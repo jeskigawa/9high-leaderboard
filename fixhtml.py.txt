@@ -1,0 +1,43 @@
+import subprocess, time
+
+fh = '/var/www/leaderboard/9high-leaderboard.html'
+s = open(fh, encoding='utf-8').read()
+
+print('doShare count:', s.count('doShare'))
+print('showShareModal count:', s.count('showShareModal'))
+print('shareImgUrl count:', s.count('shareImgUrl'))
+print('share-btn count:', s.count('share-btn'))
+
+# doShare の前後を表示（原因確認）
+idx = s.find('doShare')
+if idx != -1:
+    print('doShare context:', repr(s[max(0,idx-120):idx+120]))
+
+# 1. share-btn ボタンを削除（doShare参照）
+old_btn = '\n              <button className="share-btn" onClick={doShare}>\U0001d54f ポスト</button>'
+n1 = s.count(old_btn)
+s = s.replace(old_btn, '')
+print('1 share-btn removed:', n1)
+
+# 2. showShareModal モーダルブロックを削除
+i1 = s.find('          {showShareModal && (')
+i2 = s.find('          )}\n          <div className="header">', i1) if i1 != -1 else -1
+if i1 != -1 and i2 != -1:
+    s = s[:i1] + '          <div className="header">'
+    print('2 modal removed')
+else:
+    print('2 modal not found i1=%d i2=%d' % (i1, i2))
+
+# 3. 残った onClick={doShare} を削除
+if 'doShare' in s:
+    before = s.count('doShare')
+    s = s.replace(' onClick={doShare}', '')
+    print('3 remaining doShare removed:', before)
+
+open(fh, 'w', encoding='utf-8').write(s)
+print('saved. doShare left:', s.count('doShare'), 'showShareModal left:', s.count('showShareModal'))
+
+subprocess.run(['systemctl', 'restart', 'leaderboard'], capture_output=True)
+time.sleep(3)
+r = subprocess.run(['systemctl', 'is-active', 'leaderboard'], capture_output=True, text=True)
+print('service:', r.stdout.strip())

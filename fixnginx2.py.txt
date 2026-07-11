@@ -1,0 +1,58 @@
+import subprocess
+
+# Nginxのleaderboard設定を確認・修正
+print('=== NGINX SITES-ENABLED ===')
+r = subprocess.run(['ls', '-la', '/etc/nginx/sites-enabled'], capture_output=True, text=True)
+print(r.stdout)
+
+# Find leaderboard config
+cfg_file = None
+cfg_text = None
+
+for base in ['/etc/nginx/sites-enabled', '/etc/nginx/sites-available']:
+    r = subprocess.run(['ls', base], capture_output=True, text=True)
+    for name in r.stdout.strip().split('\n'):
+        name = name.strip()
+        if not name:
+            continue
+        path = base + '/' + name
+        try:
+            s = open(path).read()
+            if '127.0.0.1:5000' in s or 'leaderboard' in s:
+                cfg_file = path
+                cfg_text = s
+                break
+        except:
+            pass
+    if cfg_file:
+        break
+
+if not cfg_file:
+    print('ERROR: leaderboard nginx config not found')
+    import sys; sys.exit(1)
+
+print('=== CONFIG FILE:', cfg_file, '===')
+print(cfg_text)
+print('=== END CONFIG ===')
+
+# /leaderboard location ブロックの確認
+if 'location /leaderboard' not in cfg_text and 'location ~ /leaderboard' not in cfg_text:
+    print('WARNING: /leaderboard location block NOT FOUND in nginx config!')
+    print('This is why https://9high.net/leaderboard/ is not working.')
+    print('Nginx is serving WordPress instead of Flask.')
+    print('')
+    print('Current proxy_pass targets:')
+    for line in cfg_text.split('\n'):
+        if 'proxy_pass' in line or 'location' in line:
+            print(' ', line.strip())
+else:
+    print('OK: /leaderboard location block found')
+    for line in cfg_text.split('\n'):
+        if 'location' in line or 'proxy_pass' in line:
+            print(' ', line.strip())
+
+# nginx test
+print('')
+r = subprocess.run(['nginx', '-t'], capture_output=True, text=True)
+print('nginx -t:', r.returncode)
+print(r.stdout + r.stderr)
