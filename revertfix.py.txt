@@ -1,0 +1,26 @@
+import subprocess, time
+
+f = '/var/www/leaderboard/app.py'
+s = open(f).read()
+
+# Flaskアプリ初期化行とCONFIG行の間にある壊れたブロックを元に戻す
+anchor_start = "app = Flask(__name__, static_folder='static')\n"
+anchor_end = "\n# ==================== CONFIG ===================="
+
+i1 = s.find(anchor_start)
+i2 = s.find(anchor_end, i1)
+
+if i1 != -1 and i2 != -1:
+    current = s[i1+len(anchor_start):i2]
+    print('現在のブロック:', repr(current))
+    # シンプルな1行に戻す
+    s = s[:i1+len(anchor_start)] + "app.secret_key = secrets.token_hex(32)" + s[i2:]
+    open(f, 'w').write(s)
+    print('revert OK')
+else:
+    print('アンカーが見つかりません i1=%d i2=%d' % (i1, i2))
+
+r = subprocess.run(['systemctl','restart','leaderboard'], capture_output=True, text=True)
+time.sleep(3)
+r2 = subprocess.run(['systemctl','is-active','leaderboard'], capture_output=True, text=True)
+print('service:', r2.stdout.strip())
