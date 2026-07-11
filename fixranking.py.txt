@@ -1,0 +1,26 @@
+import subprocess, time
+
+f = '/var/www/leaderboard/9high-leaderboard.html'
+s = open(f).read()
+
+# 同点時: 入賞回数 → 入賞確率 の順でソート
+old = "          .sort((a, b) => b.totalPoints - a.totalPoints)"
+new = ("          .sort((a, b) => {\n"
+       "            if (b.totalPoints !== a.totalPoints) return b.totalPoints - a.totalPoints;\n"
+       "            if (b.wins !== a.wins) return b.wins - a.wins;\n"
+       "            const rA = a.details.length > 0 ? a.wins / a.details.length : 0;\n"
+       "            const rB = b.details.length > 0 ? b.wins / b.details.length : 0;\n"
+       "            return rB - rA;\n"
+       "          })")
+
+n = s.count(old)
+s = s.replace(old, new)
+print('replaced:', n)
+
+open(f, 'w').write(s)
+print('saved')
+
+r = subprocess.run(['systemctl','restart','leaderboard'], capture_output=True, text=True)
+time.sleep(3)
+r2 = subprocess.run(['systemctl','is-active','leaderboard'], capture_output=True, text=True)
+print('service:', r2.stdout.strip())
