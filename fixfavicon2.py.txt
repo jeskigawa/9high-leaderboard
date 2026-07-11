@@ -1,0 +1,115 @@
+import subprocess, os, time
+
+static_dir = '/var/www/leaderboard/static'
+os.makedirs(static_dir, exist_ok=True)
+
+# 1. SVGファビコンを書き込み（9HIGHロゴ）
+svg = '''<?xml version="1.0" encoding="utf-8"?>
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+ x="0px" y="0px" width="500px" height="500px" viewBox="0 0 500 500" enable-background="new 0 0 500 500" xml:space="preserve">
+<path fill="#E60012" d="M224.494,79.059c-20.591-10.958-44.52-16.513-71.119-16.513c-26.242,0-50.085,5.563-70.872,16.537
+c-20.642,10.903-37.186,25.832-49.166,44.373c-11.926,18.451-17.724,38.806-17.724,62.213c0,22.033,5.317,41.396,16.256,59.182
+c10.937,17.815,25.886,32.258,44.435,42.929c16.361,9.409,34.645,14.707,54.366,15.745l28.69,1.506
+c1.639,0.089,2.533,1.957,1.566,3.286L73.171,429.502c-1.652,2.276-0.018,5.478,2.798,5.478h72.404c1.141,0,2.211-0.569,2.858-1.517
+l110.332-162.568c19.632-28.78,29.582-57.453,29.582-85.226c0-23.401-5.796-43.745-17.712-62.205
+C261.42,104.89,244.955,89.952,224.494,79.059 M158.959,257.226c-42.1,3.358-77.112-31.66-73.761-73.753
+c2.64-33.129,29.477-59.965,62.61-62.609c42.093-3.351,77.106,31.661,73.755,73.764C218.922,227.755,192.083,254.59,158.959,257.226"/>
+<path fill="#E60012" d="M478.067,143.983h-64.381c-1.927,0-3.486,1.562-3.486,3.489v109.23c0,1.921-1.568,3.487-3.494,3.487H298.72
+c-1.923,0-3.491-1.566-3.491-3.487v-109.23c0-1.927-1.56-3.489-3.486-3.489h-64.379c-1.926,0-3.489,1.562-3.489,3.489v129.753
+v156.479c0,1.934,1.563,3.486,3.489,3.486h87.386c21.25,0,26.369-15.06,26.369-15.06l0.217-0.672
+c0.695-2.027-0.079-3.561-0.601-4.286c-0.909-1.269-2.385-2.049-3.866-2.049c-0.849,0-1.669,0.236-2.367,0.671
+c-5.428,3.705-11.765,6.899-18.819,6.899c-20.235,0-36.089-16.736-36.089-38.104c0-20.08,13.587-33.294,30.777-50.022
+c11.492-11.173,24.51-23.832,37.371-41.659c1.846-2.483,3.793-3.006,5.102-3.006c1.343,0,3.352,0.557,5.221,3.195
+c12.735,17.773,25.7,30.419,37.138,41.578c17.122,16.688,30.643,29.861,30.643,49.914c0,21.722-15.515,38.104-36.08,38.104
+c-7.058,0-13.395-3.194-18.814-6.899c-0.695-0.435-1.519-0.671-2.375-0.671c-1.481,0-2.957,0.78-3.862,2.049
+c-0.52,0.726-1.292,2.259-0.602,4.286l0.217,0.672c0,0,5.116,15.06,26.367,15.06h9.479h77.894c1.931,0,3.491-1.553,3.491-3.486
+V268.791V147.472C481.559,145.545,479.998,143.983,478.067,143.983"/>
+</svg>'''
+
+svg_path = static_dir + '/favicon.svg'
+with open(svg_path, 'w') as f:
+    f.write(svg)
+print('1: favicon.svg 書き込み完了')
+
+# 2. ホーム画面用PNG（180x180）を生成
+png_path = static_dir + '/apple-touch-icon.png'
+png_ok = False
+
+# cairosvg を試みる
+try:
+    import cairosvg
+    cairosvg.svg2png(url=svg_path, write_to=png_path, output_width=180, output_height=180)
+    print('2: PNG生成完了 (cairosvg)')
+    png_ok = True
+except ImportError:
+    # cairosvgをインストール
+    subprocess.run(['pip', 'install', 'cairosvg', '--break-system-packages', '-q'], capture_output=True)
+    try:
+        import cairosvg
+        cairosvg.svg2png(url=svg_path, write_to=png_path, output_width=180, output_height=180)
+        print('2: PNG生成完了 (cairosvg installed)')
+        png_ok = True
+    except Exception as e:
+        print('cairosvg失敗:', e)
+
+if not png_ok:
+    # Pillowで赤背景+ロゴPNGを生成
+    try:
+        from PIL import Image, ImageDraw
+        size = 180
+        img = Image.new('RGB', (size, size), '#C3181F')
+        d = ImageDraw.Draw(img)
+        # 白丸背景
+        margin = 20
+        d.ellipse([margin, margin, size-margin, size-margin], fill='white')
+        # 赤テキスト "9H"
+        try:
+            from PIL import ImageFont
+            font = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf', 60)
+        except:
+            font = ImageFont.load_default()
+        d.text((44, 55), '9H', fill='#C3181F', font=font)
+        img.save(png_path)
+        print('2: PNG生成完了 (PIL)')
+        png_ok = True
+    except Exception as e:
+        print('PIL失敗:', e)
+
+if not png_ok:
+    # convert (ImageMagick) を試みる
+    r = subprocess.run(['convert', '-background', '#C3181F', '-fill', 'white',
+                        '-size', '180x180', 'xc:#C3181F', png_path],
+                       capture_output=True, text=True)
+    if r.returncode == 0:
+        print('2: PNG生成完了 (ImageMagick)')
+        png_ok = True
+    else:
+        print('2: PNG生成失敗 - SVGのままホーム画面アイコンに使用します')
+
+# 3. 9high-leaderboard.html にリンクタグを追加
+fh = '/var/www/leaderboard/9high-leaderboard.html'
+s = open(fh, encoding='utf-8').read()
+
+if 'rel="icon"' in s:
+    print('3: ファビコンリンクは既に設定済み')
+else:
+    icon_line = '/static/apple-touch-icon.png' if png_ok else '/static/favicon.svg'
+    links = ('  <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">\n'
+             '  <link rel="apple-touch-icon" href="' + icon_line + '">\n'
+             '  <link rel="shortcut icon" href="/static/favicon.svg">')
+    old = '  <title>9HIGH'
+    new = links + '\n  <title>9HIGH'
+    n = s.count(old)
+    if n == 1:
+        s = s.replace(old, new)
+        open(fh, 'w', encoding='utf-8').write(s)
+        print('3: ファビコンリンク追加完了')
+        print('   - favicon: /static/favicon.svg')
+        print('   - apple-touch-icon:', icon_line)
+    else:
+        print('3: ERROR title not found n=%d' % n)
+
+subprocess.run(['systemctl', 'restart', 'leaderboard'], capture_output=True)
+time.sleep(2)
+r = subprocess.run(['systemctl', 'is-active', 'leaderboard'], capture_output=True, text=True)
+print('service:', r.stdout.strip())
