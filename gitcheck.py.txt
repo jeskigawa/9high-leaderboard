@@ -1,0 +1,29 @@
+import subprocess, os
+
+wd = '/var/www/leaderboard'
+fh = wd + '/9high-leaderboard.html'
+
+print('FILE SIZE:', os.path.getsize(fh), 'bytes')
+
+# gitリポジトリか確認
+r = subprocess.run(['git', '-C', wd, 'log', '--oneline', '-10'], capture_output=True, text=True)
+print('=== GIT LOG ===')
+print(r.stdout if r.stdout else 'NOT A GIT REPO: ' + r.stderr[:200])
+
+# バックアップ確認
+for bak in [fh + '.bak', fh + '.orig', '/tmp/9high-leaderboard.html']:
+    if os.path.exists(bak):
+        print('BACKUP:', bak, os.path.getsize(bak), 'bytes')
+    else:
+        print('no backup:', bak)
+
+# gitで復元可能か
+if r.returncode == 0 and r.stdout:
+    r2 = subprocess.run(['git', '-C', wd, 'show', 'HEAD:9high-leaderboard.html'], capture_output=True, text=True)
+    if r2.returncode == 0:
+        print('GIT RESTORE POSSIBLE - lines:', r2.stdout.count('\n'))
+        print('=== RESTORING ===')
+        open(fh, 'w', encoding='utf-8').write(r2.stdout)
+        print('RESTORED FROM GIT')
+    else:
+        print('git show failed:', r2.stderr[:200])
