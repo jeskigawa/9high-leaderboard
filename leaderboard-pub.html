@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>9HIGH 仙台 ランキングボード</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.9/babel.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg-primary: #f5f5f5;
+      --bg-secondary: #ffffff;
+      --bg-hover: #f0f0f0;
+      --text-primary: #1a1a2e;
+      --text-secondary: #555566;
+      --text-muted: #999aaa;
+      --accent: #d4a017;
+      --border: #e0e0e8;
+      --gold: #d4a017;
+      --gold-light: #fff3d0;
+      --gold-border: #d4a017;
+      --silver: #8a8a9a;
+      --silver-light: #f0f0f5;
+      --silver-border: #8a8a9a;
+      --bronze: #b87333;
+      --bronze-light: #faebd7;
+      --bronze-border: #b87333;
+      --positive: #16a34a;
+      --brand: #C3181F;
+      --shadow: 0 2px 12px rgba(0,0,0,0.08);
+      --shadow-lg: 0 4px 24px rgba(0,0,0,0.12);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Noto Sans JP', sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+    }
+    .container { max-width: 540px; margin: 0 auto; padding: 0 16px 24px; }
+
+    /* ===== HEADER ===== */
+    .header {
+      background: var(--brand); padding: 14px 20px;
+      display: flex; align-items: center; gap: 14px;
+      border-radius: 0 0 14px 14px; margin-bottom: 4px;
+    }
+    .header-logo-svg { height: 48px; flex-shrink: 0; }
+    .header-title {
+      font-size: 15px; font-weight: 700; color: rgba(255,255,255,0.95);
+      letter-spacing: 0.5px;
+    }
+
+    /* ===== DATE ROW ===== */
+    .date-row {
+      display: flex; align-items: baseline; justify-content: center;
+      gap: 12px; padding: 16px 0 8px; position: relative;
+    }
+    .date-month {
+      font-size: 26px; font-weight: 800; color: var(--text-primary); text-align: center;
+    }
+    .date-stamp {
+      font-size: 11px; color: var(--text-muted);
+      position: absolute; right: 0; bottom: 10px;
+    }
+
+    /* ===== SECTION ===== */
+    .leaderboard-section { margin-bottom: 24px; }
+    .section-title {
+      font-size: 15px; font-weight: 600; color: var(--accent);
+      margin-bottom: 12px; display: flex; align-items: center; gap: 8px;
+    }
+    .section-title::before {
+      content: ''; display: inline-block; width: 4px; height: 16px;
+      background: var(--accent); border-radius: 2px;
+    }
+
+    /* ===== PODIUM ===== */
+    .podium-container {
+      display: flex; justify-content: center; align-items: flex-end;
+      gap: 8px; padding: 20px 0 24px; margin-bottom: 8px;
+    }
+    .podium-card {
+      display: flex; flex-direction: column; align-items: center;
+      background: var(--bg-secondary); border-radius: 16px;
+      padding: 16px 12px 14px;
+      position: relative; width: 120px;
+      box-shadow: var(--shadow);
+    }
+    .podium-card.podium-1 { border: 2px solid var(--gold-border); padding-top: 28px; min-height: 190px; order: 2; }
+    .podium-card.podium-2 { border: 2px solid var(--silver-border); min-height: 165px; order: 1; }
+    .podium-card.podium-3 { border: 2px solid var(--bronze-border); min-height: 155px; order: 3; }
+
+    .podium-crown {
+      position: absolute; top: -18px; left: 50%; transform: translateX(-50%);
+      font-size: 24px; filter: drop-shadow(0 2px 4px rgba(212,160,23,0.4));
+    }
+    .podium-medal {
+      position: absolute; top: 8px; right: 8px;
+      width: 28px; height: 28px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 800; color: #fff;
+      clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+    }
+    .podium-medal.medal-1 { background: var(--gold); }
+    .podium-medal.medal-2 { background: var(--silver); }
+    .podium-medal.medal-3 { background: var(--bronze); }
+
+    .podium-photo {
+      width: 64px; height: 64px; border-radius: 50%; overflow: hidden;
+      margin-bottom: 8px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      background: var(--bg-hover);
+    }
+    .podium-1 .podium-photo { width: 80px; height: 80px; border: 3px solid var(--gold-border); box-shadow: 0 0 0 4px var(--gold-light); }
+    .podium-2 .podium-photo { border: 3px solid var(--silver-border); box-shadow: 0 0 0 3px var(--silver-light); }
+    .podium-3 .podium-photo { border: 3px solid var(--bronze-border); box-shadow: 0 0 0 3px var(--bronze-light); }
+    .podium-photo img { width: 100%; height: 100%; object-fit: cover; }
+    .podium-photo-placeholder { font-size: 28px; color: var(--text-muted); }
+
+    .podium-name {
+      font-size: 13px; font-weight: 700; text-align: center;
+      margin-bottom: 4px; line-height: 1.3;
+      max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+    .podium-1 .podium-name { color: var(--gold); font-size: 15px; }
+    .podium-2 .podium-name { color: var(--silver); }
+    .podium-3 .podium-name { color: var(--bronze); }
+    .podium-stats { font-size: 12px; color: var(--text-muted); text-align: center; }
+
+    /* ===== MISC ===== */
+    .loading { text-align: center; padding: 60px 20px; color: var(--text-muted); font-size: 15px; }
+    .empty-state { text-align: center; padding: 32px 20px; color: var(--text-muted); }
+    .empty-state-icon { font-size: 36px; margin-bottom: 8px; }
+    .empty-state-text { font-size: 13px; }
+    .pub-footer {
+      text-align: center; padding-top: 16px;
+      color: var(--text-muted); font-size: 11px;
+      border-top: 1px solid var(--border); margin-top: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect, useMemo } = React;
+
+    function getPhotoSrc(info) {
+      if (!info) return null;
+      if (info.photoUrl) return info.photoUrl;
+      if (info.photo) return `/uploads/photos/${info.photo}`;
+      return null;
+    }
+    function formatNumber(n) { return n.toLocaleString('ja-JP'); }
+    function formatChips(n) { return (n > 0 ? '+' : '') + formatNumber(n); }
+
+    // ===== PODIUM =====
+    function Podium({ top3, playersMap, valueFormatter }) {
+      if (!top3 || top3.length === 0) return (
+        <div className="empty-state">
+          <div className="empty-state-icon">📊</div>
+          <div className="empty-state-text">今月のデータがありません</div>
+        </div>
+      );
+
+      const renderCard = (player, idx) => {
+        if (!player) return <div key={idx} className="podium-card" style={{visibility:'hidden', order: idx===0?2:idx===1?1:3}} />;
+        const rank = player.rank;
+        const info = playersMap[player.playerId] || {};
+        const photoSrc = getPhotoSrc(info);
+        return (
+          <div key={player.playerId || player.playerName} className={`podium-card podium-${rank}`}>
+            {rank === 1 && <div className="podium-crown">👑</div>}
+            <div className={`podium-medal medal-${rank}`}>{rank}</div>
+            <div className="podium-photo">
+              {photoSrc
+                ? <img src={photoSrc} alt="" onError={e => { e.target.style.display='none'; }} />
+                : <div className="podium-photo-placeholder">👤</div>}
+            </div>
+            <div className="podium-name">{info.nickname || player.playerName}</div>
+            <div className="podium-stats">{valueFormatter(player)}</div>
+          </div>
+        );
+      };
+
+      return (
+        <div className="podium-container">
+          {[top3[0], top3[1], top3[2]].map((p, i) => renderCard(p, i))}
+        </div>
+      );
+    }
+
+    // ===== APP =====
+    function App() {
+      const [loading, setLoading] = useState(true);
+      const [tourData, setTourData] = useState({ results: [] });
+      const [ringData, setRingData] = useState({ sessions: [] });
+      const [playersMap, setPlayersMap] = useState({});
+
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = now.getMonth() + 1;
+
+      // Timestamp for display
+      const pad = n => String(n).padStart(2, '0');
+      const stamp = `${year}/${pad(month)}/${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}時点`;
+
+      useEffect(() => {
+        Promise.all([
+          fetch('/api/tournaments').then(r => r.json()).catch(() => ({ results: [] })),
+          fetch('/api/ringgames').then(r => r.json()).catch(() => ({ sessions: [] })),
+          fetch('/api/players').then(r => r.json()).catch(() => ({ players: [] }))
+        ]).then(([t, r, p]) => {
+          setTourData(t || { results: [] });
+          setRingData(r || { sessions: [] });
+          const map = {};
+          ((p && p.players) || []).forEach(pl => { map[pl.id] = pl; });
+          setPlayersMap(map);
+          setLoading(false);
+        });
+      }, []);
+
+      // ===== Tournament top3 (current month) =====
+      const tTop3 = useMemo(() => {
+        const filtered = (tourData.results || []).filter(r => {
+          const d = new Date(r.date);
+          return d.getFullYear() === year && d.getMonth() + 1 === month;
+        });
+        const pm = {};
+        filtered.forEach(ev => {
+          (ev.results || []).forEach(res => {
+            const k = res.playerId || ('__' + res.playerName);
+            if (!pm[k]) pm[k] = { ...res, totalPoints: 0, wins: 0, details: [] };
+            pm[k].totalPoints += (res.points || 0);
+            if ((res.points || 0) > 0) pm[k].wins++;
+            pm[k].details.push(res);
+          });
+        });
+        return Object.values(pm)
+          .filter(p => p.totalPoints > 0 || p.wins > 0)
+          .sort((a, b) => {
+            if (b.totalPoints !== a.totalPoints) return b.totalPoints - a.totalPoints;
+            if (b.wins !== a.wins) return b.wins - a.wins;
+            const rA = a.details.length > 0 ? a.wins / a.details.length : 0;
+            const rB = b.details.length > 0 ? b.wins / b.details.length : 0;
+            return rB - rA;
+          })
+          .map((p, i) => ({ ...p, rank: i + 1 }))
+          .slice(0, 3);
+      }, [tourData, year, month]);
+
+      // ===== Ring game top3 (current month) =====
+      const rTop3 = useMemo(() => {
+        const flat = (ringData.sessions || []).flatMap(sess =>
+          (sess.players || []).map(p => ({ ...p, date: sess.date }))
+        );
+        const filtered = flat.filter(s => {
+          const d = new Date(s.date);
+          return d.getFullYear() === year && d.getMonth() + 1 === month;
+        });
+        const pm = {};
+        filtered.forEach(s => {
+          const k = s.playerId || ('__' + s.playerName);
+          if (!pm[k]) pm[k] = { playerId: s.playerId || null, playerName: s.playerName, totalChips: 0, positiveChips: 0 };
+          pm[k].totalChips += (s.netChips || 0);
+          if (s.netChips > 0) pm[k].positiveChips += s.netChips;
+        });
+        return Object.values(pm)
+          .filter(p => p.totalChips !== 0 || p.positiveChips > 0)
+          .sort((a, b) => b.positiveChips - a.positiveChips)
+          .map((p, i) => ({ ...p, rank: i + 1 }))
+          .slice(0, 3);
+      }, [ringData, year, month]);
+
+      return (
+        <div className="container">
+          <div className="header">
+            <svg className="header-logo-svg" viewBox="0 0 368.5 170.08" xmlns="http://www.w3.org/2000/svg">
+              <g>
+                <path fill="white" d="M199.244,21.083c-0.284,0-0.379-0.379-0.521-0.758c-1.612-5.121-5.359-7.587-9.814-7.587c-5.265,0-9.629,4.079-9.629,10.955c0,10.243,12.095,17.878,19.019,28.594c0.282,0.427,0.614,0.665,0.946,0.665s0.665-0.238,0.949-0.665c6.925-10.715,19.016-18.351,19.016-28.594c0-6.875-4.363-10.955-9.625-10.955c-4.459,0-8.206,2.467-9.818,7.587C199.623,20.704,199.531,21.083,199.244,21.083"/>
+                <path fill="white" d="M208.053,69.08h-18.035c-0.556,0-1.006,0.451-1.006,1.005v48.874c0,0.555,0.45,1.005,1.006,1.005h18.035c0.555,0,1.005-0.45,1.005-1.005V70.085C209.058,69.531,208.607,69.08,208.053,69.08"/>
+                <path fill="white" d="M68.896,17.493c-5.928-3.155-12.818-4.754-20.476-4.754c-7.556,0-14.42,1.602-20.405,4.761c-5.943,3.139-10.706,7.437-14.155,12.775c-3.434,5.313-5.103,11.173-5.103,17.912c0,6.344,1.531,11.918,4.68,17.039c3.149,5.129,7.453,9.287,12.793,12.359c4.71,2.709,9.975,4.235,15.652,4.533l8.26,0.434c0.472,0.025,0.729,0.563,0.451,0.946L25.328,118.39c-0.476,0.655-0.005,1.577,0.806,1.577H46.98c0.329,0,0.637-0.164,0.823-0.437l31.766-46.806c5.652-8.286,8.518-16.541,8.518-24.537c0-6.737-1.669-12.595-5.1-17.91C79.527,24.93,74.787,20.629,68.896,17.493 M50.028,68.79c-12.121,0.966-22.202-9.116-21.237-21.235c0.76-9.538,8.487-17.265,18.026-18.026c12.119-0.965,22.2,9.116,21.235,21.238C67.292,60.304,59.564,68.03,50.028,68.79"/>
+                <path fill="white" d="M280.075,129.194h-16.722c-0.499,0-0.926,0.409-0.99,0.906c-0.739,5.668-5.599,10.057-11.464,10.057s-10.725-4.389-11.464-10.057c-0.064-0.497-0.492-0.906-0.99-0.906h-16.722c-0.575,0-1.046,0.481-1.014,1.053c0.859,15.907,14.073,28.583,30.189,28.583s29.33-12.676,30.189-28.583C281.118,129.676,280.646,129.194,280.075,129.194"/>
+                <path fill="white" d="M173.717,35.545h-18.537c-0.554,0-1.004,0.45-1.004,1.004v31.449c0,0.554-0.45,1.004-1.005,1.004h-31.091c-0.554,0-1.004-0.45-1.004-1.004V36.549c0-0.555-0.45-1.004-1.005-1.004h-18.535c-0.555,0-1.005,0.45-1.005,1.004v37.357v45.053c0,0.558,0.45,1.005,1.005,1.005h25.16c6.119,0,7.592-4.336,7.592-4.336l0.063-0.194c0.201-0.584-0.023-1.024-0.173-1.234c-0.261-0.365-0.686-0.589-1.113-0.589c-0.245,0-0.48,0.068-0.681,0.193c-1.563,1.066-3.387,1.985-5.419,1.985c-5.825,0-10.39-4.818-10.39-10.97c0-5.781,3.912-9.586,8.862-14.402c3.309-3.217,7.056-6.862,10.759-11.995c0.531-0.714,1.092-0.864,1.468-0.864c0.388,0,0.965,0.159,1.503,0.92c3.667,5.116,7.4,8.757,10.693,11.969c4.929,4.805,8.822,8.599,8.822,14.372c0,6.253-4.468,10.97-10.388,10.97c-2.032,0-3.856-0.919-5.417-1.985c-0.201-0.125-0.438-0.193-0.684-0.193c-0.427,0-0.852,0.224-1.113,0.589c-0.15,0.21-0.372,0.65-0.173,1.234l0.063,0.194c0,0,1.473,4.336,7.591,4.336h2.729h22.427c0.556,0,1.004-0.447,1.004-1.005V71.479v-34.93C174.722,35.995,174.273,35.545,173.717,35.545"/>
+                <path fill="white" d="M260.922,61.153v-7.198c0-0.554-0.45-1.004-1.004-1.004h-18.035c-0.557,0-1.007,0.45-1.007,1.004v7.195c0,0.417-0.263,0.784-0.653,0.932c-11.87,4.482-20.182,16.215-19.52,29.801c0.741,15.221,13.053,27.712,28.261,28.661c17.574,1.092,32.168-12.838,32.168-30.176c0-12.936-8.13-23.971-19.557-28.286C261.184,61.935,260.922,61.569,260.922,61.153 M265.764,91.409c-3.913,3.498-10.369,11.161-13.989,17.78c-0.252,0.458-0.585,0.668-0.875,0.668c-0.291,0-0.626-0.21-0.875-0.668c-3.622-6.619-10.076-14.282-13.992-17.78c-0.415-0.373-0.582-0.706-0.582-1.041c0-0.332,0.167-0.624,0.582-1.039c3.706-3.708,10.37-11.161,13.992-17.782c0.249-0.458,0.584-0.666,0.875-0.666c0.29,0,0.623,0.208,0.875,0.666c3.62,6.621,10.284,14.074,13.989,17.782c0.416,0.415,0.585,0.707,0.585,1.039C266.349,90.703,266.18,91.036,265.764,91.409"/>
+                <path fill="white" d="M330.568,59.417c-10.388,0-15.433,3.891-17.326,5.545c-0.295,0.259-0.757,0.048-0.757-0.344V36.435c0-0.554-0.448-1.004-1.005-1.004h-18.03c-0.555,0-1.005,0.45-1.005,1.004v82.524c0,0.555,0.45,1.005,1.005,1.005h23.955c1.699,0,3.337-0.721,4.419-2.024c0.524-0.633,0.995-1.333,1.423-2.162c1.117-2.479-1.404-3.648-3.061-2.813l-1.232,0.622l0.019-0.023c-1.23,0.64-2.625,1.027-4.221,1.027c-5.647,0-10.046-4.2-10.046-10.147c0-5.698,4.551-10.196,9.347-10.196c1.245,0,2.723,0.276,3.764,0.741c0,0,0.018,0.005,0.055,0.022c0.059,0.029,0.116,0.055,0.169,0.082c0.337,0.149,0.958,0.354,1.277,0.016c0.364-0.384-0.109-0.87-0.109-0.87c-1.906-1.966-3.004-4.205-3.004-6.592c0-5.699,4.598-10.396,10.347-10.396c5.752,0,10.349,4.697,10.349,10.396c0,2.387-1.098,4.626-3.004,6.592c0,0-0.474,0.486-0.109,0.87c0.319,0.339,0.94,0.134,1.277-0.016c0.054-0.027,0.11-0.053,0.169-0.082c0.037-0.018,0.055-0.022,0.055-0.022c1.039-0.465,2.52-0.741,3.762-0.741c4.798,0,9.349,4.498,9.349,10.196c0,5.947-4.401,10.147-10.048,10.147c-1.593,0-2.99-0.388-4.219-1.027l0.019,0.023l-1.232-0.622c-1.659-0.836-4.178,0.333-3.061,2.813c0.428,0.829,0.896,1.529,1.423,2.162c1.082,1.304,2.72,2.024,4.419,2.024h23.956c0.556,0,1.006-0.45,1.006-1.005V90.192C360.66,74.542,351.286,59.417,330.568,59.417"/>
+              </g>
+            </svg>
+            <div className="header-title">Sendai Leaders Board</div>
+          </div>
+
+          {loading ? (
+            <div className="loading">読み込み中...</div>
+          ) : (
+            <>
+              <div className="date-row">
+                <div className="date-month">{year}年{month}月</div>
+                <div className="date-stamp">{stamp}</div>
+              </div>
+
+              <div className="leaderboard-section">
+                <div className="section-title">トーナメントランキング</div>
+                <Podium
+                  top3={tTop3}
+                  playersMap={playersMap}
+                  valueFormatter={p => `${formatNumber(p.totalPoints)} pt / ${p.wins}回`}
+                />
+              </div>
+
+              <div className="leaderboard-section">
+                <div className="section-title">リングゲームランキング</div>
+                <Podium
+                  top3={rTop3}
+                  playersMap={playersMap}
+                  valueFormatter={p => formatChips(p.positiveChips)}
+                />
+              </div>
+
+              <div className="pub-footer">https://9high.net/leaderboard/</div>
+            </>
+          )}
+        </div>
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+  </script>
+</body>
+</html>

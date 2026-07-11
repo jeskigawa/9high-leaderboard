@@ -1,0 +1,103 @@
+import subprocess, time, shutil
+
+base = '/var/www/leaderboard'
+
+# 1. Copy leaderboard-pub.html to server directory
+shutil.copy('/tmp/r/leaderboard-pub.html', base + '/leaderboard-pub.html')
+print('1 HTML copied')
+
+# 2. Add Flask route for /leaderboard-pub in app.py
+fa = base + '/app.py'
+sa = open(fa, encoding='utf-8').read()
+
+old2 = ("@app.route('/leaderboard')\n"
+        "def public_leaderboard():\n"
+        "    return send_from_directory('.', '9high-leaderboard.html')")
+new2 = old2 + """
+
+@app.route('/leaderboard-pub')
+def leaderboard_pub_page():
+    return send_from_directory('.', 'leaderboard-pub.html')"""
+
+n2 = sa.count(old2)
+sa = sa.replace(old2, new2)
+open(fa, 'w', encoding='utf-8').write(sa)
+print('2 route:', n2)
+
+# 3. Update index.html: replace doShare with simple version + update modal
+fi = base + '/index.html'
+si = open(fi, encoding='utf-8').read()
+
+# 3a. Add shareTxt state
+old3a = ("      const [showShareModal, setShowShareModal] = useState(false);\n"
+         "      const [shareImgUrl, setShareImgUrl] = useState(null);")
+new3a = ("      const [showShareModal, setShowShareModal] = useState(false);\n"
+         "      const [shareImgUrl, setShareImgUrl] = useState(null);\n"
+         "      const [shareTxt, setShareTxt] = useState('');")
+n3a = si.count(old3a)
+si = si.replace(old3a, new3a)
+print('3a shareTxt state:', n3a)
+
+# 3b. Replace doShare body (canvas generation → simple pub window + tweet text)
+ds_start = "      const doShare = () => {"
+ds_end   = "      // ===== END X SHARE ====="
+i1 = si.find(ds_start)
+i2 = si.find(ds_end, i1)
+if i1 != -1 and i2 != -1:
+    new_doShare = """      const doShare = () => {
+        const now = new Date();
+        const mm = now.getMonth() + 1;
+        const dd = now.getDate();
+        const txt = mm + '月' + dd + '日時点のランキングボードが更新されました！！\\n\\n#仙台ポーカー\\n#9High仙台\\n\\nランキング詳細は↓\\nhttps://9high.net/leaderboard/';
+        setShareTxt(txt);
+        setShowShareModal(true);
+      };
+      """
+    si = si[:i1] + new_doShare + ds_end + si[i2 + len(ds_end):]
+    print('3b doShare replaced')
+else:
+    print('3b doShare: not found i1=%d i2=%d' % (i1, i2))
+
+# 3c. Update modal inner content
+old3c = ('                <p className="lb-share-hint">'
+         '①画像をダウンロード'
+         '　　②Xに投稿ボタンで'
+         '投稿画面へ　　③画像'
+         'を添付</p>')
+
+# Use position-based approach instead
+hint_old = '①画像をダウンロード　②Xに投稿ボタンで投稿画面へ　③画像を添付'
+i_hint = si.find(hint_old)
+if i_hint != -1:
+    # Find the end of the share-actions div
+    actions_end = '</div>'
+    i_end = si.find(actions_end, i_hint)
+    # Find next </div> after that (closes the lb-share-actions)
+    i_end2 = si.find(actions_end, i_end + len(actions_end))
+    if i_end2 != -1:
+        block_end = i_end2 + len(actions_end)
+        new_block = """①ランキング画面を開いてスクリーンショット　②Xに投稿して画像を添付</p>
+                <div className="lb-share-actions">
+                  <button className="lb-share-dl" style={{cursor:'pointer'}} onClick={() => window.open('/leaderboard-pub', 'lbpub', 'width=580,height=860,scrollbars=yes')}>
+                    ランキング画面を開く
+                  </button>
+                  <button className="lb-share-post" onClick={() => window.open('https://twitter.com/intent/tweet?text=' + encodeURIComponent(shareTxt), '_blank')}>\U0001d54f に投稿</button>
+                </div>
+                {shareTxt && (
+                  <div style={{marginTop:10,background:'#f5f5f5',borderRadius:8,padding:'10px 12px',fontSize:11,color:'#444',whiteSpace:'pre-wrap',lineHeight:1.7,userSelect:'all'}}>{shareTxt}</div>
+                )}"""
+        # Replace from hint to end of the nested div
+        si = si[:i_hint] + new_block + si[block_end:]
+        print('3c modal content replaced')
+    else:
+        print('3c: could not find actions end')
+else:
+    print('3c hint not found')
+
+open(fi, 'w', encoding='utf-8').write(si)
+print('index.html saved')
+
+r = subprocess.run(['systemctl', 'restart', 'leaderboard'], capture_output=True, text=True)
+time.sleep(3)
+r2 = subprocess.run(['systemctl', 'is-active', 'leaderboard'], capture_output=True, text=True)
+print('service:', r2.stdout.strip())
