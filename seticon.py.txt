@@ -1,0 +1,69 @@
+import subprocess, os, time, shutil, json
+
+src = '/tmp/r/icon.png'
+static_dir = '/var/www/leaderboard/static'
+os.makedirs(static_dir, exist_ok=True)
+
+if not os.path.exists(src):
+    print('ERROR: /tmp/r/icon.png が見つかりません')
+    import sys; sys.exit(1)
+
+print('icon.png:', os.path.getsize(src), 'bytes')
+
+# 1. アイコンをコピー（iOS・Android共通で512x512をそのまま使用）
+shutil.copy(src, static_dir + '/icon.png')
+shutil.copy(src, static_dir + '/apple-touch-icon.png')
+print('1: アイコンコピー完了')
+
+# 2. Android用 manifest.json を作成
+manifest = {
+    "name": "9HIGH仙台 リーダーボード",
+    "short_name": "9HIGH仙台",
+    "start_url": "/leaderboard/",
+    "display": "standalone",
+    "background_color": "#C3181F",
+    "theme_color": "#C3181F",
+    "icons": [
+        {"src": "/static/icon.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable"}
+    ]
+}
+with open(static_dir + '/manifest.json', 'w', encoding='utf-8') as f:
+    json.dump(manifest, f, ensure_ascii=False, indent=2)
+print('2: manifest.json 作成完了')
+
+# 3. 9high-leaderboard.html にリンクタグを追加
+fh = '/var/www/leaderboard/9high-leaderboard.html'
+s = open(fh, encoding='utf-8').read()
+
+# 既存のファビコンタグを削除してから追加
+if 'rel="icon"' in s or 'rel="apple-touch-icon"' in s or 'rel="manifest"' in s:
+    lines = s.split('\n')
+    lines = [l for l in lines if not any(x in l for x in [
+        'rel="icon"', 'rel="shortcut icon"', 'rel="apple-touch-icon"', 'rel="manifest"'
+    ])]
+    s = '\n'.join(lines)
+    print('3a: 既存ファビコンタグを削除')
+
+links = ('  <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">\n'
+         '  <link rel="shortcut icon" href="/static/favicon.svg">\n'
+         '  <link rel="apple-touch-icon" href="/static/apple-touch-icon.png">\n'
+         '  <link rel="manifest" href="/static/manifest.json">')
+old = '  <title>9HIGH'
+new = links + '\n  <title>9HIGH'
+if s.count(old) == 1:
+    s = s.replace(old, new)
+    open(fh, 'w', encoding='utf-8').write(s)
+    print('3b: リンクタグ追加完了')
+else:
+    print('ERROR: titleタグが見つかりません')
+
+# 4. Flaskで /static/ を配信できるか確認
+r = subprocess.run(['grep', '-n', 'static', '/var/www/leaderboard/app.py'],
+                   capture_output=True, text=True)
+print('4: app.py static設定:', r.stdout[:300] if r.stdout else 'なし')
+
+subprocess.run(['systemctl', 'restart', 'leaderboard'], capture_output=True)
+time.sleep(2)
+r = subprocess.run(['systemctl', 'is-active', 'leaderboard'], capture_output=True, text=True)
+print('service:', r.stdout.strip())
+print('完了！ホーム画面に追加してアイコンを確認してください')
