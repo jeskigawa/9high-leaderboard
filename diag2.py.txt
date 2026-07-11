@@ -1,0 +1,22 @@
+fh = '/var/www/leaderboard/9high-leaderboard.html'
+s = open(fh, encoding='utf-8').read()
+lines = s.split('\n')
+print('TOTAL:', len(lines), 'lines,', len(s), 'bytes')
+
+# 括弧バランスチェック
+ob = s.count('{'); cb = s.count('}')
+op = s.count('('); cp = s.count(')')
+print('braces { }: open=%d close=%d diff=%d' % (ob, cb, ob-cb))
+print('parens ( ): open=%d close=%d diff=%d' % (op, cp, op-cp))
+
+# 重要マーカーの行番号
+print('=== 構造 ===')
+for i, ln in enumerate(lines):
+    ls = ln.strip()
+    if any(ls.startswith(m) for m in ['<script','</script','ReactDOM','function ','const [','return (','// ===','useState(']):
+        print('L%d: %s' % (i+1, ls[:100]))
+
+# 最後50行
+print('=== LAST 50 LINES ===')
+for i, ln in enumerate(lines[max(0,len(lines)-50):]):
+    print('%d: %s' % (len(lines)-50+i+1, ln[:120]))
